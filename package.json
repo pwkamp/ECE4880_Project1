@@ -11,16 +11,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "twilio": "^6.1.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "@types/supertest": "^7.2.1",
     "@vitejs/plugin-react": "^6.1.0",
+    "concurrently": "^10.0.5",
     "jsdom": "^25.0.1",
     "oxlint": "^1.79.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.23.13",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
     "vitest": "^3.2.7"
