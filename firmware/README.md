@@ -1,0 +1,1 @@
+This is where all the esp32-side code will be stored (ESP IDF Project directory)

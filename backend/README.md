@@ -1,0 +1,1 @@
+Folder for the backend BLE client code which acts as a gateway between the esp32 and the Web application
