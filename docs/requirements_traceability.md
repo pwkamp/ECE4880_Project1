@@ -75,3 +75,16 @@ uses authenticated localhost REST control between the web backend and the BLE
 service. Confirmed display results are still passed to the database adapter,
 but the MySQL queue requirements are **not implemented** and are not claimed by
 this repository.
+
+## Database subsystem
+
+| Requirement(s) | Jira issue(s) | Status | Implementation / verification |
+|---|---|---|---|
+| SWE-DB-MLR-551 | SCRUM-531 | Implemented | temperature_samples persists probe1, probe2, and computed-average series with per-series value + status and sample identity (boot_id, sample_seq). Note: implementation status vocabulary (VALID/DISCONNECTED/NOT_RETRIEVED/MISSING) differs from this requirement's text (unplugged-sensor/no-data/provisional/derived-unavailable); reconciliation flagged for team. |
+| SWE-DB-LLR-550 | SCRUM-550 | Implemented | temperature_samples created with all specified fields except device_id, which is intentionally omitted: single-device system per spec, and the adapter identifies the device by BLE address/name, not a stored id. Deviation flagged for review. |
+| SWE-DB-LLR-551 | SCRUM-551 | Acceptance pending | UNIQUE KEY (boot_id, sample_seq) enforces real-sample uniqueness (natural key demoted from PK to allow NULL-keyed PROVISIONAL rows under a surrogate id). Duplicate-rejection verified manually (error 1062); reproducible verification not yet committed. |
+| SWE-DB-LLR-552 | SCRUM-552 | Acceptance pending | Index entry_index (observed_at_utc) created (device_id dropped, so keyed on time alone). EXPLAIN verification incomplete on the required query forms. |
+| SWE-DB-LLR-559 | SCRUM-559 | Implemented | Temperature fields (sensor1_c, sensor2_c, average_c) typed DECIMAL(5,2), stored in Celsius, matching the i16 centi-Celsius wire format. |
+| SWE-DB-LLR-560 | SCRUM-560 | Acceptance pending | observed_at_utc typed DATETIME. UTC compliance requires the MySQL server timezone set to UTC; server currently runs local time, so DB-generated defaults are not yet UTC. |
+
+See [backend/database/README.md](../backend/database/README.md) for schema design decisions and open flags.
