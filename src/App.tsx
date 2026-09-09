@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AlertLog } from './components/AlertLog';
 import { AlertSettings } from './components/AlertSettings';
 import { ChartRecorder } from './components/ChartRecorder';
@@ -6,33 +6,49 @@ import { DebugPanel } from './components/DebugPanel';
 import { RealtimeReadout } from './components/RealtimeReadout';
 import { SensorControls } from './components/SensorControls';
 import { SENSOR_IDS } from './datasource/types';
+import { useAlertEngine } from './hooks/useAlertEngine';
+import { useAlertNotifier } from './hooks/useAlertNotifier';
 import { useThermometer } from './hooks/useThermometer';
 import {
-  DEFAULT_ALERT_CONFIG,
-  EMPTY_LATCH,
-  evaluateAlerts,
-  type AlertConfig,
-  type AlertLatch,
-  type SimulatedAlert,
-} from './lib/alerts';
+  AlertSource,
+  type AlertRecipient,
+  type AlertRule,
+} from './lib/alertEngine';
+import { DEFAULT_ALERT_CONFIG, type AlertConfig } from './lib/alerts';
 import type { Unit } from './lib/temperature';
 
-const MAX_LOG = 40;
+/** Sent when a sensor comes back inside the configured band (SCRUM-624). */
+const CLEAR_MESSAGE = 'Temperature back within the configured range.';
 
 export default function App() {
   const { frame, history } = useThermometer();
   const [unit, setUnit] = useState<Unit>('C');
   const [alertConfig, setAlertConfig] = useState<AlertConfig>(DEFAULT_ALERT_CONFIG);
-  const [alerts, setAlerts] = useState<SimulatedAlert[]>([]);
-  const latchRef = useRef<AlertLatch>(EMPTY_LATCH);
 
-  useEffect(() => {
-    const { latch, fired } = evaluateAlerts(frame, alertConfig, latchRef.current);
-    latchRef.current = latch;
-    if (fired.length > 0) {
-      setAlerts((prev) => [...fired.reverse(), ...prev].slice(0, MAX_LOG));
-    }
-  }, [frame, alertConfig]);
+  // Adapt the single UI config into the alert engine's rule/recipient model.
+  // One rule per physical sensor; the destination becomes the sole recipient.
+  const rules = useMemo<AlertRule[]>(() => {
+    const shared = {
+      minC: alertConfig.minC,
+      maxC: alertConfig.maxC,
+      enabled: alertConfig.enabled,
+      highMessage: alertConfig.maxMessage,
+      lowMessage: alertConfig.minMessage,
+      clearMessage: CLEAR_MESSAGE,
+    };
+    return [
+      { id: 'sensor-1', source: AlertSource.SENSOR_1, ...shared },
+      { id: 'sensor-2', source: AlertSource.SENSOR_2, ...shared },
+    ];
+  }, [alertConfig]);
+
+  const recipients = useMemo<AlertRecipient[]>(
+    () => [{ id: 'primary', destination: alertConfig.destination, enabled: true }],
+    [alertConfig.destination],
+  );
+
+  const alerts = useAlertEngine(frame, rules, recipients);
+  const delivery = useAlertNotifier(alerts);
 
   return (
     <div className="app">
@@ -69,7 +85,7 @@ export default function App() {
       <div className="panels">
         <SensorControls frame={frame} />
         <AlertSettings config={alertConfig} onChange={setAlertConfig} unit={unit} />
-        <AlertLog alerts={alerts} unit={unit} />
+        <AlertLog alerts={alerts} unit={unit} delivery={delivery} />
         <DebugPanel frame={frame} />
       </div>
     </div>

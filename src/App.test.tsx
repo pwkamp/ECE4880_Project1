@@ -7,12 +7,14 @@ let container: HTMLDivElement;
 
 beforeEach(() => {
   vi.useFakeTimers({ now: Date.now() });
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 503 })));
   container = document.createElement('div');
   document.body.appendChild(container);
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
   container.remove();
 });
 

@@ -49,7 +49,34 @@ save; `Ctrl+C` stops it.
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | oxlint |
 
-No cloud services, API keys, or internet access are required.
+No cloud services, API keys, or internet access are required for the default
+console (mock data + logged SMS).
+
+## Running with SMS alerts
+
+`npm run dev` starts the web app **and** a small delivery service
+(`server/`, on `127.0.0.1:8787`). The browser evaluates alerts against the
+mock sensor data as usual and POSTs each HIGH/LOW transition to the service.
+
+Delivery mode is set by `server/.env` (copy from `server/.env.example`):
+
+| `SMS_MODE` | Behaviour | Needs |
+| --- | --- | --- |
+| `console` (default) | Logs the message to the server console. Nothing is sent. | nothing |
+| `test` | Calls the Twilio API with **test credentials** and [magic numbers](https://www.twilio.com/docs/iam/test-credentials). Exercises the real request path without sending or charging. | Twilio test SID/token; `TWILIO_FROM_NUMBER=+15005550006` |
+| `live` | Sends a real SMS. | Twilio live SID/token, an SMS-capable Twilio number, and (on a trial account) a verified destination number |
+
+Set the destination phone number in the app's **Threshold alerts** panel
+(E.164 format, e.g. `+15551234567`). The default destination is already a
+valid dummy E.164 number. To test end to end in `console` mode:
+open the app, use the **Demo controls** to pin a sensor above 50 °C, and
+watch the **api** terminal for a line like
+`Text message sent to +15555550123: "Temperature high: …"` and the app's Alert
+activity panel for the delivery badge.
+
+If `ALERT_API_TOKEN` is set in `server/.env`, also set
+`VITE_ALERT_API_TOKEN` (same value) in a root `.env` file so the frontend
+can authenticate.
 
 ---
 
@@ -80,12 +107,13 @@ No cloud services, API keys, or internet access are required.
   clipped to the top or bottom rail. The numeric readout still shows the true
   value with an "off chart scale" note.
 
-**Threshold alerts (simulated)**
+**Threshold alerts**
 - Configure max threshold, min threshold, an independent custom message for
-  each, and a destination (phone number or email — free text).
-- Crossing a threshold logs a `SIMULATED ALERT` entry showing the message and
-  destination. Nothing is actually sent (see
-  [Phone / email alert delivery](#phone--email-alert-delivery)).
+  each, and an E.164 destination phone number.
+- Crossing a threshold logs a `SIMULATED ALERT` entry and POSTs the event to
+  the local delivery service (see
+  [Running with SMS alerts](#running-with-sms-alerts)). In the default
+  `console` mode the service logs the SMS and does not send anything.
 - Fires **once per crossing**, not every second. Re-arms only after the reading
   returns inside the band.
 
@@ -312,23 +340,10 @@ with a certificate on the box/broker.
 
 ### Phone / email alert delivery
 
-The alert **logic** is done (thresholds, custom messages, once-per-crossing,
-destination field). Actually delivering a text or email needs, separately from
-the hardware work:
+SMS delivery is implemented: see [Running with SMS alerts](#running-with-sms-alerts).
+Default `console` mode needs no API keys. Real Twilio send is optional (`SMS_MODE=live`).
 
-1. **A backend endpoint** — the provider API key is a secret and cannot live in
-   the browser. Smallest option: one serverless function or a tiny Express
-   route, `POST /api/notify`.
-2. **A provider account:**
-   - *Email* (low friction, recommended for the demo): Resend, SendGrid, AWS
-     SES, or SMTP with a Gmail app password.
-   - *SMS*: Twilio / Vonage / AWS SNS. For US numbers this also requires buying
-     a sending number and completing A2P 10DLC registration, which has fees and
-     a multi-day review — start early if a real text is required.
-3. **A `notify/` module** mirroring the data-source seam: an `AlertNotifier`
-   interface with `send(alert)`, a `ConsoleNotifier` (today's behaviour) and an
-   `HttpNotifier` that POSTs fired alerts to the backend. `App.tsx` calls
-   `notifier.send(alert)` at the same point it currently appends to the log.
+Email delivery is still out of scope.
 
 ---
 

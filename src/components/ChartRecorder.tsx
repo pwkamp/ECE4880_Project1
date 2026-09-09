@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { SensorId, ThermometerFrame } from '../datasource/types';
+import {
+  isPinnedToLive,
+  liveScrollLeft,
+  plotWidthPx,
+  WINDOW_S,
+} from '../lib/chartScroll';
 import { SCALE_C, cToF, scaleFraction, type Unit } from '../lib/temperature';
 
 interface Props {
@@ -9,9 +15,9 @@ interface Props {
   unit: Unit;
 }
 
-const WINDOW_S = 300;
 const HEIGHT = 340;
-const M = { top: 16, right: 16, bottom: 36, left: 52 };
+const M = { top: 16, right: 16, bottom: 36, left: 12 };
+const Y_LABEL_W = 44;
 
 const COLOR: Record<SensorId, string> = { 1: '#1f5c8b', 2: '#b3541e' };
 const GRID = '#e4e4e4';
@@ -37,18 +43,39 @@ interface Sample {
 export function ChartRecorder({ history, nowMs, unit }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(720);
+  const pinnedRef = useRef(true);
+  const dragRef = useRef<{ x: number; scrollLeft: number } | null>(null);
+  const [viewportW, setViewportW] = useState(720);
+
+  const canvasCssW = M.left + M.right + plotWidthPx(viewportW, M.left + M.right);
 
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width;
-      if (w) setWidth(Math.max(360, Math.floor(w)));
+      if (w) setViewportW(Math.max(360, Math.floor(w)));
     });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      el.scrollLeft += e.deltaY + e.deltaX;
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el || !pinnedRef.current) return;
+    el.scrollLeft = liveScrollLeft(el.scrollWidth, el.clientWidth);
+  }, [history, nowMs, canvasCssW]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -57,14 +84,14 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = width * dpr;
+    canvas.width = canvasCssW * dpr;
     canvas.height = HEIGHT * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, HEIGHT);
+    ctx.clearRect(0, 0, canvasCssW, HEIGHT);
 
     const plot = {
       left: M.left,
-      right: width - M.right,
+      right: canvasCssW - M.right,
       top: M.top,
       bottom: HEIGHT - M.bottom,
     };
@@ -90,9 +117,6 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       ctx.moveTo(plot.left, y);
       ctx.lineTo(plot.right, y);
       ctx.stroke();
-      const label = unit === 'C' ? String(c) : String(Math.round(cToF(c)));
-      ctx.textAlign = 'right';
-      ctx.fillText(label, plot.left - 8, y);
     }
 
     // --- X axis (seconds ago) ---
@@ -107,7 +131,6 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       ctx.fillStyle = AXIS_TEXT;
       ctx.fillText(String(s), x, plot.bottom + 14);
     }
-    ctx.fillText('seconds ago from current time', (plot.left + plot.right) / 2, plot.bottom + 28);
 
     // plot border
     ctx.strokeStyle = '#bdbdbd';
@@ -125,12 +148,69 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     });
 
     drawLegend(ctx, plot.right, plot.top);
-  }, [history, nowMs, unit, width]);
+  }, [history, nowMs, unit, canvasCssW]);
+
+  const yTicks: Array<{ c: number; y: number; label: string }> = [];
+  {
+    const plotH = HEIGHT - M.top - M.bottom;
+    for (let c = SCALE_C.min; c <= SCALE_C.max; c += 10) {
+      yTicks.push({
+        c,
+        y: M.top + (1 - clamp01(scaleFraction(c))) * plotH,
+        label: unit === 'C' ? String(c) : String(Math.round(cToF(c))),
+      });
+    }
+  }
 
   return (
-    <div className="chart-wrap" ref={wrapRef}>
-      <canvas ref={canvasRef} style={{ width: '100%', height: HEIGHT }} />
-    </div>
+    <>
+      <p className="chart-hint">
+        Drag or scroll sideways to look back (300 s). Newest readings stay on the
+        right.
+      </p>
+      <div className="chart-frame">
+        <div className="chart-y-labels" style={{ height: HEIGHT, width: Y_LABEL_W }} aria-hidden>
+          {yTicks.map((t) => (
+            <span key={t.c} style={{ top: t.y }}>
+              {t.label}
+            </span>
+          ))}
+        </div>
+        <div
+          className="chart-wrap"
+          ref={wrapRef}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          pinnedRef.current = isPinnedToLive(el.scrollLeft, el.scrollWidth, el.clientWidth);
+        }}
+        onPointerDown={(e) => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          const el = wrapRef.current;
+          if (!el) return;
+          dragRef.current = { x: e.clientX, scrollLeft: el.scrollLeft };
+          el.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          const drag = dragRef.current;
+          const el = wrapRef.current;
+          if (!drag || !el) return;
+          el.scrollLeft = drag.scrollLeft - (e.clientX - drag.x);
+        }}
+        onPointerUp={() => {
+          dragRef.current = null;
+        }}
+        onPointerCancel={() => {
+          dragRef.current = null;
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          style={{ width: canvasCssW, height: HEIGHT, display: 'block' }}
+        />
+      </div>
+      </div>
+      <p className="chart-xaxis-caption">seconds ago from current time</p>
+    </>
   );
 }
 

@@ -76,7 +76,7 @@ export function AlertSettings({ config, onChange, unit }: Props) {
         />
       </label>
       <label className="field-block">
-        Destination (phone or email)
+        Destination (E.164 phone, e.g. +15555550123)
         <input
           type="text"
           value={config.destination}

@@ -4,7 +4,7 @@ import type { SmsSender } from './types.ts';
 export function createConsoleSmsSender(): SmsSender {
   return {
     async send(msg) {
-      console.log(`[sms:console] to=${msg.to} body=${JSON.stringify(msg.body)}`);
+      console.log(`Text message sent to ${msg.to}: ${JSON.stringify(msg.body)}`);
       return { status: 'logged' };
     },
   };

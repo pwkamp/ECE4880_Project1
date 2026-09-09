@@ -7,8 +7,9 @@ it('logs the message and reports "logged"', async () => {
     const result = await createConsoleSmsSender().send({ to: '+15005550006', body: 'sensor 1 hot' });
     expect(result).toEqual({ status: 'logged' });
     expect(spy).toHaveBeenCalledOnce();
-    expect(String(spy.mock.calls[0][0])).toContain('+15005550006');
-    expect(String(spy.mock.calls[0][0])).toContain('sensor 1 hot');
+    expect(String(spy.mock.calls[0][0])).toBe(
+      'Text message sent to +15005550006: "sensor 1 hot"',
+    );
   } finally {
     spy.mockRestore();
   }
