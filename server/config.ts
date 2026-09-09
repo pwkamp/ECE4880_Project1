@@ -11,6 +11,8 @@ export interface Config {
   port: number;
   apiToken: string | null;
   twilio: TwilioConfig | null;
+  /** mysql:// URL for temperature_samples. Null means the DB reader is off. */
+  mysqlUrl: string | null;
 }
 
 const MODES: readonly SmsMode[] = ['console', 'test', 'live'];
@@ -47,5 +49,5 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     twilio = { accountSid, authToken, fromNumber };
   }
 
-  return { mode, port, apiToken, twilio };
+  return { mode, port, apiToken, twilio, mysqlUrl: env.MYSQL_URL || null };
 }

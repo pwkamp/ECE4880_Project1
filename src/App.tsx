@@ -3,9 +3,10 @@ import { AlertLog } from './components/AlertLog';
 import { AlertSettings } from './components/AlertSettings';
 import { ChartRecorder } from './components/ChartRecorder';
 import { DebugPanel } from './components/DebugPanel';
+import { DevicePanel } from './components/DevicePanel';
 import { RealtimeReadout } from './components/RealtimeReadout';
 import { SensorControls } from './components/SensorControls';
-import { SENSOR_IDS } from './datasource/types';
+import { thermometerSource, SENSOR_IDS, supportsBle } from './datasource';
 import { useAlertEngine } from './hooks/useAlertEngine';
 import { useAlertNotifier } from './hooks/useAlertNotifier';
 import { useThermometer } from './hooks/useThermometer';
@@ -55,7 +56,11 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1>Networked Thermometer</h1>
-          <p className="subtitle">Computer console &mdash; mock data source</p>
+          <p className="subtitle">
+            {supportsBle(thermometerSource)
+              ? 'Computer console — Python BLE connector'
+              : 'Computer console — mock data source'}
+          </p>
         </div>
         <div className="unit-toggle" role="group" aria-label="Temperature unit">
           {(['C', 'F'] as Unit[]).map((u) => (
@@ -83,6 +88,7 @@ export default function App() {
       </section>
 
       <div className="panels">
+        <DevicePanel />
         <SensorControls frame={frame} />
         <AlertSettings config={alertConfig} onChange={setAlertConfig} unit={unit} />
         <AlertLog alerts={alerts} unit={unit} delivery={delivery} />

@@ -48,8 +48,9 @@ export function useThermometer(): ThermometerState {
     });
 
     const unsubscribe = thermometerSource.subscribe((frame) => {
+      const seeded = thermometerSource.getHistory(WINDOW_SECONDS);
       const next = trim(
-        [...historyRef.current, frame],
+        seeded.length > 0 ? seeded : [...historyRef.current, frame],
         frame.timestamp,
       );
       historyRef.current = next;

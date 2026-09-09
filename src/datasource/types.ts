@@ -124,3 +124,27 @@ export function supportsSim(
 ): source is ThermometerSource & ThermometerSimControls {
   return typeof (source as Partial<ThermometerSimControls>).simReset === 'function';
 }
+
+/**
+ * Optional BLE connector controls. The Python FastAPI service owns the radio;
+ * the console only scans, connects, and toggles displays through that API.
+ */
+export interface BleConnector {
+  scan(): Promise<Array<{ name: string; address: string; rssi: number | null }>>;
+  connect(address: string, passkey?: string): Promise<void>;
+  disconnect(): Promise<void>;
+  reconnect(): Promise<void>;
+  getConnectionStatus(): {
+    phase: string;
+    connected: boolean;
+    ready: boolean;
+    target: { name: string; address: string } | null;
+    last_error: string | null;
+  };
+}
+
+export function supportsBle(
+  source: ThermometerSource,
+): source is ThermometerSource & BleConnector {
+  return typeof (source as Partial<BleConnector>).scan === 'function';
+}

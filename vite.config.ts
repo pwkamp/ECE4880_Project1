@@ -6,7 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:8787',
+      // FastAPI BLE connector (backend/main.py). More specific than /api.
+      '/api/v1': 'http://127.0.0.1:8000',
+      '/api': 'http://127.0.0.1:8787',
     },
   },
 })

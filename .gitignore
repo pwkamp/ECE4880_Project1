@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 server/.env
+.env
+!.env.example
+backend/.venv/
+backend/paired_devices.csv
+**/__pycache__/
+.venv/
+venv/
 
 # Editor directories and files
 .vscode/*

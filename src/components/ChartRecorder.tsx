@@ -3,10 +3,15 @@ import type { SensorId, ThermometerFrame } from '../datasource/types';
 import {
   isPinnedToLive,
   liveScrollLeft,
+  plotHeightPx,
   plotWidthPx,
+  specWindowScrollTop,
   WINDOW_S,
+  yFraction,
+  Y_PLOT_MAX,
+  Y_PLOT_MIN,
 } from '../lib/chartScroll';
-import { SCALE_C, cToF, scaleFraction, type Unit } from '../lib/temperature';
+import { cToF, type Unit } from '../lib/temperature';
 
 interface Props {
   history: ThermometerFrame[];
@@ -15,7 +20,7 @@ interface Props {
   unit: Unit;
 }
 
-const HEIGHT = 340;
+const VIEWPORT_H = 340;
 const M = { top: 16, right: 16, bottom: 36, left: 12 };
 const Y_LABEL_W = 44;
 
@@ -32,22 +37,31 @@ interface Sample {
 /**
  * A fixed-scale chart recorder.
  *
- *  - Y axis is fixed at 10-50 C (50-122 F) and never auto-scales.
+ *  - Drawable Y is 0–60 C; the default view is the spec window 10–50 C.
  *  - X axis is "seconds ago", 300 on the left to 0 on the right.
  *  - New points enter at the right; the trace scrolls left; old points fall off.
  *  - Missing data (switch off / unplugged / display off) is drawn as a
- *    hatched band in the sensor's colour. Off-scale readings are drawn as a
- *    solid triangle clipped to the rail. The two are deliberately distinct.
+ *    hatched band in the sensor's colour. Off-scale readings (outside 0–60 C)
+ *    are drawn as a solid triangle clipped to the rail. The two are distinct.
  *  - The chart keeps scrolling during an outage.
  */
 export function ChartRecorder({ history, nowMs, unit }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
-  const dragRef = useRef<{ x: number; scrollLeft: number } | null>(null);
+  const vInitRef = useRef(false);
+  const dragRef = useRef<{
+    x: number;
+    y: number;
+    scrollLeft: number;
+    scrollTop: number;
+  } | null>(null);
   const [viewportW, setViewportW] = useState(720);
 
-  const canvasCssW = M.left + M.right + plotWidthPx(viewportW, M.left + M.right);
+  const plotW = plotWidthPx(viewportW, M.left + M.right);
+  const plotH = plotHeightPx(VIEWPORT_H, M.top + M.bottom);
+  const canvasCssW = M.left + M.right + plotW;
+  const canvasCssH = M.top + M.bottom + plotH;
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -60,22 +74,17 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      el.scrollLeft += e.deltaY + e.deltaX;
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, []);
-
   useLayoutEffect(() => {
     const el = wrapRef.current;
-    if (!el || !pinnedRef.current) return;
-    el.scrollLeft = liveScrollLeft(el.scrollWidth, el.clientWidth);
-  }, [history, nowMs, canvasCssW]);
+    if (!el) return;
+    if (!vInitRef.current) {
+      el.scrollTop = specWindowScrollTop(M.top, plotH);
+      vInitRef.current = true;
+    }
+    if (pinnedRef.current) {
+      el.scrollLeft = liveScrollLeft(el.scrollWidth, el.clientWidth);
+    }
+  }, [history, nowMs, canvasCssW, plotH]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -85,41 +94,37 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = canvasCssW * dpr;
-    canvas.height = HEIGHT * dpr;
+    canvas.height = canvasCssH * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, canvasCssW, HEIGHT);
+    ctx.clearRect(0, 0, canvasCssW, canvasCssH);
 
     const plot = {
       left: M.left,
       right: canvasCssW - M.right,
       top: M.top,
-      bottom: HEIGHT - M.bottom,
+      bottom: canvasCssH - M.bottom,
     };
-    const plotW = plot.right - plot.left;
-    const plotH = plot.bottom - plot.top;
 
     const xFor = (secondsAgo: number) =>
       plot.right - (secondsAgo / WINDOW_S) * plotW;
-    const yForFrac = (frac: number) =>
-      plot.bottom - clamp01(frac) * plotH;
+    const yForC = (celsius: number) =>
+      plot.bottom - yFraction(celsius) * plotH;
 
     ctx.font =
       "11px ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
     ctx.textBaseline = 'middle';
 
-    // --- grid + Y axis (fixed scale) ---
     ctx.strokeStyle = GRID;
     ctx.fillStyle = AXIS_TEXT;
     ctx.lineWidth = 1;
-    for (let c = SCALE_C.min; c <= SCALE_C.max; c += 10) {
-      const y = yForFrac(scaleFraction(c));
+    for (let c = Y_PLOT_MIN; c <= Y_PLOT_MAX; c += 10) {
+      const y = yForC(c);
       ctx.beginPath();
       ctx.moveTo(plot.left, y);
       ctx.lineTo(plot.right, y);
       ctx.stroke();
     }
 
-    // --- X axis (seconds ago) ---
     ctx.textAlign = 'center';
     for (let s = 0; s <= WINDOW_S; s += 60) {
       const x = xFor(s);
@@ -132,11 +137,9 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       ctx.fillText(String(s), x, plot.bottom + 14);
     }
 
-    // plot border
     ctx.strokeStyle = '#bdbdbd';
     ctx.strokeRect(plot.left, plot.top, plotW, plotH);
 
-    // --- per-sensor series ---
     ([1, 2] as SensorId[]).forEach((sensorId) => {
       const samples: Sample[] = history.map((f) => ({
         x: xFor((nowMs - f.timestamp) / 1000),
@@ -144,78 +147,91 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       }));
 
       drawMissingBands(ctx, samples, plot.top, plot.bottom, sensorId);
-      drawTrace(ctx, samples, yForFrac, plot, sensorId);
+      drawTrace(ctx, samples, yForC, plot, sensorId);
     });
 
-    drawLegend(ctx, plot.right, plot.top);
-  }, [history, nowMs, unit, canvasCssW]);
+    drawLegend(ctx, plot.right, yForC(50));
+  }, [history, nowMs, unit, canvasCssW, canvasCssH, plotW, plotH]);
 
   const yTicks: Array<{ c: number; y: number; label: string }> = [];
-  {
-    const plotH = HEIGHT - M.top - M.bottom;
-    for (let c = SCALE_C.min; c <= SCALE_C.max; c += 10) {
-      yTicks.push({
-        c,
-        y: M.top + (1 - clamp01(scaleFraction(c))) * plotH,
-        label: unit === 'C' ? String(c) : String(Math.round(cToF(c))),
-      });
-    }
+  for (let c = Y_PLOT_MIN; c <= Y_PLOT_MAX; c += 10) {
+    yTicks.push({
+      c,
+      y: M.top + (1 - yFraction(c)) * plotH,
+      label: unit === 'C' ? String(c) : String(Math.round(cToF(c))),
+    });
   }
 
   return (
     <>
       <p className="chart-hint">
-        Drag or scroll sideways to look back (300 s). Newest readings stay on the
-        right.
+        Drag or scroll to look back in time or up and down the temperature scale.
+        Newest readings stay on the right; the default view is 10–50 °C.
       </p>
       <div className="chart-frame">
-        <div className="chart-y-labels" style={{ height: HEIGHT, width: Y_LABEL_W }} aria-hidden>
-          {yTicks.map((t) => (
-            <span key={t.c} style={{ top: t.y }}>
-              {t.label}
-            </span>
-          ))}
-        </div>
         <div
           className="chart-wrap"
           ref={wrapRef}
-        onScroll={(e) => {
-          const el = e.currentTarget;
-          pinnedRef.current = isPinnedToLive(el.scrollLeft, el.scrollWidth, el.clientWidth);
-        }}
-        onPointerDown={(e) => {
-          if (e.pointerType === 'mouse' && e.button !== 0) return;
-          const el = wrapRef.current;
-          if (!el) return;
-          dragRef.current = { x: e.clientX, scrollLeft: el.scrollLeft };
-          el.setPointerCapture(e.pointerId);
-        }}
-        onPointerMove={(e) => {
-          const drag = dragRef.current;
-          const el = wrapRef.current;
-          if (!drag || !el) return;
-          el.scrollLeft = drag.scrollLeft - (e.clientX - drag.x);
-        }}
-        onPointerUp={() => {
-          dragRef.current = null;
-        }}
-        onPointerCancel={() => {
-          dragRef.current = null;
-        }}
-      >
-        <canvas
-          ref={canvasRef}
-          style={{ width: canvasCssW, height: HEIGHT, display: 'block' }}
-        />
-      </div>
+          style={{ height: VIEWPORT_H }}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            pinnedRef.current = isPinnedToLive(
+              el.scrollLeft,
+              el.scrollWidth,
+              el.clientWidth,
+            );
+          }}
+          onPointerDown={(e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const el = wrapRef.current;
+            if (!el) return;
+            dragRef.current = {
+              x: e.clientX,
+              y: e.clientY,
+              scrollLeft: el.scrollLeft,
+              scrollTop: el.scrollTop,
+            };
+            el.setPointerCapture(e.pointerId);
+          }}
+          onPointerMove={(e) => {
+            const drag = dragRef.current;
+            const el = wrapRef.current;
+            if (!drag || !el) return;
+            el.scrollLeft = drag.scrollLeft - (e.clientX - drag.x);
+            el.scrollTop = drag.scrollTop - (e.clientY - drag.y);
+          }}
+          onPointerUp={() => {
+            dragRef.current = null;
+          }}
+          onPointerCancel={() => {
+            dragRef.current = null;
+          }}
+        >
+          <div
+            className="chart-scroll-inner"
+            style={{ width: Y_LABEL_W + canvasCssW, height: canvasCssH }}
+          >
+            <div
+              className="chart-y-labels"
+              style={{ height: canvasCssH, width: Y_LABEL_W }}
+              aria-hidden
+            >
+              {yTicks.map((t) => (
+                <span key={t.c} style={{ top: t.y }}>
+                  {t.label}
+                </span>
+              ))}
+            </div>
+            <canvas
+              ref={canvasRef}
+              style={{ width: canvasCssW, height: canvasCssH, display: 'block' }}
+            />
+          </div>
+        </div>
       </div>
       <p className="chart-xaxis-caption">seconds ago from current time</p>
     </>
   );
-}
-
-function clamp01(n: number): number {
-  return n < 0 ? 0 : n > 1 ? 1 : n;
 }
 
 function drawMissingBands(
@@ -279,7 +295,7 @@ function paintBand(
 function drawTrace(
   ctx: CanvasRenderingContext2D,
   samples: Sample[],
-  yForFrac: (f: number) => number,
+  yForC: (c: number) => number,
   plot: { top: number; bottom: number },
   sensorId: SensorId,
 ) {
@@ -293,19 +309,17 @@ function drawTrace(
       penDown = false;
       continue;
     }
-    const y = yForFrac(scaleFraction(s.celsius));
+    const y = yForC(s.celsius);
     if (penDown) ctx.lineTo(s.x, y);
     else ctx.moveTo(s.x, y);
     penDown = true;
   }
   ctx.stroke();
 
-  // Off-scale markers: triangle clipped to the rail.
   for (const s of samples) {
     if (s.celsius == null) continue;
-    const frac = scaleFraction(s.celsius);
-    if (frac >= 0 && frac <= 1) continue;
-    const high = frac > 1;
+    if (s.celsius >= Y_PLOT_MIN && s.celsius <= Y_PLOT_MAX) continue;
+    const high = s.celsius > Y_PLOT_MAX;
     const y = high ? plot.top : plot.bottom;
     ctx.fillStyle = color;
     ctx.beginPath();

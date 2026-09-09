@@ -33,3 +33,10 @@ it('reads PORT and ALERT_API_TOKEN overrides', () => {
   expect(c.port).toBe(9000);
   expect(c.apiToken).toBe('sekret');
 });
+
+it('reads MYSQL_URL when provided', () => {
+  const c = loadConfig({
+    MYSQL_URL: 'mysql://user:pass@127.0.0.1:3306/thermometer',
+  } as NodeJS.ProcessEnv);
+  expect(c.mysqlUrl).toBe('mysql://user:pass@127.0.0.1:3306/thermometer');
+});

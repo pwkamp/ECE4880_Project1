@@ -4,7 +4,13 @@ import { createApp } from './app.ts';
 import type { Config } from './config.ts';
 import type { SmsSender } from './sms/types.ts';
 
-const consoleConfig: Config = { mode: 'console', port: 8787, apiToken: null, twilio: null };
+const consoleConfig: Config = {
+  mode: 'console',
+  port: 8787,
+  apiToken: null,
+  twilio: null,
+  mysqlUrl: null,
+};
 const okSender: SmsSender = { async send() { return { status: 'logged' }; } };
 
 const validEvent = {
@@ -32,11 +38,22 @@ it('POST /api/notify returns 400 for a bad destination', async () => {
   expect(res.status).toBe(400);
 });
 
-it('GET /api/health reports the mode', async () => {
+it('GET /api/health reports the mode', () => {
   const app = createApp({ config: consoleConfig, sender: okSender });
-  const res = await request(app).get('/api/health');
-  expect(res.status).toBe(200);
-  expect(res.body).toEqual({ status: 'ok', mode: 'console' });
+  return request(app)
+    .get('/api/health')
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ status: 'ok', mode: 'console' });
+    });
+});
+
+it('GET /api/samples reports the DB reader as unconfigured by default', async () => {
+  const app = createApp({ config: consoleConfig, sender: okSender });
+  const latest = await request(app).get('/api/samples/latest');
+  const history = await request(app).get('/api/samples?seconds=300');
+  expect(latest.body).toEqual({ configured: false, row: null });
+  expect(history.body).toEqual({ configured: false, rows: [] });
 });
 
 it('enforces the bearer token when one is configured', async () => {
