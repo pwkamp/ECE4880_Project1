@@ -1,0 +1,3 @@
+# Copy this file to device_config.cmake and give every ESP32 its own passkey.
+# device_config.cmake is intentionally ignored by source control.
+set(THERMOMETER_PAIRING_PASSKEY "000000")

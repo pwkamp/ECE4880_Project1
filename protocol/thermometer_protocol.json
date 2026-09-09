@@ -1,0 +1,180 @@
+{
+  "bluetooth": {
+    "device_name_prefix": "Thermometer-",
+    "service_uuid": "7e570001-7e57-4a11-9d8b-5f21d8a0c001",
+    "request_characteristic_uuid": "7e570002-7e57-4a11-9d8b-5f21d8a0c001",
+    "response_characteristic_uuid": "7e570003-7e57-4a11-9d8b-5f21d8a0c001",
+    "preferred_att_mtu": 247,
+    "advertising_interval_ms": {
+      "minimum": 800,
+      "maximum": 1000
+    },
+    "preferred_connection": {
+      "minimum_interval_ms": 200,
+      "maximum_interval_ms": 200,
+      "peripheral_latency": 1,
+      "supervision_timeout_ms": 6000
+    }
+  },
+  "device": {
+    "sensor_count": 2,
+    "history_capacity_records": 300,
+    "sample_period_ms": 1000,
+    "sampling_task_stack_bytes": 3072,
+    "sampling_task_priority": 5,
+    "failed_reads_before_disconnected": 1,
+    "successful_reads_before_reconnected": 1,
+    "default_backlight_percent": 100
+  },
+  "simulation": {
+    "simulate_disconnects": true,
+    "disconnect_cycle_samples": 60,
+    "sensors": [
+      {
+        "center_centi_c": 2000,
+        "amplitude_centi_c": 300,
+        "wave_period_samples": 30,
+        "wave_offset_samples": 0,
+        "disconnect_start_sample": 55,
+        "disconnect_end_sample": 60
+      },
+      {
+        "center_centi_c": 2250,
+        "amplitude_centi_c": 220,
+        "wave_period_samples": 40,
+        "wave_offset_samples": 9,
+        "disconnect_start_sample": 25,
+        "disconnect_end_sample": 30
+      }
+    ]
+  },
+  "client": {
+    "connect_timeout_seconds": 20.0,
+    "scan_timeout_seconds": 5.0,
+    "pairing_timeout_seconds": 30.0,
+    "use_cached_gatt_services": false
+  },
+  "service": {
+    "api_host": "127.0.0.1",
+    "api_port": 8000,
+    "startup_scan_timeout_seconds": 2.5,
+    "auto_discovery_interval_seconds": 2.0,
+    "recovery_deadline_seconds": 10.0,
+    "poll_interval_seconds": 1.0,
+    "poll_tolerance_seconds": 0.1,
+    "history_sync_budget_seconds": 10.0,
+    "history_chunk_retry_count": 2,
+    "display_command_timeout_seconds": 0.9,
+    "completed_operation_retention_seconds": 600.0,
+    "persistence_queue_capacity": 300,
+    "credential_registry_filename": "paired_devices.csv"
+  },
+  "authentication": {
+    "domain_separator": "THERMOMETER-AUTH-V2",
+    "nonce_size_bytes": 16,
+    "proof_size_bytes": 32,
+    "challenge_timeout_seconds": 5.0,
+    "maximum_failures": 3,
+    "lockout_seconds": 30.0
+  },
+  "protocol": {
+    "version": 2,
+    "byte_order": "little",
+    "response_flag": 1,
+    "max_history_records_per_chunk": 32,
+    "opcodes": {
+      "get_current": 1,
+      "set_display": 2,
+      "get_history_meta": 3,
+      "get_history_chunk": 4,
+      "auth_begin": 5,
+      "auth_prove": 6,
+      "reset_bond": 7
+    },
+    "status_codes": {
+      "success": 0,
+      "invalid_command": 1,
+      "invalid_sensor": 2,
+      "invalid_value": 3,
+      "not_available": 4,
+      "internal_error": 5,
+      "unsupported_version": 6,
+      "authentication_required": 7,
+      "authentication_failed": 8,
+      "authentication_locked": 9
+    },
+    "visible_states": {
+      "off": 0,
+      "on": 1,
+      "disconnected": 2
+    },
+    "data_statuses": {
+      "valid": 0,
+      "disconnected": 1
+    },
+    "layouts": {
+      "header": [
+        { "name": "version", "type": "u8" },
+        { "name": "opcode", "type": "u8" },
+        { "name": "request_id", "type": "u16" },
+        { "name": "payload_length", "type": "u16" },
+        { "name": "status", "type": "u8" },
+        { "name": "flags", "type": "u8" }
+      ],
+      "current_response": [
+        { "name": "boot_id", "type": "u32" },
+        { "name": "newest_sequence", "type": "u32" },
+        { "name": "sensor_1_temperature_centi_c", "type": "i16" },
+        { "name": "sensor_1_visible_state", "type": "u8" },
+        { "name": "sensor_1_display_enabled", "type": "u8" },
+        { "name": "sensor_2_temperature_centi_c", "type": "i16" },
+        { "name": "sensor_2_visible_state", "type": "u8" },
+        { "name": "sensor_2_display_enabled", "type": "u8" },
+        { "name": "average_temperature_centi_c", "type": "i16" },
+        { "name": "average_valid", "type": "u8" },
+        { "name": "reserved", "type": "u8" }
+      ],
+      "set_display_request": [
+        { "name": "sensor_id", "type": "u8" },
+        { "name": "enabled", "type": "u8" }
+      ],
+      "set_display_response": [
+        { "name": "sensor_id", "type": "u8" },
+        { "name": "visible_state", "type": "u8" },
+        { "name": "enabled", "type": "u8" }
+      ],
+      "history_meta_response": [
+        { "name": "boot_id", "type": "u32" },
+        { "name": "newest_sequence", "type": "u32" },
+        { "name": "sensor_1_count", "type": "u16" },
+        { "name": "sensor_2_count", "type": "u16" },
+        { "name": "sensor_1_oldest_sequence", "type": "u32" },
+        { "name": "sensor_2_oldest_sequence", "type": "u32" }
+      ],
+      "history_chunk_request": [
+        { "name": "sensor_id", "type": "u8" },
+        { "name": "start_sequence", "type": "u32" },
+        { "name": "record_count", "type": "u8" }
+      ],
+      "history_chunk_prefix": [
+        { "name": "sensor_id", "type": "u8" },
+        { "name": "start_sequence", "type": "u32" },
+        { "name": "record_count", "type": "u8" },
+        { "name": "record_size", "type": "u8" }
+      ],
+      "history_record": [
+        { "name": "sequence", "type": "u32" },
+        { "name": "temperature_centi_c", "type": "i16" },
+        { "name": "data_status", "type": "u8" }
+      ],
+      "auth_begin_response": [
+        { "name": "device_id", "type": "bytes6" },
+        { "name": "boot_id", "type": "u32" },
+        { "name": "nonce", "type": "bytes16" }
+      ],
+      "auth_prove_request": [
+        { "name": "proof", "type": "bytes32" }
+      ]
+    }
+  }
+}
