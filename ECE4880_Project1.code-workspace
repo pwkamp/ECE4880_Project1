@@ -15,6 +15,12 @@
     {
       "name": "docs",
       "path": "docs"
+    },
+    {
+      "path": "frontend"
+    },
+    {
+      "path": "hardware"
     }
   ],
   "settings": {
