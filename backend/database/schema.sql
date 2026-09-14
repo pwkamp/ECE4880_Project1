@@ -18,3 +18,47 @@ CREATE TABLE temperature_samples(
     UNIQUE KEY uq_sample (boot_id, sample_seq),    -- natural key still enforced for real rows; NULLs don't collide, so multiple PROVISIONAL rows are allowed
     INDEX entry_index (observed_at_utc)            -- SWE-DB-LLR-552;
 );
+
+CREATE TABLE users( -- SWE-DB-LLR-554
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,           -- sized for bcrypt/Argon2id/scrypt PHC strings, never plaintext
+    role ENUM('USER','ADMIN') NOT NULL,            -- ADMIN: third-box control + alert configuration; USER: read-only
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_username (username)
+);
+
+CREATE TABLE alert_recipients( -- SWE-DB-LLR-555
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    type ENUM('EMAIL','SMS') NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)                               -- no unique constraint: multiple recipients per type must be allowed
+);
+
+CREATE TABLE alert_rules( -- SWE-DB-LLR-556
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    min_threshold DECIMAL(5,2) NOT NULL,           -- Celsius, matches temperature_samples precision
+    max_threshold DECIMAL(5,2) NOT NULL,
+    high_temp_message VARCHAR(255) NOT NULL,
+    low_temp_message VARCHAR(255) NOT NULL,
+    monitored_series ENUM('SENSOR1','SENSOR2','AVERAGE') NOT NULL,
+    created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE alert_rule_recipients( -- SWE-DB-LLR-556: many-to-many junction, a rule can notify several recipients and vice versa
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    alert_rule_id BIGINT UNSIGNED NOT NULL,
+    alert_recipient_id BIGINT UNSIGNED NOT NULL,
+    created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_rule_recipient (alert_rule_id, alert_recipient_id),
+    FOREIGN KEY (alert_rule_id) REFERENCES alert_rules(id) ON DELETE CASCADE,
+    FOREIGN KEY (alert_recipient_id) REFERENCES alert_recipients(id) ON DELETE CASCADE
+);
