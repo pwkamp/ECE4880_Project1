@@ -9,6 +9,7 @@ from tests._framework.discovery import discover
 from tests._framework.scaffold import check_scaffold
 from tests._framework.validation import (
     EXPECTED_LEVEL_COUNTS,
+    _normalized_text_sha256,
     discover_unittest_cases,
     validate_catalog,
 )
@@ -29,6 +30,19 @@ class CatalogValidationTests(unittest.TestCase):
             )
         )
         self.assertEqual(lock["expected_counts"]["by_level"], EXPECTED_LEVEL_COUNTS)
+
+    def test_frozen_text_hash_is_independent_of_platform_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lf_path = root / "lf.csv"
+            crlf_path = root / "crlf.csv"
+            lf_path.write_bytes(b"column\nvalue\n")
+            crlf_path.write_bytes(b"column\r\nvalue\r\n")
+
+            self.assertEqual(
+                _normalized_text_sha256(lf_path),
+                _normalized_text_sha256(crlf_path),
+            )
 
     def test_all_generated_folders_are_current(self) -> None:
         self.assertEqual(check_scaffold(), [])

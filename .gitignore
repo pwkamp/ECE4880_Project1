@@ -108,6 +108,7 @@ Desktop.ini
 .history/
 .idea/
 .vs/
+.vscode/
 # General workspace files from IDEs and editors
 *.workspace
 # Visual Studio user-specific files

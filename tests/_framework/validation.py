@@ -26,6 +26,13 @@ SCHEMA_FILES = (
 )
 
 
+def _normalized_text_sha256(path: Path) -> str:
+    """Hash text with platform line endings normalized to LF."""
+    with path.open("r", encoding="utf-8", newline=None) as stream:
+        content = stream.read()
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
 @dataclass
 class ValidationReport:
     errors: List[str] = field(default_factory=list)
@@ -183,9 +190,7 @@ def validate_catalog(root: Path | None = None) -> ValidationReport:
     input_baseline: Dict[str, Any] = {}
     try:
         input_baseline = load_data(root / "input_baseline.json")
-        matrix_digest = hashlib.sha256(
-            (root / "test_matrix.lock.csv").read_bytes()
-        ).hexdigest()
+        matrix_digest = _normalized_text_sha256(root / "test_matrix.lock.csv")
         if matrix_digest != input_baseline["test_matrix"]["sha256"]:
             report.errors.append(
                 "frozen test matrix hash changed; review and update the input baseline"
