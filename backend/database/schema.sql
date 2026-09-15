@@ -14,6 +14,7 @@ CREATE TABLE temperature_samples(
     average_c DECIMAL(5,2),
     average_valid BOOLEAN NOT NULL,
     record_source ENUM('LIVE','HISTORY','PROVISIONAL') NOT NULL,
+    failure_reason VARCHAR(255),                   -- nullable: why a PROVISIONAL slot was missed (SCRUM-341)
     PRIMARY KEY (id),
     UNIQUE KEY uq_sample (boot_id, sample_seq),    -- natural key still enforced for real rows; NULLs don't collide, so multiple PROVISIONAL rows are allowed
     INDEX entry_index (observed_at_utc)            -- SWE-DB-LLR-552;

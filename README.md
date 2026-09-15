@@ -247,12 +247,24 @@ adapter contract. Its integration points are `start`, `close`,
 `persistence_configured=false`.
 
 The database teammate can supply a synchronous no-argument factory returning an
-object with that interface:
+object with that interface. A reference implementation against this project's
+schema ships at [pc_client/mysql_adapter.py](backend/pc_client/mysql_adapter.py)
+(SCRUM-341/368):
 
 ```powershell
-$env:THERMOMETER_DATABASE_ADAPTER_FACTORY = "my_package.mysql_adapter:create_adapter"
+$env:THERMOMETER_DATABASE_ADAPTER_FACTORY = "pc_client.mysql_adapter:create_adapter"
+$env:THERMOMETER_DB_HOST = "127.0.0.1"      # defaults shown; only set what differs
+$env:THERMOMETER_DB_PORT = "3306"
+$env:THERMOMETER_DB_USER = "root"
+$env:THERMOMETER_DB_PASSWORD = "..."
+$env:THERMOMETER_DB_NAME = "thermometer"
 .venv\Scripts\python main.py
 ```
+
+No ESP32 required to exercise this path end-to-end:
+[pc_client/mock_run.py](backend/pc_client/mock_run.py) runs the real service
+against a simulated thermometer (`python -m pc_client.mock_run`), so rows can
+be confirmed landing in MySQL before real firmware is available.
 
 Database credentials and driver-specific configuration belong in environment
 or deployment secrets and must not be committed. History samples carry device,
