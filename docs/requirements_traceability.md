@@ -80,11 +80,15 @@ this repository.
 
 | Requirement(s) | Jira issue(s) | Status | Implementation / verification |
 |---|---|---|---|
-| SWE-DB-MLR-551 | SCRUM-531 | Implemented | temperature_samples persists probe1, probe2, and computed-average series with per-series value + status and sample identity (boot_id, sample_seq). Note: implementation status vocabulary (VALID/DISCONNECTED/NOT_RETRIEVED/MISSING) differs from this requirement's text (unplugged-sensor/no-data/provisional/derived-unavailable); reconciliation flagged for team. |
-| SWE-DB-LLR-550 | SCRUM-550 | Implemented | temperature_samples created with all specified fields except device_id, which is intentionally omitted: single-device system per spec, and the adapter identifies the device by BLE address/name, not a stored id. Deviation flagged for review. |
-| SWE-DB-LLR-551 | SCRUM-551 | Acceptance pending | UNIQUE KEY (boot_id, sample_seq) enforces real-sample uniqueness (natural key demoted from PK to allow NULL-keyed PROVISIONAL rows under a surrogate id). Duplicate-rejection verified manually (error 1062); reproducible verification not yet committed. |
-| SWE-DB-LLR-552 | SCRUM-552 | Acceptance pending | Index entry_index (observed_at_utc) created (device_id dropped, so keyed on time alone). EXPLAIN verification incomplete on the required query forms. |
-| SWE-DB-LLR-559 | SCRUM-559 | Implemented | Temperature fields (sensor1_c, sensor2_c, average_c) typed DECIMAL(5,2), stored in Celsius, matching the i16 centi-Celsius wire format. |
-| SWE-DB-LLR-560 | SCRUM-560 | Acceptance pending | observed_at_utc typed DATETIME. UTC compliance requires the MySQL server timezone set to UTC; server currently runs local time, so DB-generated defaults are not yet UTC. |
+| SWE-DB-MLR-551 | SCRUM-531 | Implemented | temperature_samples persists both probe series, computed average, and per-series status with sample identity (boot_id, sample_seq). Status vocabulary follows the implementation (VALID/DISCONNECTED/NOT_RETRIEVED/MISSING); requirement text update is a docs task. |
+| SWE-DB-MLR-552 | SCRUM-532 | Implemented | users, alert_recipients, alert_rules, and alert_rule_recipients junction persist user roles, alert recipients, and alert rules for the web application. |
+| SWE-DB-LLR-550 | SCRUM-550 | Implemented | temperature_samples created with all specified fields except device_id, intentionally omitted: single-device system by design, adapter keys on BLE address/name, so the column would hold no distinguishing value. Closed deviation. |
+| SWE-DB-LLR-551 | SCRUM-551 | Acceptance pending | UNIQUE KEY (boot_id, sample_seq) enforces real-sample uniqueness (natural key demoted from PK so NULL-keyed PROVISIONAL rows insert under a surrogate id). Duplicate rejection verified manually (error 1062); reproducible verification not yet committed. |
+| SWE-DB-LLR-552 | SCRUM-552 | Acceptance pending | Index entry_index (observed_at_utc) created. EXPLAIN verification on the required query forms not yet captured. |
+| SWE-DB-LLR-554 | SCRUM-554 | Implemented | users table: unique username, password_hash (no plaintext), role ENUM(USER,ADMIN), enabled (default TRUE), created/updated UTC audit timestamps. Verified: role storage, enabled default, updated_at auto-refresh on edit, username uniqueness rejection (error 1062). |
+| SWE-DB-LLR-555 | SCRUM-555 | Implemented | alert_recipients table: type ENUM(EMAIL,SMS), address, no per-type uniqueness. Verified: multiple EMAIL and SMS recipients persist and are retrievable. |
+| SWE-DB-LLR-556 | SCRUM-556 | Implemented | alert_rules (min/max thresholds DECIMAL(5,2) Celsius, high/low messages, monitored_series) plus alert_rule_recipients many-to-many junction. Verified: all five rule fields persist; rule links to multiple recipients; ON DELETE CASCADE removes links but not recipients. |
+| SWE-DB-LLR-559 | SCRUM-559 | Implemented | Temperature and threshold fields typed DECIMAL(5,2), stored in Celsius. |
+| SWE-DB-LLR-560 | SCRUM-560 | Implemented | Timestamps stored UTC. Server timezone set to UTC (default-time-zone='+00:00'); verified @@global.time_zone = +00:00 and a DB-stamped row returns UTC. |
 
 See [backend/database/README.md](../backend/database/README.md) for schema design decisions and open flags.
