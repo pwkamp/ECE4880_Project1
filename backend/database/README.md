@@ -32,6 +32,12 @@ Rows in `temperature_samples` arrive from the BLE connection service through the
 database adapter. The user and alert tables are consumed by the web application
 (not yet built); the schema is the contract.
 
+`temperature_samples` also has a nullable `failure_reason VARCHAR(255)` column
+(SCRUM-341), populated for `PROVISIONAL` rows with why the 1 Hz slot was
+missed. It has no dedicated requirement ID yet; it exists to give the
+`SampleRecord.failure_reason` field a destination column since the BLE
+connector actively populates it.
+
 ## Traceability
 
 | Piece | Requirement |
@@ -133,8 +139,11 @@ a MySQL server against this schema:
 - Provisional rows are not write-once. The adapter method
   `reconcile_provisional_intervals` implies previously-stored `PROVISIONAL` rows
   may be updated to a final state after a history sync; status and
-  `average_valid` columns are therefore mutable by design. Update semantics live
-  in the adapter implementation (not in this repo).
+  `average_valid` columns are therefore mutable by design. `PROVISIONAL` rows
+  have NULL `boot_id`/`sample_seq`, so matching one to a specific finalized
+  sample needs a real strategy (e.g. an `observed_at_utc` window), not a
+  natural-key upsert; the reference adapter (`backend/pc_client/mysql_adapter.py`)
+  leaves this method a documented no-op, deferred to SCRUM-369.
 - Status/source vocabulary follows the implementation (decided). The schema uses
   the code's values (`VALID / DISCONNECTED / NOT_RETRIEVED / MISSING`) so the
   database and BLE service agree exactly. The approved requirement text
@@ -166,6 +175,16 @@ concerns, distinct from the superseded command queue above.
 
 ## Not included here
 
-Test seed data and verification scripts are kept local, not committed. The
-concrete database adapter and credentials live outside the repo (see root
-README, "Database integration").
+Test seed data and verification scripts are kept local, not committed.
+
+A reference concrete adapter now lives in this repo at
+`backend/pc_client/mysql_adapter.py` (SCRUM-341/368), implementing
+`ThermometerDatabaseAdapter` against this schema with `aiomysql`. It performs
+the live-sample and missing-interval INSERTs; `upsert_history` is a
+best-effort per-row insert (stretch scope, SCRUM-369); and
+`reconcile_provisional_intervals`, `publish_connection_state`, and
+`publish_display_result` are documented no-ops (see "Open items" and "Scope
+questions" above). Credentials are never hardcoded: connection settings come
+from `THERMOMETER_DB_HOST` / `_PORT` / `_USER` / `_PASSWORD` / `_NAME`
+environment variables. See root README, "Database integration", and
+`backend/pc_client/mock_run.py` for a hardware-free way to exercise it.
