@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,7 +14,11 @@ from tests._framework.models import (
     TestManifest as ManifestRecord,
 )
 from tests._framework.planning import plan_tests
-from tests._framework.resource_locks import ResourceBusyError, ResourceLockSet
+from tests._framework.resource_locks import (
+    ResourceBusyError,
+    ResourceLockSet,
+    _pid_is_alive,
+)
 
 
 def manifest_with(profile: Profile) -> ManifestRecord:
@@ -71,6 +76,15 @@ class CapabilityAndLockTests(unittest.TestCase):
             first.release()
         second.acquire()
         second.release()
+
+    @unittest.skipUnless(os.name == "nt", "Windows-specific process probe")
+    def test_windows_process_probe_does_not_send_ctrl_c(self) -> None:
+        with patch(
+            "tests._framework.resource_locks.os.kill",
+            side_effect=AssertionError("os.kill(pid, 0) sends CTRL_C_EVENT on Windows"),
+        ) as kill:
+            self.assertTrue(_pid_is_alive(os.getpid()))
+        kill.assert_not_called()
 
 
 if __name__ == "__main__":

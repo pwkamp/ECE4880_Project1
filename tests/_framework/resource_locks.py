@@ -13,17 +13,39 @@ class ResourceBusyError(RuntimeError):
     pass
 
 
+def _pid_is_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        # On Windows, signal 0 is CTRL_C_EVENT.  Using the POSIX liveness
+        # idiom os.kill(pid, 0) therefore interrupts the runner itself when
+        # it inspects a lock owned by the current process.
+        import _winapi
+
+        try:
+            handle = _winapi.OpenProcess(_winapi.SYNCHRONIZE, False, pid)
+        except OSError as error:
+            # ERROR_INVALID_PARAMETER means the PID does not exist.  Treat
+            # access-denied and other failures conservatively as still alive.
+            return getattr(error, "winerror", None) != 87
+        try:
+            return _winapi.WaitForSingleObject(handle, 0) == _winapi.WAIT_TIMEOUT
+        finally:
+            _winapi.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    return True
+
+
 def _owner_is_alive(path: Path) -> bool:
     try:
         first_line = path.read_text(encoding="utf-8").splitlines()[0]
         pid = int(first_line.removeprefix("pid="))
     except (OSError, ValueError, IndexError):
         return False
-    try:
-        os.kill(pid, 0)
-    except OSError:
-        return False
-    return True
+    return _pid_is_alive(pid)
 
 
 class ResourceLockSet:
