@@ -21,6 +21,12 @@
     },
     {
       "path": "hardware"
+    },
+    {
+      "path": ".github"
+    },
+    {
+      "path": "tests"
     }
   ],
   "settings": {

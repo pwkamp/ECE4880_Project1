@@ -60,6 +60,24 @@ def command_result(code: int | None = 0, timed_out: bool = False) -> CommandResu
 
 
 class ExecutionTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # Keep lifecycle tests independent of the host Git process and console.
+        source_identity = {
+            "repository_url": "https://github.com/pwkamp/ECE4880_Project1",
+            "sha": "a" * 40,
+            "branch": "unit-test",
+            "dirty": False,
+            "patch_sha256": None,
+            "git_metadata_available": True,
+            "reviewed_baseline": {},
+        }
+        source_patcher = patch(
+            "tests._framework.execution.collect_source_identity",
+            return_value=source_identity,
+        )
+        source_patcher.start()
+        self.addCleanup(source_patcher.stop)
+
     def execute_with(self, side_effect):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
