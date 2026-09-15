@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import datetime, timedelta, timezone
 
 import aiomysql
 import pymysql
@@ -25,6 +26,7 @@ from .database_adapter import (
     PersistenceResult,
     SampleRecord,
 )
+from .protocol import CONFIG
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +38,15 @@ _INSERT_SAMPLE_SQL = """
          average_c, average_valid, record_source, failure_reason)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
+
+
+def _as_naive_utc(value: datetime) -> datetime:
+    # DATETIME columns carry no timezone; DB-read values come back naive.
+    # Aware values (all in-process timestamps are tz-aware UTC) must be
+    # normalized the same way before either binding or comparing them.
+    if value.tzinfo is not None:
+        return value.astimezone(timezone.utc).replace(tzinfo=None)
+    return value
 
 
 def _sample_params(sample: SampleRecord) -> tuple:
@@ -181,14 +192,54 @@ class MySQLDatabaseAdapter:
     async def reconcile_provisional_intervals(
         self, batch: HistoryBatch
     ) -> PersistenceResult:
-        # Deferred to SCRUM-369: PROVISIONAL rows are stored with NULL
-        # boot_id/sample_seq by design (see schema.sql), so matching them to
-        # a specific finalized HISTORY sample needs a real strategy (e.g. an
-        # observed_at_utc window match), not a natural-key upsert. Left as a
-        # documented no-op rather than a heuristic that could silently
-        # mutate the wrong row.
+        # PROVISIONAL rows are stored with NULL boot_id/sample_seq by design
+        # (see schema.sql), so they can't be matched to a recovered HISTORY
+        # sample via the natural key. Instead: a PROVISIONAL row is stale iff
+        # a HISTORY sample from this batch landed within half a sample
+        # period of its observed_at_utc — that HISTORY row (already written
+        # by upsert_history, which the persistence worker always runs first)
+        # is strictly better data for the same real-world second, so the
+        # placeholder is deleted rather than merged/updated in place.
+        if not batch.samples:
+            return PersistenceResult(True, False, "no history samples to reconcile against")
+
+        tolerance = timedelta(seconds=CONFIG.device.sample_period_ms / 1000.0 / 2)
+        sample_times = sorted(
+            _as_naive_utc(sample.observed_at_utc) for sample in batch.samples
+        )
+        window_start = sample_times[0] - tolerance
+        window_end = sample_times[-1] + tolerance
+
+        async with self._acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "SELECT id, observed_at_utc FROM temperature_samples "
+                    "WHERE record_source = 'PROVISIONAL' AND observed_at_utc BETWEEN %s AND %s",
+                    (window_start, window_end),
+                )
+                candidates = await cur.fetchall()
+
+                stale_ids = [
+                    row_id
+                    for row_id, observed_at in candidates
+                    if any(
+                        abs((observed_at - sample_time).total_seconds())
+                        <= tolerance.total_seconds()
+                        for sample_time in sample_times
+                    )
+                ]
+                if stale_ids:
+                    placeholders = ",".join(["%s"] * len(stale_ids))
+                    await cur.execute(
+                        f"DELETE FROM temperature_samples "
+                        f"WHERE record_source = 'PROVISIONAL' AND id IN ({placeholders})",
+                        tuple(stale_ids),
+                    )
+
         return PersistenceResult(
-            True, False, "provisional reconciliation deferred to SCRUM-369; no-op"
+            True,
+            bool(stale_ids),
+            f"removed {len(stale_ids)} provisional row(s) superseded by recovered history",
         )
 
     async def publish_connection_state(

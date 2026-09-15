@@ -136,14 +136,17 @@ a MySQL server against this schema:
   negligible at 32-bit width and would fail loud (duplicate-key rejection)
   rather than silently. A persistent incrementing counter would remove the risk
   entirely; noted, not blocking.
-- Provisional rows are not write-once. The adapter method
-  `reconcile_provisional_intervals` implies previously-stored `PROVISIONAL` rows
-  may be updated to a final state after a history sync; status and
-  `average_valid` columns are therefore mutable by design. `PROVISIONAL` rows
-  have NULL `boot_id`/`sample_seq`, so matching one to a specific finalized
-  sample needs a real strategy (e.g. an `observed_at_utc` window), not a
-  natural-key upsert; the reference adapter (`backend/pc_client/mysql_adapter.py`)
-  leaves this method a documented no-op, deferred to SCRUM-369.
+- Provisional rows are not write-once (implemented, SCRUM-369). A `PROVISIONAL`
+  row has NULL `boot_id`/`sample_seq`, so it can't be matched to a recovered
+  `HISTORY` sample via the natural key. The reference adapter
+  (`backend/pc_client/mysql_adapter.py::reconcile_provisional_intervals`)
+  instead deletes a `PROVISIONAL` row when a `HISTORY` sample from the same
+  batch lands within half a sample period of its `observed_at_utc` — that
+  `HISTORY` row (already written by `upsert_history`, which the persistence
+  worker always runs first) is strictly better data for the same real-world
+  second. Verified live: a real recovered sample correctly removes the
+  placeholder it supersedes, and an unrelated `PROVISIONAL` row outside the
+  match window is left alone.
 - Status/source vocabulary follows the implementation (decided). The schema uses
   the code's values (`VALID / DISCONNECTED / NOT_RETRIEVED / MISSING`) so the
   database and BLE service agree exactly. The approved requirement text
@@ -178,13 +181,22 @@ concerns, distinct from the superseded command queue above.
 Test seed data and verification scripts are kept local, not committed.
 
 A reference concrete adapter now lives in this repo at
-`backend/pc_client/mysql_adapter.py` (SCRUM-341/368), implementing
+`backend/pc_client/mysql_adapter.py` (SCRUM-341/368/369), implementing
 `ThermometerDatabaseAdapter` against this schema with `aiomysql`. It performs
-the live-sample and missing-interval INSERTs; `upsert_history` is a
-best-effort per-row insert (stretch scope, SCRUM-369); and
-`reconcile_provisional_intervals`, `publish_connection_state`, and
-`publish_display_result` are documented no-ops (see "Open items" and "Scope
-questions" above). Credentials are never hardcoded: connection settings come
-from `THERMOMETER_DB_HOST` / `_PORT` / `_USER` / `_PASSWORD` / `_NAME`
-environment variables. See root README, "Database integration", and
-`backend/pc_client/mock_run.py` for a hardware-free way to exercise it.
+the live-sample and missing-interval INSERTs; `upsert_history` (per-row
+insert, tolerant of re-synced overlap) and `reconcile_provisional_intervals`
+(deletes superseded `PROVISIONAL` placeholders, see "Open items" above) are
+both implemented and verified live. `publish_connection_state` and
+`publish_display_result` remain documented no-ops (see "Scope questions"
+above — no destination tables exist yet). Credentials are never hardcoded:
+connection settings come from `THERMOMETER_DB_HOST` / `_PORT` / `_USER` /
+`_PASSWORD` / `_NAME` environment variables.
+
+**Requires a running MySQL server** — this is a client only, it does not
+start or embed one. Install MySQL locally (or point the env vars above at a
+shared instance), then apply `schema.sql` once before running anything else
+in this section.
+
+See root README, "Database integration", and `backend/pc_client/mock_run.py`
+for a hardware-free way to exercise it (including a simulated dropped-poll
+mode, `--drop-after`/`--drop-for`, to exercise the missing-interval path).
