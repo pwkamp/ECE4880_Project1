@@ -249,7 +249,8 @@ adapter contract. Its integration points are `start`, `close`,
 The database teammate can supply a synchronous no-argument factory returning an
 object with that interface. A reference implementation against this project's
 schema ships at [pc_client/mysql_adapter.py](backend/pc_client/mysql_adapter.py)
-(SCRUM-341/368):
+(SCRUM-341/368/369). It requires a MySQL server already running somewhere
+reachable — it's a client only, it does not start one itself:
 
 ```powershell
 $env:THERMOMETER_DATABASE_ADAPTER_FACTORY = "pc_client.mysql_adapter:create_adapter"

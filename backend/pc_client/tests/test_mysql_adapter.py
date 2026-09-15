@@ -1,6 +1,6 @@
 import os
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import pymysql
@@ -22,10 +22,11 @@ def make_sample(
     source="LIVE",
     average=21.0,
     failure_reason=None,
+    observed_at_utc=datetime(2026, 1, 1, tzinfo=timezone.utc),
 ) -> SampleRecord:
     return SampleRecord(
         device=None,
-        observed_at_utc=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        observed_at_utc=observed_at_utc,
         boot_id=boot_id,
         sample_sequence=sample_seq,
         sensor_readings=(
@@ -40,9 +41,10 @@ def make_sample(
 
 
 class _FakeCursor:
-    def __init__(self, fetchone_result=None, raise_on_execute=None):
+    def __init__(self, fetchone_result=None, fetchall_result=None, raise_on_execute=None):
         self.executed = []
         self._fetchone_result = fetchone_result
+        self._fetchall_result = fetchall_result or []
         self._raise_on_execute = raise_on_execute
 
     async def __aenter__(self):
@@ -58,6 +60,9 @@ class _FakeCursor:
 
     async def fetchone(self):
         return self._fetchone_result
+
+    async def fetchall(self):
+        return self._fetchall_result
 
 
 class _FakeConnection:
@@ -203,9 +208,25 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("2 inserted", result.detail)
         self.assertIn("1 already present", result.detail)
 
-    async def test_reconcile_connection_state_and_display_result_are_documented_noops(
+    async def test_connection_state_and_display_result_are_documented_noops(
         self,
     ) -> None:
+        adapter = MySQLDatabaseAdapter(
+            host="localhost", port=3306, user="u", password="p", database="thermometer"
+        )
+
+        connection_result = await adapter.publish_connection_state(
+            ConnectionStateRecord(None, datetime.now(timezone.utc), "phase", True, None, None)
+        )
+        display_result = await adapter.publish_display_result(
+            DisplayStateRecord(None, datetime.now(timezone.utc), 1, True, True, "ON")
+        )
+
+        for result in (connection_result, display_result):
+            self.assertTrue(result.configured)
+            self.assertFalse(result.persisted)
+
+    async def test_reconcile_with_empty_batch_is_a_noop(self) -> None:
         adapter = MySQLDatabaseAdapter(
             host="localhost", port=3306, user="u", password="p", database="thermometer"
         )
@@ -222,17 +243,71 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
             failure_reason=None,
         )
 
-        reconcile_result = await adapter.reconcile_provisional_intervals(batch)
-        connection_result = await adapter.publish_connection_state(
-            ConnectionStateRecord(None, datetime.now(timezone.utc), "phase", True, None, None)
+        result = await adapter.reconcile_provisional_intervals(batch)
+
+        self.assertTrue(result.configured)
+        self.assertFalse(result.persisted)
+
+    async def test_reconcile_deletes_provisional_rows_matched_by_history_timestamp(
+        self,
+    ) -> None:
+        anchor = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        anchor_naive = anchor.replace(tzinfo=None)  # DATETIME columns read back naive
+        cursor = _FakeCursor(
+            fetchall_result=[
+                (101, anchor_naive),  # matches a recovered HISTORY sample: stale
+                (102, anchor_naive + timedelta(seconds=5)),  # no matching sample: keep
+            ]
         )
-        display_result = await adapter.publish_display_result(
-            DisplayStateRecord(None, datetime.now(timezone.utc), 1, True, True, "ON")
+        adapter = make_adapter_with_cursor(cursor)
+        batch = HistoryBatch(
+            device=None,
+            boot_id=77,
+            previous_boot_id=None,
+            new_boot=False,
+            samples=(make_sample(sample_seq=1, source="HISTORY", observed_at_utc=anchor),),
+            expected_counts=(1, 1),
+            retrieved_counts=(1, 1),
+            complete=True,
+            elapsed_seconds=0.1,
+            failure_reason=None,
         )
 
-        for result in (reconcile_result, connection_result, display_result):
-            self.assertTrue(result.configured)
-            self.assertFalse(result.persisted)
+        result = await adapter.reconcile_provisional_intervals(batch)
+
+        self.assertTrue(result.persisted)
+        self.assertIn("removed 1 provisional", result.detail)
+        select_sql, _ = cursor.executed[0]
+        self.assertIn("SELECT id, observed_at_utc", select_sql)
+        delete_sql, delete_params = cursor.executed[1]
+        self.assertIn("DELETE FROM temperature_samples", delete_sql)
+        self.assertIn("record_source = 'PROVISIONAL'", delete_sql)
+        self.assertEqual(delete_params, (101,))
+
+    async def test_reconcile_deletes_nothing_when_no_timestamps_match(self) -> None:
+        anchor = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        anchor_naive = anchor.replace(tzinfo=None)
+        cursor = _FakeCursor(
+            fetchall_result=[(101, anchor_naive + timedelta(seconds=30))]
+        )
+        adapter = make_adapter_with_cursor(cursor)
+        batch = HistoryBatch(
+            device=None,
+            boot_id=77,
+            previous_boot_id=None,
+            new_boot=False,
+            samples=(make_sample(sample_seq=1, source="HISTORY", observed_at_utc=anchor),),
+            expected_counts=(1, 1),
+            retrieved_counts=(1, 1),
+            complete=True,
+            elapsed_seconds=0.1,
+            failure_reason=None,
+        )
+
+        result = await adapter.reconcile_provisional_intervals(batch)
+
+        self.assertFalse(result.persisted)
+        self.assertEqual(len(cursor.executed), 1)  # SELECT only, no DELETE issued
 
 
 class CreateAdapterTests(unittest.TestCase):
