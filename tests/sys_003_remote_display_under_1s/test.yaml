@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "SYS-003",
+  "name": "Remote per-sensor display control under one second",
+  "entrypoint": "test_sys_003.py",
+  "owners": [
+    "system"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-415",
+      "uid": "SYS-HLR-510"
+    },
+    {
+      "jira": "SCRUM-646",
+      "uid": "INT-LLR-416"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-physical": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "lcd",
+        "browser",
+        "implementation:SYS-003:hil-physical"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Blocked by physical LCD and unresolved queue-versus-REST decision",
+  "test_type": "Full-system HIL timing",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 1,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-physical"
+  }
+}

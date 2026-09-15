@@ -63,6 +63,12 @@ from .service_state import (
 LOGGER = logging.getLogger(__name__)
 _UNCHANGED = object()
 
+# Accelerated unit-test settings can reduce scan and retry intervals to a few
+# milliseconds. A Windows event-loop scheduling slice can legitimately exceed
+# that total, so retain a small watchdog floor. Production settings already
+# yield a much larger timeout and are unaffected.
+MINIMUM_SCAN_WATCHDOG_SECONDS = 0.25
+
 
 class ServiceEvent(TypedDict, total=False):
     type: str
@@ -1829,7 +1835,10 @@ class ThermometerBleService:
         # Bleak normally applies its own scan timeout. This outer deadline also
         # covers a Windows watcher that stalls while stopping, so DISCOVERING
         # can never accidentally become a terminal state.
-        scan_deadline = timeout + self.settings.auto_discovery_interval_seconds
+        scan_deadline = max(
+            timeout + self.settings.auto_discovery_interval_seconds,
+            MINIMUM_SCAN_WATCHDOG_SECONDS,
+        )
         try:
             discovered = await asyncio.wait_for(
                 self._discover(timeout=timeout), timeout=scan_deadline

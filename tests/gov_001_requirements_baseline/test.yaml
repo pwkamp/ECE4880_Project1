@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "GOV-001",
+  "name": "Requirements baseline, ambiguity, and deviation gate",
+  "entrypoint": "test_gov_001.py",
+  "owners": [
+    "project"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-401",
+      "uid": "PRJ-REQ-003"
+    },
+    {
+      "jira": "SCRUM-402",
+      "uid": "PRJ-REQ-004"
+    }
+  ],
+  "profiles": {
+    "manual": {
+      "automation": "manual",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "human-review",
+        "implementation:GOV-001:manual"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable now",
+  "test_type": "HITL requirements review",
+  "execution_mode": "Manual",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "manual"
+  }
+}

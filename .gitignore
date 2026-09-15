@@ -85,6 +85,8 @@ env/
 
 # Test and coverage output
 .pytest_cache/
+/tests/results/
+/tests/benches/*.local.yaml
 .coverage
 .coverage.*
 coverage.xml

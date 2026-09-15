@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "CON-002",
+  "name": "Monotonic one-hertz polling and complete database publication",
+  "entrypoint": "test_con_002.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-525",
+      "uid": "SWE-CONN-MLR-502"
+    },
+    {
+      "jira": "SCRUM-536",
+      "uid": "SWE-CONN-LLR-501"
+    },
+    {
+      "jira": "SCRUM-537",
+      "uid": "SWE-CONN-LLR-502"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "scripted-ble",
+        "implementation:CON-002:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Partially runnable; concrete MySQL adapter absent",
+  "test_type": "Software-in-loop plus database integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 1,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

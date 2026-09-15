@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "CON-001",
+  "name": "Independent connector service and lifecycle API",
+  "entrypoint": "test_con_001.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-523",
+      "uid": "SWE-CONN-MLR-500"
+    },
+    {
+      "jira": "SCRUM-524",
+      "uid": "SWE-CONN-MLR-501"
+    },
+    {
+      "jira": "SCRUM-535",
+      "uid": "SWE-CONN-LLR-500"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "fastapi"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "scripted-ble",
+        "implementation:CON-001:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable with no-op database and mocked BLE",
+  "test_type": "Software integration test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "implemented",
+    "python_test_count": 20,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

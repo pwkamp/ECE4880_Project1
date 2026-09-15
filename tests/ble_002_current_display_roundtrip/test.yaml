@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "BLE-002",
+  "name": "GET_CURRENT and SET_DISPLAY protocol round trips",
+  "entrypoint": "test_ble_002.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-501",
+      "uid": "INT-MLR-402"
+    },
+    {
+      "jira": "SCRUM-502",
+      "uid": "INT-MLR-403"
+    },
+    {
+      "jira": "SCRUM-511",
+      "uid": "INT-LLR-404"
+    },
+    {
+      "jira": "SCRUM-512",
+      "uid": "INT-LLR-405"
+    },
+    {
+      "jira": "SCRUM-513",
+      "uid": "INT-LLR-406"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "verification-firmware",
+        "implementation:BLE-002:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable; LED simulates LCD",
+  "test_type": "BLE HIL protocol integration",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 2,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

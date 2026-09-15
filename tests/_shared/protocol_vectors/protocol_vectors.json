@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "protocol_version": 2,
+  "byte_order": "little",
+  "request_vectors": [
+    {
+      "name": "get_current",
+      "opcode": "GET_CURRENT",
+      "request_id": 4660,
+      "payload_hex": "",
+      "packet_hex": "0201341200000000"
+    },
+    {
+      "name": "set_sensor_2_display_on",
+      "opcode": "SET_DISPLAY",
+      "request_id": 2,
+      "payload_hex": "0201",
+      "packet_hex": "02020200020000000201"
+    },
+    {
+      "name": "history_sensor_1_sequence_16909060",
+      "opcode": "GET_HISTORY_CHUNK",
+      "request_id": 3,
+      "payload_hex": "010403020120",
+      "packet_hex": "0204030006000000010403020120"
+    },
+    {
+      "name": "authentication_begin",
+      "opcode": "AUTH_BEGIN",
+      "request_id": 65535,
+      "payload_hex": "",
+      "packet_hex": "0205ffff00000000"
+    }
+  ],
+  "status_values": {
+    "SUCCESS": 0,
+    "INVALID_COMMAND": 1,
+    "INVALID_SENSOR": 2,
+    "INVALID_VALUE": 3,
+    "NOT_AVAILABLE": 4,
+    "INTERNAL_ERROR": 5,
+    "UNSUPPORTED_VERSION": 6,
+    "AUTHENTICATION_REQUIRED": 7,
+    "AUTHENTICATION_FAILED": 8,
+    "AUTHENTICATION_LOCKED": 9
+  }
+}

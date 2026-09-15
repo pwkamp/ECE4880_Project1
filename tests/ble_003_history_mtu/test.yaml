@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "BLE-003",
+  "name": "History metadata, chronological chunks, and MTU adaptation",
+  "entrypoint": "test_ble_003.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-503",
+      "uid": "INT-MLR-404"
+    },
+    {
+      "jira": "SCRUM-514",
+      "uid": "INT-LLR-407"
+    },
+    {
+      "jira": "SCRUM-515",
+      "uid": "INT-LLR-408"
+    },
+    {
+      "jira": "SCRUM-516",
+      "uid": "INT-LLR-409"
+    },
+    {
+      "jira": "SCRUM-517",
+      "uid": "INT-LLR-410"
+    },
+    {
+      "jira": "SCRUM-518",
+      "uid": "INT-LLR-411"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "verification-firmware",
+        "implementation:BLE-003:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Largely runnable; dedicated firmware tests absent",
+  "test_type": "Software-in-loop plus BLE HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 3,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

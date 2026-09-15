@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "HW-007",
+  "name": "LCD content capacity, readability, states, and local backlight control",
+  "entrypoint": "test_hw_007.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-411",
+      "uid": "SYS-HLR-400"
+    },
+    {
+      "jira": "SCRUM-412",
+      "uid": "SYS-HLR-410"
+    },
+    {
+      "jira": "SCRUM-413",
+      "uid": "SYS-HLR-420"
+    },
+    {
+      "jira": "SCRUM-428",
+      "uid": "HWE-MLR-207"
+    },
+    {
+      "jira": "SCRUM-429",
+      "uid": "HWE-MLR-208"
+    },
+    {
+      "jira": "SCRUM-432",
+      "uid": "HWE-MLR-211"
+    },
+    {
+      "jira": "SCRUM-634",
+      "uid": "HWE-MLR-213"
+    },
+    {
+      "jira": "SCRUM-635",
+      "uid": "HWE-MLR-214"
+    },
+    {
+      "jira": "SCRUM-444",
+      "uid": "HWE-LLR-210"
+    },
+    {
+      "jira": "SCRUM-445",
+      "uid": "HWE-LLR-211"
+    },
+    {
+      "jira": "SCRUM-446",
+      "uid": "HWE-LLR-212"
+    },
+    {
+      "jira": "SCRUM-447",
+      "uid": "HWE-LLR-213"
+    },
+    {
+      "jira": "SCRUM-453",
+      "uid": "HWE-LLR-219"
+    },
+    {
+      "jira": "SCRUM-638",
+      "uid": "HWE-LLR-222"
+    }
+  ],
+  "profiles": {
+    "full-hardware": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "lcd",
+        "backlight-input",
+        "camera",
+        "human-review",
+        "implementation:HW-007:full-hardware"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked by LCD/backlight/input selection and real drivers",
+  "test_type": "Full-hardware HITL display acceptance",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "full-hardware"
+  }
+}

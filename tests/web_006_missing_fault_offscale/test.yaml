@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "WEB-006",
+  "name": "Disconnected, no-data, missing, and valid off-scale representation",
+  "entrypoint": "test_web_006.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-568",
+      "uid": "SWE-WEB-MLR-606"
+    },
+    {
+      "jira": "SCRUM-592",
+      "uid": "SWE-WEB-LLR-618"
+    },
+    {
+      "jira": "SCRUM-593",
+      "uid": "SWE-WEB-LLR-619"
+    },
+    {
+      "jira": "SCRUM-594",
+      "uid": "SWE-WEB-LLR-620"
+    },
+    {
+      "jira": "SCRUM-595",
+      "uid": "SWE-WEB-LLR-621"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-006:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; UI absent and DB vocabulary unresolved",
+  "test_type": "Browser functional plus visual review",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

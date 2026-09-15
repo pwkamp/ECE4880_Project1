@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "CON-008",
+  "name": "Running-software recovery after third-box power-on within 10 seconds",
+  "entrypoint": "test_con_008.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-643",
+      "uid": "SWE-CONN-MLR-508"
+    },
+    {
+      "jira": "SCRUM-645",
+      "uid": "SWE-CONN-LLR-516"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-physical": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "power-relay",
+        "mysql",
+        "implementation:CON-008:hil-physical"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test",
+    "test-mysql",
+    "power-relay"
+  ],
+  "current_feasibility": "Partially runnable; external persistence missing",
+  "test_type": "Hardware-in-the-loop performance",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 1,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-physical"
+  }
+}

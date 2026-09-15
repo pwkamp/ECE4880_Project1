@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "baseline_date": "2026-09-11",
+  "test_matrix": {
+    "source_filename": "thermometer_test_matrix.csv",
+    "locked_path": "tests/test_matrix.lock.csv",
+    "sha256": "64b2e51eba72a59ddde3a4787d6461919f40113da36c79287a116ef053ede154",
+    "row_count": 56
+  },
+  "jira_requirements": {
+    "locked_path": "tests/requirements.lock.json",
+    "requirement_content_baseline_sha256": "7e57fd6b95a6d90a36ea677607182e47325929998c242e83b5190d45528d0c96",
+    "requirement_count": 255,
+    "read_only": true
+  }
+}

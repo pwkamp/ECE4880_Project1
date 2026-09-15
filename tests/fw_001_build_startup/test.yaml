@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "FW-001",
+  "name": "Firmware clean build matrix and startup initialization",
+  "entrypoint": "test_fw_001.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-456",
+      "uid": "SWE-EMB-MLR-300"
+    },
+    {
+      "jira": "SCRUM-470",
+      "uid": "SWE-EMB-LLR-300"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp-idf",
+        "device-config"
+      ]
+    }
+  },
+  "timeout_seconds": 900,
+  "exclusive_resources": [],
+  "current_feasibility": "Partially runnable; real backends are stubs",
+  "test_type": "Firmware build integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "implemented",
+    "python_test_count": 1,
+    "pr1_vitest": false,
+    "qualification_profile": "unit"
+  }
+}

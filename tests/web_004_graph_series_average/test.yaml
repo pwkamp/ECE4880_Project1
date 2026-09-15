@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "WEB-004",
+  "name": "Graph series selection, same-sample average, and prominent current values",
+  "entrypoint": "test_web_004.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-566",
+      "uid": "SWE-WEB-MLR-604"
+    },
+    {
+      "jira": "SCRUM-647",
+      "uid": "SWE-WEB-MLR-613"
+    },
+    {
+      "jira": "SCRUM-587",
+      "uid": "SWE-WEB-LLR-613"
+    },
+    {
+      "jira": "SCRUM-588",
+      "uid": "SWE-WEB-LLR-614"
+    },
+    {
+      "jira": "SCRUM-589",
+      "uid": "SWE-WEB-LLR-615"
+    },
+    {
+      "jira": "SCRUM-649",
+      "uid": "SWE-WEB-LLR-630"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-004:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; graph UI is absent",
+  "test_type": "Browser data-visualization integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

@@ -21,6 +21,7 @@ backend/     Python BLE library, REST service, GUI, and unit tests
 firmware/    Complete ESP-IDF project
 protocol/    Shared JSON schema plus validation/header-generation tools
 docs/        Architecture, traceability, and power-measurement notes
+tests/       Consolidated requirement catalog, runner, and evidence schemas
 ```
 
 Neither consumer owns a private protocol copy. Python locates the sibling
@@ -422,7 +423,8 @@ backend\.venv\Scripts\python.exe -m pip install -r backend\pc_client\requirement
 backend\.venv\Scripts\python.exe master_test.py
 ```
 
-The tests cover byte layout, request IDs, response validation, current/history
+The root command discovers both the 77 connector tests and the test-runner
+unit tests. The connector tests cover byte layout, request IDs, response validation, current/history
 decoding, incomplete-record rejection, requester-only ordering, display control,
 MTU-aware chunk sizing, controller state/reconnect behavior, provisional poll
 slots, priority preemption, history budgets/retries, database isolation, GUI
@@ -431,6 +433,20 @@ challenge proof construction, autonomous state transitions, and API error
 mapping. The suite uses mocked BLE and Windows pairing boundaries, so it does
 not require an ESP32 or Bluetooth adapter. `master_test.py` returns zero only
 when the entire discovered suite passes.
+
+### Consolidated requirement tests
+
+The project-wide runner freezes all 255 Jira requirements into 56 consolidated
+test owners and keeps PASS separate from qualification credit:
+
+```powershell
+backend\.venv\Scripts\python.exe -m tests.runner validate
+backend\.venv\Scripts\python.exe -m tests.runner plan --profile unit --all
+backend\.venv\Scripts\python.exe -m tests.runner run --profile unit --test BLE-005 --executor "Your Name"
+```
+
+See [tests/README.md](tests/README.md) for profiles, immutable evidence,
+GitHub PR #1 integration behavior, and blocked hardware/manual boundaries.
 
 ### Firmware build tests
 

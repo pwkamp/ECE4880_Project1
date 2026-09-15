@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "WEB-010",
+  "name": "Authentication, server-side RBAC, password hashing, and session security",
+  "entrypoint": "test_web_010.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-609",
+      "uid": "SWE-SEC-MLR-750"
+    },
+    {
+      "jira": "SCRUM-625",
+      "uid": "SWE-SEC-LLR-750"
+    },
+    {
+      "jira": "SCRUM-626",
+      "uid": "SWE-SEC-LLR-751"
+    },
+    {
+      "jira": "SCRUM-627",
+      "uid": "SWE-SEC-LLR-752"
+    },
+    {
+      "jira": "SCRUM-628",
+      "uid": "SWE-SEC-LLR-753"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-010:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; web/auth/users table absent",
+  "test_type": "Security integration test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

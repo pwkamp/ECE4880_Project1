@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "WEB-001",
+  "name": "Current/history APIs and one-hertz browser refresh",
+  "entrypoint": "test_web_001.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-562",
+      "uid": "SWE-WEB-MLR-600"
+    },
+    {
+      "jira": "SCRUM-563",
+      "uid": "SWE-WEB-MLR-601"
+    },
+    {
+      "jira": "SCRUM-574",
+      "uid": "SWE-WEB-LLR-600"
+    },
+    {
+      "jira": "SCRUM-575",
+      "uid": "SWE-WEB-LLR-601"
+    },
+    {
+      "jira": "SCRUM-578",
+      "uid": "SWE-WEB-LLR-604"
+    },
+    {
+      "jira": "SCRUM-579",
+      "uid": "SWE-WEB-LLR-605"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-001:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; frontend is a placeholder",
+  "test_type": "API and browser integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "DB-003",
+  "name": "Users, roles, recipients, and alert-rule schema",
+  "entrypoint": "test_db_003.py",
+  "owners": [
+    "database"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-532",
+      "uid": "SWE-DB-MLR-552"
+    },
+    {
+      "jira": "SCRUM-554",
+      "uid": "SWE-DB-LLR-554"
+    },
+    {
+      "jira": "SCRUM-555",
+      "uid": "SWE-DB-LLR-555"
+    },
+    {
+      "jira": "SCRUM-556",
+      "uid": "SWE-DB-LLR-556"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "mysql-test-instance",
+        "production-mysql-adapter",
+        "implementation:DB-003:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Blocked; tables are absent",
+  "test_type": "MySQL schema and CRUD integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

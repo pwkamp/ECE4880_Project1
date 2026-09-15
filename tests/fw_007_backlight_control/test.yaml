@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "FW-007",
+  "name": "Backlight software abstraction and selected input behavior",
+  "entrypoint": "test_fw_007.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-465",
+      "uid": "SWE-EMB-MLR-309"
+    },
+    {
+      "jira": "SCRUM-490",
+      "uid": "SWE-EMB-LLR-320"
+    },
+    {
+      "jira": "SCRUM-491",
+      "uid": "SWE-EMB-LLR-321"
+    },
+    {
+      "jira": "SCRUM-492",
+      "uid": "SWE-EMB-LLR-322"
+    }
+  ],
+  "profiles": {
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "verification-firmware",
+        "implementation:FW-007:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Blocked by backlight hardware/input selection",
+  "test_type": "Firmware unit plus HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

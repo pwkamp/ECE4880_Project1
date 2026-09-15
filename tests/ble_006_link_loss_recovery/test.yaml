@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "BLE-006",
+  "name": "Automatic BLE link-loss recovery",
+  "entrypoint": "test_ble_006.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-504",
+      "uid": "INT-MLR-405"
+    },
+    {
+      "jira": "SCRUM-522",
+      "uid": "INT-LLR-415"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "verification-firmware",
+        "implementation:BLE-006:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with current service and fake firmware backends",
+  "test_type": "BLE HIL recovery",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 3,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

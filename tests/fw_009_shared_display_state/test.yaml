@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "FW-009",
+  "name": "Unified local/remote display state path and invalid-command protection",
+  "entrypoint": "test_fw_009.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-469",
+      "uid": "SWE-EMB-MLR-313"
+    },
+    {
+      "jira": "SCRUM-497",
+      "uid": "SWE-EMB-LLR-327"
+    },
+    {
+      "jira": "SCRUM-498",
+      "uid": "SWE-EMB-LLR-328"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "firmware-unity",
+        "implementation:FW-009:unit"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Mostly runnable in current logic",
+  "test_type": "Firmware unit and software-in-loop",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "unit"
+  }
+}

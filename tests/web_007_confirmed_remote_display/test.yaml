@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "WEB-007",
+  "name": "Admin remote-display controls, confirmed result, and display-enable semantics",
+  "entrypoint": "test_web_007.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-569",
+      "uid": "SWE-WEB-MLR-607"
+    },
+    {
+      "jira": "SCRUM-630",
+      "uid": "SWE-WEB-MLR-612"
+    },
+    {
+      "jira": "SCRUM-576",
+      "uid": "SWE-WEB-LLR-602"
+    },
+    {
+      "jira": "SCRUM-577",
+      "uid": "SWE-WEB-LLR-603"
+    },
+    {
+      "jira": "SCRUM-596",
+      "uid": "SWE-WEB-LLR-622"
+    },
+    {
+      "jira": "SCRUM-597",
+      "uid": "SWE-WEB-LLR-623"
+    },
+    {
+      "jira": "SCRUM-631",
+      "uid": "SWE-WEB-LLR-629"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-007:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked by web UI and real LCD; connector REST path exists",
+  "test_type": "Browser/API integration plus HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "BLE-005",
+  "name": "Protocol header, request ID, version, and status conformance",
+  "entrypoint": "test_ble_005.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-506",
+      "uid": "INT-MLR-407"
+    },
+    {
+      "jira": "SCRUM-509",
+      "uid": "INT-LLR-402"
+    },
+    {
+      "jira": "SCRUM-510",
+      "uid": "INT-LLR-403"
+    },
+    {
+      "jira": "SCRUM-519",
+      "uid": "INT-LLR-412"
+    },
+    {
+      "jira": "SCRUM-520",
+      "uid": "INT-LLR-413"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "cross-language": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "c-compiler",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable; current Python tests cover core cases",
+  "test_type": "Protocol unit and fuzz test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "implemented",
+    "python_test_count": 4,
+    "pr1_vitest": true,
+    "qualification_profile": "unit"
+  }
+}

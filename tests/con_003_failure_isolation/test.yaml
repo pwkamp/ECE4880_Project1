@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "CON-003",
+  "name": "Missing one-second intervals and BLE/database failure isolation",
+  "entrypoint": "test_con_003.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-527",
+      "uid": "SWE-CONN-MLR-504"
+    },
+    {
+      "jira": "SCRUM-538",
+      "uid": "SWE-CONN-LLR-503"
+    },
+    {
+      "jira": "SCRUM-549",
+      "uid": "SWE-CONN-LLR-514"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "scripted-ble",
+        "implementation:CON-003:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable with adapter spy; MySQL confirmation pending",
+  "test_type": "Fault-injection integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 4,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

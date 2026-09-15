@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "HW-006",
+  "name": "ESP32, ESP-IDF, and BLE platform compatibility",
+  "entrypoint": "test_hw_006.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-427",
+      "uid": "HWE-MLR-206"
+    },
+    {
+      "jira": "SCRUM-443",
+      "uid": "HWE-LLR-209"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp-idf",
+        "device-config"
+      ]
+    }
+  },
+  "timeout_seconds": 900,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable with ESP-IDF 6.x",
+  "test_type": "Build and static compatibility",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "implemented",
+    "python_test_count": 1,
+    "pr1_vitest": false,
+    "qualification_profile": "unit"
+  }
+}

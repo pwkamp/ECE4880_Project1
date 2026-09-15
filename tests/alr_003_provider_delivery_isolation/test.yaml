@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "ALR-003",
+  "name": "Email/SMS provider adapters and failure isolation",
+  "entrypoint": "test_alr_003.py",
+  "owners": [
+    "alerts"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-606",
+      "uid": "SWE-ALR-MLR-703"
+    },
+    {
+      "jira": "SCRUM-616",
+      "uid": "SWE-ALR-LLR-706"
+    },
+    {
+      "jira": "SCRUM-617",
+      "uid": "SWE-ALR-LLR-707"
+    },
+    {
+      "jira": "SCRUM-618",
+      "uid": "SWE-ALR-LLR-708"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "external": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "email-sandbox",
+        "sms-sandbox",
+        "provider-adapters",
+        "implementation:ALR-003:external"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "provider-test-destination"
+  ],
+  "current_feasibility": "Blocked; adapters absent",
+  "test_type": "Provider sandbox integration",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "external"
+  }
+}

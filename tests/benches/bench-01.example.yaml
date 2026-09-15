@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "id": "bench-01",
+  "capabilities": ["esp32", "ble", "verification-firmware"],
+  "resources": {
+    "serial_port": "SET_IN_LOCAL_COPY",
+    "ble_adapter": "SET_IN_LOCAL_COPY"
+  },
+  "instruments": []
+}

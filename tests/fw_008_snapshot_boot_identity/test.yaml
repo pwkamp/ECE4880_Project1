@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "FW-008",
+  "name": "Atomic current snapshot and boot/session identity",
+  "entrypoint": "test_fw_008.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-467",
+      "uid": "SWE-EMB-MLR-311"
+    },
+    {
+      "jira": "SCRUM-494",
+      "uid": "SWE-EMB-LLR-324"
+    },
+    {
+      "jira": "SCRUM-495",
+      "uid": "SWE-EMB-LLR-325"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "firmware-unity",
+        "implementation:FW-008:unit"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Logic present; C test harness missing",
+  "test_type": "Firmware concurrency unit test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "unit"
+  }
+}

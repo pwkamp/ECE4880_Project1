@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "CON-004",
+  "name": "History synchronization, reconstructed time, idempotency, and gap reconciliation",
+  "entrypoint": "test_con_004.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-526",
+      "uid": "SWE-CONN-MLR-503"
+    },
+    {
+      "jira": "SCRUM-540",
+      "uid": "SWE-CONN-LLR-505"
+    },
+    {
+      "jira": "SCRUM-541",
+      "uid": "SWE-CONN-LLR-506"
+    },
+    {
+      "jira": "SCRUM-542",
+      "uid": "SWE-CONN-LLR-507"
+    },
+    {
+      "jira": "SCRUM-543",
+      "uid": "SWE-CONN-LLR-508"
+    },
+    {
+      "jira": "SCRUM-544",
+      "uid": "SWE-CONN-LLR-509"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "scripted-ble",
+        "implementation:CON-004:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Partially runnable; concrete adapter/reconciliation absent",
+  "test_type": "Software-in-loop plus database integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 3,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

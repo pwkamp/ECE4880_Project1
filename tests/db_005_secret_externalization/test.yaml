@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "DB-005",
+  "name": "Database secret externalization",
+  "entrypoint": "test_db_005.py",
+  "owners": [
+    "database"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-561",
+      "uid": "SWE-DB-LLR-561"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable now for current files; production adapter config pending",
+  "test_type": "Static security and deployment smoke test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "implemented",
+    "python_test_count": 1,
+    "pr1_vitest": true,
+    "qualification_profile": "unit"
+  }
+}

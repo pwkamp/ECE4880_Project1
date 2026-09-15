@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "SYS-004",
+  "name": "Configurable high/low email and SMS delivery",
+  "entrypoint": "test_sys_004.py",
+  "owners": [
+    "system"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-418",
+      "uid": "SYS-HLR-700"
+    }
+  ],
+  "profiles": {
+    "external": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "mysql",
+        "web-console",
+        "email-sandbox",
+        "sms-sandbox",
+        "implementation:SYS-004:external"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql",
+    "provider-test-destination"
+  ],
+  "current_feasibility": "Blocked by database, web settings, alert evaluator, and providers",
+  "test_type": "Full-system external-service acceptance",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "external"
+  }
+}

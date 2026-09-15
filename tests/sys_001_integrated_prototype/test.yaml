@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "SYS-001",
+  "name": "Integrated prototype, internet data access, and 300-second graph",
+  "entrypoint": "test_sys_001.py",
+  "owners": [
+    "system"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-400",
+      "uid": "PRJ-REQ-002"
+    },
+    {
+      "jira": "SCRUM-403",
+      "uid": "SYS-HLR-100"
+    },
+    {
+      "jira": "SCRUM-404",
+      "uid": "SYS-HLR-110"
+    },
+    {
+      "jira": "SCRUM-414",
+      "uid": "SYS-HLR-500"
+    },
+    {
+      "jira": "SCRUM-417",
+      "uid": "SYS-HLR-600"
+    }
+  ],
+  "profiles": {
+    "full-hardware": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "full-system-bench",
+        "mysql",
+        "web-console",
+        "implementation:SYS-001:full-hardware"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Blocked by final hardware, database, and web UI",
+  "test_type": "Full-system acceptance",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "full-hardware"
+  }
+}

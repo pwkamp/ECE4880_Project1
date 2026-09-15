@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "ALR-001",
+  "name": "Per-recipient, per-source alert rule evaluation",
+  "entrypoint": "test_alr_001.py",
+  "owners": [
+    "alerts"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-603",
+      "uid": "SWE-ALR-MLR-700"
+    },
+    {
+      "jira": "SCRUM-604",
+      "uid": "SWE-ALR-MLR-701"
+    },
+    {
+      "jira": "SCRUM-605",
+      "uid": "SWE-ALR-MLR-702"
+    },
+    {
+      "jira": "SCRUM-607",
+      "uid": "SWE-ALR-MLR-704"
+    },
+    {
+      "jira": "SCRUM-632",
+      "uid": "SWE-ALR-MLR-706"
+    },
+    {
+      "jira": "SCRUM-610",
+      "uid": "SWE-ALR-LLR-700"
+    },
+    {
+      "jira": "SCRUM-611",
+      "uid": "SWE-ALR-LLR-701"
+    },
+    {
+      "jira": "SCRUM-612",
+      "uid": "SWE-ALR-LLR-702"
+    },
+    {
+      "jira": "SCRUM-613",
+      "uid": "SWE-ALR-LLR-703"
+    },
+    {
+      "jira": "SCRUM-614",
+      "uid": "SWE-ALR-LLR-704"
+    },
+    {
+      "jira": "SCRUM-615",
+      "uid": "SWE-ALR-LLR-705"
+    },
+    {
+      "jira": "SCRUM-619",
+      "uid": "SWE-ALR-LLR-709"
+    },
+    {
+      "jira": "SCRUM-620",
+      "uid": "SWE-ALR-LLR-710"
+    },
+    {
+      "jira": "SCRUM-633",
+      "uid": "SWE-ALR-LLR-715"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "alert-engine",
+        "mysql-test-instance",
+        "implementation:ALR-001:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Blocked; alert subsystem/tables absent",
+  "test_type": "Table-driven unit plus database integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

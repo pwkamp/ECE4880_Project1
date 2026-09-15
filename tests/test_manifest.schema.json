@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ece4880.example/schemas/test-manifest-v1.json",
+  "title": "Consolidated thermometer test manifest",
+  "type": "object",
+  "required": ["schema_version", "id", "name", "entrypoint", "owners", "requirements", "profiles", "timeout_seconds", "exclusive_resources", "current_feasibility", "implementation"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[A-Z]{2,4}-[0-9]{3}$"},
+    "name": {"type": "string", "minLength": 1},
+    "entrypoint": {"type": "string", "pattern": "^test_[a-z0-9_]+\\.py$"},
+    "owners": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["jira", "uid"],
+        "properties": {
+          "jira": {"type": "string", "pattern": "^SCRUM-[0-9]+$"},
+          "uid": {"type": "string", "minLength": 5}
+        },
+        "additionalProperties": false
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["automation", "evidence_credit", "capabilities"],
+        "properties": {
+          "automation": {"enum": ["automated", "semi-automated", "manual"]},
+          "evidence_credit": {"enum": ["FULL", "PARTIAL", "SUPPORTING_ONLY", "NONE"]},
+          "capabilities": {"type": "array", "items": {"type": "string"}},
+          "optional_capabilities": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+    "exclusive_resources": {"type": "array", "items": {"type": "string"}},
+    "current_feasibility": {"type": "string"},
+    "implementation": {
+      "type": "object",
+      "required": ["phase", "status"],
+      "properties": {
+        "phase": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["placeholder", "harvested", "implemented", "partial"]}
+      }
+    }
+  },
+  "additionalProperties": true
+}

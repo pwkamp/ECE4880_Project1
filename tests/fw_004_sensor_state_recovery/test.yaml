@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "FW-004",
+  "name": "Sensor visible-state machine, disconnect, and recovery",
+  "entrypoint": "test_fw_004.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-459",
+      "uid": "SWE-EMB-MLR-303"
+    },
+    {
+      "jira": "SCRUM-460",
+      "uid": "SWE-EMB-MLR-304"
+    },
+    {
+      "jira": "SCRUM-468",
+      "uid": "SWE-EMB-MLR-312"
+    },
+    {
+      "jira": "SCRUM-478",
+      "uid": "SWE-EMB-LLR-308"
+    },
+    {
+      "jira": "SCRUM-479",
+      "uid": "SWE-EMB-LLR-309"
+    },
+    {
+      "jira": "SCRUM-480",
+      "uid": "SWE-EMB-LLR-310"
+    },
+    {
+      "jira": "SCRUM-481",
+      "uid": "SWE-EMB-LLR-311"
+    },
+    {
+      "jira": "SCRUM-496",
+      "uid": "SWE-EMB-LLR-326"
+    }
+  ],
+  "profiles": {
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "verification-firmware",
+        "implementation:FW-004:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with fake sensors",
+  "test_type": "Firmware unit plus HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

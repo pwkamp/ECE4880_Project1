@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "source_root": "backend/pc_client/tests",
+  "expected_test_count": 77,
+  "mapping_rule": "Each pre-runner test case has exactly one consolidated primary owner; additional evidence relationships belong in result metadata.",
+  "owners": {
+    "CON-001": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_startup_auto_connects_only_device_and_publishes_current_first",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_multiple_devices_require_explicit_selection",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_explicit_disconnect_suppresses_reconnection_but_keeps_target",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_manual_scan_joins_startup_discovery",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_manual_selection_wins_over_in_flight_discovery",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_disconnect_supersedes_in_flight_gatt_connection",
+      "backend/pc_client/tests/test_database_adapter.py::DatabaseAdapterTests::test_no_environment_setting_selects_noop_adapter",
+      "backend/pc_client/tests/test_database_adapter.py::DatabaseAdapterTests::test_environment_factory_loads_replaceable_adapter",
+      "backend/pc_client/tests/test_database_adapter.py::DatabaseAdapterTests::test_invalid_factory_setting_has_an_actionable_error",
+      "backend/pc_client/tests/test_gui_worker.py::GuiWorkerTests::test_submitted_operation_errors_are_consumed_and_reported",
+      "backend/pc_client/tests/test_gui_worker.py::GuiWorkerTests::test_gui_connect_delegates_to_service_controller",
+      "backend/pc_client/tests/test_service_api.py::ServiceApiTests::test_lifecycle_and_read_endpoints",
+      "backend/pc_client/tests/test_service_api.py::ServiceApiTests::test_all_control_endpoints_return_their_contracts",
+      "backend/pc_client/tests/test_service_api.py::ServiceApiTests::test_validation_and_service_errors_are_mapped",
+      "backend/pc_client/tests/test_service_api.py::ServiceApiTests::test_unavailable_maps_to_503",
+      "backend/pc_client/tests/test_service_api.py::ServiceApiTests::test_authentication_required_maps_to_401",
+      "backend/pc_client/tests/test_service_components.py::StateReducerTests::test_rejects_ready_state_without_transport",
+      "backend/pc_client/tests/test_service_components.py::StateReducerTests::test_connected_state_is_complete_and_revisioned",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_client_configuration_contains_only_active_settings",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_service_configuration_is_central_and_loopback_only"
+    ],
+    "CON-008": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_startup_discovers_device_that_is_powered_on_later"
+    ],
+    "CON-006": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_startup_recovers_from_a_discovery_failure_without_api_input",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_unexpected_disconnect_reconnects_to_process_target",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_failed_gatt_open_returns_to_reconnect_probe_and_recovers",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_reconnect_waits_for_restarted_device_and_refreshes_target",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_late_disconnect_from_replaced_client_is_ignored",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_reconnect_continues_when_old_client_cleanup_stalls",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_scan_recovers_registered_name_when_windows_reports_unknown",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_connected_state_does_not_wait_for_persistence",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_disconnection_callback_immediately_starts_recovery",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_event_callback_cannot_stall_authoritative_state"
+    ],
+    "CON-004": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_history_is_metadata_first_recent_first_and_round_robin",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_history_retries_a_chunk_twice_before_succeeding",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_history_budget_persists_and_reports_partial_results"
+    ],
+    "CON-005": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_display_preempts_history_between_chunks",
+      "backend/pc_client/tests/test_service_components.py::SchedulerTests::test_display_preempts_queued_history"
+    ],
+    "CON-003": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_disconnected_poll_cycles_publish_distinct_provisional_slots",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_database_failure_does_not_terminate_connection_worker",
+      "backend/pc_client/tests/test_service_components.py::PersistenceWorkerTests::test_full_queue_reports_loss_without_blocking",
+      "backend/pc_client/tests/test_service_components.py::PersistenceWorkerTests::test_adapter_exception_does_not_stop_worker"
+    ],
+    "CON-002": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_monotonic_scheduler_produces_300_one_second_slots"
+    ],
+    "BLE-004": [
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_unknown_single_device_waits_for_pin_then_enrolls",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_rejected_application_credential_stops_automatic_retry",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_pairing_reset_is_authorized_and_ordered",
+      "backend/pc_client/tests/test_ble_service.py::BleServiceTests::test_pairing_reset_partial_failure_remains_observable",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_connection_uses_stock_bleak_without_implicit_pairing",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_public_pair_uses_central_passkey_and_timeout",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_public_forget_pairing_uses_explicit_windows_reset",
+      "backend/pc_client/tests/test_credential_registry.py::CredentialRegistryTests::test_default_csv_is_beside_main",
+      "backend/pc_client/tests/test_credential_registry.py::CredentialRegistryTests::test_verified_credentials_round_trip_and_preserve_leading_zero",
+      "backend/pc_client/tests/test_credential_registry.py::CredentialRegistryTests::test_rejects_invalid_address_and_passkey",
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_authentication_proof_is_deterministic_and_never_contains_pin",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_shared_json_contains_no_device_secret",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_per_device_configuration_requires_six_digits",
+      "backend/pc_client/tests/test_windows_pairing.py::WindowsPairingTests::test_resolves_address_and_injects_zero_padded_passkey",
+      "backend/pc_client/tests/test_windows_pairing.py::WindowsPairingTests::test_reuses_existing_authenticated_bond",
+      "backend/pc_client/tests/test_windows_pairing.py::WindowsPairingTests::test_cleanup_error_does_not_hide_successful_pairing",
+      "backend/pc_client/tests/test_windows_pairing.py::WindowsPairingTests::test_pairing_failure_reports_status_and_removes_handler",
+      "backend/pc_client/tests/test_windows_pairing.py::WindowsPairingTests::test_forget_device_explicitly_removes_bond"
+    ],
+    "BLE-006": [
+      "backend/pc_client/tests/test_client.py::ClientTests::test_blank_platform_error_gets_a_useful_name",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_failed_exchange_disconnects_without_hidden_retry",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_physical_disconnect_retains_backend_until_cleanup"
+    ],
+    "BLE-001": [
+      "backend/pc_client/tests/test_client.py::ClientTests::test_client_is_always_requester_and_controls_display",
+      "backend/pc_client/tests/test_client.py::ClientTests::test_disconnect_waits_for_complete_write_read_transaction"
+    ],
+    "BLE-003": [
+      "backend/pc_client/tests/test_client.py::ClientTests::test_chunk_size_adapts_to_mtu",
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_history_request_uses_stable_sequence_addressing",
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_decodes_only_complete_history_records"
+    ],
+    "SYS-003": [
+      "backend/pc_client/tests/test_gui_worker.py::GuiWorkerTests::test_gui_display_delegates_to_service_scheduler"
+    ],
+    "BLE-002": [
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_set_display_request_has_expected_little_endian_layout",
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_decodes_current_snapshot"
+    ],
+    "BLE-005": [
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_rejects_response_with_wrong_request_id",
+      "backend/pc_client/tests/test_protocol.py::ProtocolTests::test_surfaces_server_status",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_shared_protocol_is_the_monorepo_sibling",
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_json_drives_python_enums_and_layouts"
+    ],
+    "HW-006": [
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_vscode_workspace_selects_the_firmware_project"
+    ],
+    "DB-005": [
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_repository_ignores_credentials_and_generated_state"
+    ],
+    "FW-001": [
+      "backend/pc_client/tests/test_shared_config.py::SharedConfigTests::test_generated_firmware_header_matches_python_sizes"
+    ]
+  }
+}
+

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "WEB-005",
+  "name": "Celsius/Fahrenheit presentation without storage mutation",
+  "entrypoint": "test_web_005.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-567",
+      "uid": "SWE-WEB-MLR-605"
+    },
+    {
+      "jira": "SCRUM-590",
+      "uid": "SWE-WEB-LLR-616"
+    },
+    {
+      "jira": "SCRUM-591",
+      "uid": "SWE-WEB-LLR-617"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-005:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; web UI absent",
+  "test_type": "Unit plus browser integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

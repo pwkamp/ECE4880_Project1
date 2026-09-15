@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "HW-008",
+  "name": "Accidental standard USB-C connection safety",
+  "entrypoint": "test_hw_008.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-431",
+      "uid": "HWE-MLR-210"
+    },
+    {
+      "jira": "SCRUM-451",
+      "uid": "HWE-LLR-217"
+    },
+    {
+      "jira": "SCRUM-452",
+      "uid": "HWE-LLR-218"
+    }
+  ],
+  "profiles": {
+    "hil-physical": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "hardware-schematics",
+        "usb-c-safety-fixture",
+        "power-analyzer",
+        "implementation:HW-008:hil-physical"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked by schematics and hardware",
+  "test_type": "Hardware safety analysis and fault injection",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-physical"
+  }
+}

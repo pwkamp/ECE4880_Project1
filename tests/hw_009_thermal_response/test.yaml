@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "HW-009",
+  "name": "Hand and soldering-iron thermal response",
+  "entrypoint": "test_hw_009.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-409",
+      "uid": "SYS-HLR-310"
+    },
+    {
+      "jira": "SCRUM-637",
+      "uid": "HWE-MLR-216"
+    },
+    {
+      "jira": "SCRUM-640",
+      "uid": "HWE-LLR-224"
+    },
+    {
+      "jira": "SCRUM-641",
+      "uid": "HWE-LLR-225"
+    }
+  ],
+  "profiles": {
+    "full-hardware": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "real-sensors",
+        "reference-thermometer",
+        "thermal-fixture",
+        "implementation:HW-009:full-hardware"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked by production sensors and driver",
+  "test_type": "Full-hardware dynamic response",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "full-hardware"
+  }
+}

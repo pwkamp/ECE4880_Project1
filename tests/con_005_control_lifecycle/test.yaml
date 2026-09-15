@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "CON-005",
+  "name": "Control IPC or queue worker lifecycle and completion",
+  "entrypoint": "test_con_005.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-528",
+      "uid": "SWE-CONN-MLR-505"
+    },
+    {
+      "jira": "SCRUM-545",
+      "uid": "SWE-CONN-LLR-510"
+    },
+    {
+      "jira": "SCRUM-546",
+      "uid": "SWE-CONN-LLR-511"
+    },
+    {
+      "jira": "SCRUM-547",
+      "uid": "SWE-CONN-LLR-512"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "control-path-decision",
+        "verification-firmware",
+        "ble",
+        "implementation:CON-005:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter"
+  ],
+  "current_feasibility": "Blocked by architecture decision; current repo uses REST instead of required MySQL queue",
+  "test_type": "Database integration plus HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 2,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

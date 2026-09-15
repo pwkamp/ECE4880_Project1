@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "ALR-002",
+  "name": "NORMAL/HIGH/LOW episode state and duplicate suppression",
+  "entrypoint": "test_alr_002.py",
+  "owners": [
+    "alerts"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-608",
+      "uid": "SWE-ALR-MLR-705"
+    },
+    {
+      "jira": "SCRUM-621",
+      "uid": "SWE-ALR-LLR-711"
+    },
+    {
+      "jira": "SCRUM-622",
+      "uid": "SWE-ALR-LLR-712"
+    },
+    {
+      "jira": "SCRUM-623",
+      "uid": "SWE-ALR-LLR-713"
+    },
+    {
+      "jira": "SCRUM-624",
+      "uid": "SWE-ALR-LLR-714"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "alert-engine",
+        "mysql-test-instance",
+        "implementation:ALR-002:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Blocked; evaluator absent",
+  "test_type": "Alert state-machine unit test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

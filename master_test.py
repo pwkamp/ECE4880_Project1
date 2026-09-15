@@ -1,4 +1,4 @@
-"""Run every Python unit test in the repository with one command."""
+"""Run every active stdlib-compatible Python unit test in the repository."""
 
 from __future__ import annotations
 
@@ -9,7 +9,10 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent
 BACKEND_ROOT = REPOSITORY_ROOT / "backend"
-TEST_DIRECTORY = BACKEND_ROOT / "pc_client" / "tests"
+TEST_DIRECTORIES = (
+    BACKEND_ROOT / "pc_client" / "tests",
+    REPOSITORY_ROOT / "tests" / "_framework" / "tests",
+)
 
 
 def main() -> int:
@@ -18,10 +21,20 @@ def main() -> int:
         if root_text not in sys.path:
             sys.path.insert(0, root_text)
 
-    suite = unittest.defaultTestLoader.discover(
-        str(TEST_DIRECTORY),
-        pattern="test_*.py",
-        top_level_dir=str(BACKEND_ROOT),
+    suite = unittest.TestSuite()
+    suite.addTests(
+        unittest.defaultTestLoader.discover(
+            str(TEST_DIRECTORIES[0]),
+            pattern="test_*.py",
+            top_level_dir=str(BACKEND_ROOT),
+        )
+    )
+    suite.addTests(
+        unittest.defaultTestLoader.discover(
+            str(TEST_DIRECTORIES[1]),
+            pattern="test_*.py",
+            top_level_dir=str(REPOSITORY_ROOT),
+        )
     )
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     return 0 if result.wasSuccessful() else 1

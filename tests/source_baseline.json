@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-09-11T18:16:14.033Z",
+  "repository": "pwkamp/ECE4880_Project1",
+  "main": {
+    "sha": "d84fb2f3274475e48b6844249ffba26c7426bb26",
+    "url": "https://github.com/pwkamp/ECE4880_Project1/tree/d84fb2f3274475e48b6844249ffba26c7426bb26"
+  },
+  "pull_request_1": {
+    "title": "Computer console (MVP, mock data source)",
+    "status": "open",
+    "url": "https://github.com/pwkamp/ECE4880_Project1/pull/1",
+    "base_sha": "9f1c6e79ff80888f0518bfea52feb531cabf551e",
+    "reviewed_head_sha": "85b16b47e038c4fe74cf5998a4692f06ee321b0c",
+    "ahead_by": 9,
+    "integration_policy": "Record whether a run used main, the exact PR head, or a named integration commit; never infer one from another."
+  }
+}

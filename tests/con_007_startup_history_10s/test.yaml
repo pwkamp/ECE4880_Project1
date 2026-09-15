@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "CON-007",
+  "name": "Startup retrieval of 300 seconds within 10 seconds",
+  "entrypoint": "test_con_007.py",
+  "owners": [
+    "connector"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-642",
+      "uid": "SWE-CONN-MLR-507"
+    },
+    {
+      "jira": "SCRUM-644",
+      "uid": "SWE-CONN-LLR-515"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "scripted-ble",
+        "implementation:CON-007:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked by production MySQL adapter and web history API",
+  "test_type": "Full-path performance integration",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

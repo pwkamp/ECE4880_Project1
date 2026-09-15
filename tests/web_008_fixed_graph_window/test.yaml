@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "WEB-008",
+  "name": "Fixed compliance graph axes, 300-second window, and leftward scroll",
+  "entrypoint": "test_web_008.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-570",
+      "uid": "SWE-WEB-MLR-608"
+    },
+    {
+      "jira": "SCRUM-572",
+      "uid": "SWE-WEB-MLR-610"
+    },
+    {
+      "jira": "SCRUM-648",
+      "uid": "SWE-WEB-MLR-614"
+    },
+    {
+      "jira": "SCRUM-598",
+      "uid": "SWE-WEB-LLR-624"
+    },
+    {
+      "jira": "SCRUM-599",
+      "uid": "SWE-WEB-LLR-625"
+    },
+    {
+      "jira": "SCRUM-600",
+      "uid": "SWE-WEB-LLR-626"
+    },
+    {
+      "jira": "SCRUM-650",
+      "uid": "SWE-WEB-LLR-631"
+    },
+    {
+      "jira": "SCRUM-651",
+      "uid": "SWE-WEB-LLR-632"
+    },
+    {
+      "jira": "SCRUM-652",
+      "uid": "SWE-WEB-LLR-633"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-008:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; graph UI absent",
+  "test_type": "Browser graph test with fake clock",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

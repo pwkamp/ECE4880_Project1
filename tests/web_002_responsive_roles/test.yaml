@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "WEB-002",
+  "name": "Responsive USER and ADMIN experience",
+  "entrypoint": "test_web_002.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-564",
+      "uid": "SWE-WEB-MLR-602"
+    },
+    {
+      "jira": "SCRUM-580",
+      "uid": "SWE-WEB-LLR-606"
+    },
+    {
+      "jira": "SCRUM-581",
+      "uid": "SWE-WEB-LLR-607"
+    },
+    {
+      "jira": "SCRUM-582",
+      "uid": "SWE-WEB-LLR-608"
+    },
+    {
+      "jira": "SCRUM-583",
+      "uid": "SWE-WEB-LLR-609"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-002:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; frontend and auth UI are absent",
+  "test_type": "Browser functional plus HITL visual",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

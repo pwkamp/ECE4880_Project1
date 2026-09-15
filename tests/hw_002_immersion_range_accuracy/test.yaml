@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "HW-002",
+  "name": "Sensor immersion, range, and room/ice accuracy qualification",
+  "entrypoint": "test_hw_002.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-410",
+      "uid": "SYS-HLR-320"
+    },
+    {
+      "jira": "SCRUM-419",
+      "uid": "SYS-HLR-321"
+    },
+    {
+      "jira": "SCRUM-420",
+      "uid": "SYS-HLR-322"
+    },
+    {
+      "jira": "SCRUM-422",
+      "uid": "HWE-MLR-201"
+    },
+    {
+      "jira": "SCRUM-433",
+      "uid": "HWE-MLR-212"
+    },
+    {
+      "jira": "SCRUM-435",
+      "uid": "HWE-LLR-201"
+    },
+    {
+      "jira": "SCRUM-454",
+      "uid": "HWE-LLR-220"
+    },
+    {
+      "jira": "SCRUM-455",
+      "uid": "HWE-LLR-221"
+    }
+  ],
+  "profiles": {
+    "full-hardware": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "final-hardware",
+        "reference-thermometer",
+        "implementation:HW-002:full-hardware"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; sensor selection and real driver are absent",
+  "test_type": "Full-hardware environmental measurement",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "full-hardware"
+  }
+}

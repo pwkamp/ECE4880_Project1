@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "repository": "pwkamp/ECE4880_Project1",
+  "pull_request": 1,
+  "reviewed_head_sha": "85b16b47e038c4fe74cf5998a4692f06ee321b0c",
+  "reviewed_pr_test_file_count": 18,
+  "note": "Files are assigned to one primary consolidated owner. JUnit cases retain their individual names after the PR tree is integrated.",
+  "owners": {
+    "BLE-005": [
+      "tests/_shared/protocol_vectors/protocol_vectors.test.ts"
+    ],
+    "WEB-001": [
+      "src/App.test.tsx",
+      "src/datasource/mockThermometerSource.test.ts"
+    ],
+    "WEB-005": [
+      "src/lib/logic.test.ts"
+    ],
+    "WEB-006": [
+      "src/datasource/bleMap.test.ts"
+    ],
+    "WEB-007": [
+      "src/datasource/bleClient.test.ts"
+    ],
+    "WEB-008": [
+      "src/lib/chartScroll.test.ts"
+    ],
+    "WEB-010": [
+      "src/lib/sessionCookie.test.ts"
+    ],
+    "CON-007": [
+      "src/datasource/pythonBleSource.test.ts"
+    ],
+    "DB-001": [
+      "server/samples.test.ts"
+    ],
+    "DB-005": [
+      "server/config.test.ts",
+      "server/loadEnv.test.ts"
+    ],
+    "ALR-002": [
+      "src/lib/alertEngine.test.ts"
+    ],
+    "ALR-003": [
+      "src/hooks/useAlertNotifier.test.tsx",
+      "src/lib/notifyClient.test.ts",
+      "server/app.test.ts",
+      "server/notify.test.ts",
+      "server/sms/consoleSender.test.ts",
+      "server/sms/index.test.ts"
+    ]
+  }
+}

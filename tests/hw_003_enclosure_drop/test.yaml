@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "HW-003",
+  "name": "Enclosure, orientation, and connected-cable drop survival",
+  "entrypoint": "test_hw_003.py",
+  "owners": [
+    "hardware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-405",
+      "uid": "SYS-HLR-200"
+    },
+    {
+      "jira": "SCRUM-423",
+      "uid": "HWE-MLR-202"
+    },
+    {
+      "jira": "SCRUM-424",
+      "uid": "HWE-MLR-203"
+    },
+    {
+      "jira": "SCRUM-636",
+      "uid": "HWE-MLR-215"
+    },
+    {
+      "jira": "SCRUM-436",
+      "uid": "HWE-LLR-202"
+    },
+    {
+      "jira": "SCRUM-437",
+      "uid": "HWE-LLR-203"
+    },
+    {
+      "jira": "SCRUM-639",
+      "uid": "HWE-LLR-223"
+    }
+  ],
+  "profiles": {
+    "full-hardware": {
+      "automation": "manual",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "final-hardware",
+        "drop-fixture",
+        "human-review",
+        "implementation:HW-003:full-hardware"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; final enclosure is absent",
+  "test_type": "Full-hardware mechanical acceptance",
+  "execution_mode": "Manual",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "full-hardware"
+  }
+}

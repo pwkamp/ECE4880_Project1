@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "FW-006",
+  "name": "Physical sensor buttons and cached render within 20 ms",
+  "entrypoint": "test_fw_006.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-463",
+      "uid": "SWE-EMB-MLR-307"
+    },
+    {
+      "jira": "SCRUM-482",
+      "uid": "SWE-EMB-LLR-312"
+    },
+    {
+      "jira": "SCRUM-483",
+      "uid": "SWE-EMB-LLR-313"
+    },
+    {
+      "jira": "SCRUM-486",
+      "uid": "SWE-EMB-LLR-316"
+    },
+    {
+      "jira": "SCRUM-487",
+      "uid": "SWE-EMB-LLR-317"
+    }
+  ],
+  "profiles": {
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "verification-firmware",
+        "implementation:FW-006:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Blocked by physical input and LCD drivers",
+  "test_type": "Firmware HIL timing",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

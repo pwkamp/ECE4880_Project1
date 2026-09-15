@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "FW-005",
+  "name": "Local display content, average, fault text, and canonical Celsius",
+  "entrypoint": "test_fw_005.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-461",
+      "uid": "SWE-EMB-MLR-305"
+    },
+    {
+      "jira": "SCRUM-462",
+      "uid": "SWE-EMB-MLR-306"
+    },
+    {
+      "jira": "SCRUM-464",
+      "uid": "SWE-EMB-MLR-308"
+    },
+    {
+      "jira": "SCRUM-466",
+      "uid": "SWE-EMB-MLR-310"
+    },
+    {
+      "jira": "SCRUM-484",
+      "uid": "SWE-EMB-LLR-314"
+    },
+    {
+      "jira": "SCRUM-485",
+      "uid": "SWE-EMB-LLR-315"
+    },
+    {
+      "jira": "SCRUM-488",
+      "uid": "SWE-EMB-LLR-318"
+    },
+    {
+      "jira": "SCRUM-489",
+      "uid": "SWE-EMB-LLR-319"
+    },
+    {
+      "jira": "SCRUM-493",
+      "uid": "SWE-EMB-LLR-323"
+    }
+  ],
+  "profiles": {
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "verification-firmware",
+        "implementation:FW-005:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with LED; physical LCD missing",
+  "test_type": "Firmware unit plus HIL display",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

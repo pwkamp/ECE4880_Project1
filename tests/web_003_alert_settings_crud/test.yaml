@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "WEB-003",
+  "name": "Alert settings CRUD and server-side validation",
+  "entrypoint": "test_web_003.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-565",
+      "uid": "SWE-WEB-MLR-603"
+    },
+    {
+      "jira": "SCRUM-584",
+      "uid": "SWE-WEB-LLR-610"
+    },
+    {
+      "jira": "SCRUM-585",
+      "uid": "SWE-WEB-LLR-611"
+    },
+    {
+      "jira": "SCRUM-586",
+      "uid": "SWE-WEB-LLR-612"
+    },
+    {
+      "jira": "SCRUM-629",
+      "uid": "SWE-SEC-LLR-754"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-003:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Blocked; settings UI/API/tables are absent",
+  "test_type": "Browser plus API/database integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

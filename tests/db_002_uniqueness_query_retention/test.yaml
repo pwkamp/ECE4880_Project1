@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "DB-002",
+  "name": "Sample uniqueness, required query plans, and retention",
+  "entrypoint": "test_db_002.py",
+  "owners": [
+    "database"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-551",
+      "uid": "SWE-DB-LLR-551"
+    },
+    {
+      "jira": "SCRUM-552",
+      "uid": "SWE-DB-LLR-552"
+    },
+    {
+      "jira": "SCRUM-553",
+      "uid": "SWE-DB-LLR-553"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "mysql-test-instance",
+        "production-mysql-adapter",
+        "implementation:DB-002:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Partially runnable; current index omits device_id and retention is absent",
+  "test_type": "MySQL integrity and performance integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}

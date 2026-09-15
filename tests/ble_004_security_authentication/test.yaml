@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "BLE-004",
+  "name": "BLE bonding, encrypted access, and application authentication",
+  "entrypoint": "test_ble_004.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-505",
+      "uid": "INT-MLR-406"
+    },
+    {
+      "jira": "SCRUM-521",
+      "uid": "INT-LLR-414"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "verification-firmware",
+        "implementation:BLE-004:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with current pairing/auth code",
+  "test_type": "Security HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 18,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

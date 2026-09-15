@@ -1,0 +1,32 @@
+name: Test runner validation
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  python-validation:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install test dependencies
+        run: python -m pip install -r backend/pc_client/requirements-dev.txt
+      - name: Validate frozen traceability and generated scaffolds
+        run: |
+          python -m tests.runner validate
+          python -m tests._framework.scaffold --check
+      - name: Run all active Python unit tests
+        run: python master_test.py
+      - name: Run consolidated protocol unit test
+        run: python -m tests.runner run --profile unit --test BLE-005 --executor "GitHub Actions"
+      - name: Upload immutable test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: thermometer-test-evidence
+          path: tests/results/
+          if-no-files-found: warn

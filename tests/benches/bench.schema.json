@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "id", "capabilities", "resources"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string"},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "resources": {"type": "object"},
+    "instruments": {"type": "array", "items": {"type": "object"}}
+  }
+}

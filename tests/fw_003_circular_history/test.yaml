@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "FW-003",
+  "name": "One-second 300-record circular history",
+  "entrypoint": "test_fw_003.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-458",
+      "uid": "SWE-EMB-MLR-302"
+    },
+    {
+      "jira": "SCRUM-474",
+      "uid": "SWE-EMB-LLR-304"
+    },
+    {
+      "jira": "SCRUM-475",
+      "uid": "SWE-EMB-LLR-305"
+    },
+    {
+      "jira": "SCRUM-476",
+      "uid": "SWE-EMB-LLR-306"
+    },
+    {
+      "jira": "SCRUM-477",
+      "uid": "SWE-EMB-LLR-307"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "firmware-unity",
+        "implementation:FW-003:unit"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Logic present; dedicated C unit harness missing",
+  "test_type": "Firmware unit test",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "unit"
+  }
+}

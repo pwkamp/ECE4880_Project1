@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ece4880.example/schemas/requirements-lock-v1.json",
+  "title": "Frozen Jira requirements baseline",
+  "type": "object",
+  "required": ["schema_version", "baseline_date", "source", "expected_counts", "baseline_sha256", "requirements"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "baseline_date": {"type": "string", "format": "date"},
+    "baseline_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source": {"type": "object", "required": ["system", "site", "jql", "read_only_export"]},
+    "expected_counts": {"type": "object", "required": ["total", "by_level"]},
+    "requirements": {
+      "type": "array",
+      "minItems": 255,
+      "maxItems": 255,
+      "items": {
+        "type": "object",
+        "required": ["jira", "uid", "level", "summary", "approved_text", "updated_at", "primary_test", "content_sha256"],
+        "properties": {
+          "jira": {"type": "string", "pattern": "^SCRUM-[0-9]+$"},
+          "uid": {"type": "string", "minLength": 5},
+          "level": {"enum": ["Project", "HLR", "MLR", "LLR"]},
+          "primary_test": {"type": "string", "pattern": "^[A-Z]{2,4}-[0-9]{3}$"},
+          "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

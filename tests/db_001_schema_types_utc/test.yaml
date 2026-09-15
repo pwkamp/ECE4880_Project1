@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "DB-001",
+  "name": "Temperature schema, types, statuses, device identity, and UTC",
+  "entrypoint": "test_db_001.py",
+  "owners": [
+    "database"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-530",
+      "uid": "SWE-DB-MLR-550"
+    },
+    {
+      "jira": "SCRUM-531",
+      "uid": "SWE-DB-MLR-551"
+    },
+    {
+      "jira": "SCRUM-534",
+      "uid": "SWE-DB-MLR-554"
+    },
+    {
+      "jira": "SCRUM-550",
+      "uid": "SWE-DB-LLR-550"
+    },
+    {
+      "jira": "SCRUM-559",
+      "uid": "SWE-DB-LLR-559"
+    },
+    {
+      "jira": "SCRUM-560",
+      "uid": "SWE-DB-LLR-560"
+    }
+  ],
+  "profiles": {
+    "pr1-unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "node",
+        "npm",
+        "pr1-console"
+      ]
+    },
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "mysql-test-instance",
+        "production-mysql-adapter",
+        "implementation:DB-001:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "test-mysql"
+  ],
+  "current_feasibility": "Partially runnable; current schema deviates and migration is destructive",
+  "test_type": "MySQL schema integration",
+  "execution_mode": "Automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 0,
+    "pr1_vitest": true,
+    "qualification_profile": "sitl"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "FW-002",
+  "name": "Continuous dual-sensor acquisition and fault isolation",
+  "entrypoint": "test_fw_002.py",
+  "owners": [
+    "firmware"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-457",
+      "uid": "SWE-EMB-MLR-301"
+    },
+    {
+      "jira": "SCRUM-471",
+      "uid": "SWE-EMB-LLR-301"
+    },
+    {
+      "jira": "SCRUM-472",
+      "uid": "SWE-EMB-LLR-302"
+    },
+    {
+      "jira": "SCRUM-473",
+      "uid": "SWE-EMB-LLR-303"
+    }
+  ],
+  "profiles": {
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "verification-firmware",
+        "implementation:FW-002:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with fake sensors",
+  "test_type": "Firmware unit plus HIL",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

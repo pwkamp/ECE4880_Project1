@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "BLE-001",
+  "name": "Custom GATT service and requester-only application traffic",
+  "entrypoint": "test_ble_001.py",
+  "owners": [
+    "integration"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-499",
+      "uid": "INT-MLR-400"
+    },
+    {
+      "jira": "SCRUM-500",
+      "uid": "INT-MLR-401"
+    },
+    {
+      "jira": "SCRUM-507",
+      "uid": "INT-LLR-400"
+    },
+    {
+      "jira": "SCRUM-508",
+      "uid": "INT-LLR-401"
+    }
+  ],
+  "profiles": {
+    "unit": {
+      "automation": "automated",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema"
+      ]
+    },
+    "hil-sim": {
+      "automation": "semi-automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "esp32",
+        "ble",
+        "verification-firmware",
+        "implementation:BLE-001:hil-sim"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [
+    "ble-adapter",
+    "esp32-under-test"
+  ],
+  "current_feasibility": "Partially runnable with current firmware/client",
+  "test_type": "BLE protocol HIL conformance",
+  "execution_mode": "Semi-automated",
+  "implementation": {
+    "phase": 2,
+    "status": "harvested",
+    "python_test_count": 2,
+    "pr1_vitest": false,
+    "qualification_profile": "hil-sim"
+  }
+}

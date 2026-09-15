@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "DOC-001",
+  "name": "Design dossier and full-range capability evidence",
+  "entrypoint": "test_doc_001.py",
+  "owners": [
+    "project"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-399",
+      "uid": "PRJ-REQ-001"
+    },
+    {
+      "jira": "SCRUM-653",
+      "uid": "PRJ-REQ-005"
+    },
+    {
+      "jira": "SCRUM-408",
+      "uid": "SYS-HLR-300"
+    }
+  ],
+  "profiles": {
+    "manual": {
+      "automation": "manual",
+      "evidence_credit": "PARTIAL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "human-review",
+        "implementation:DOC-001:manual"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Partially runnable",
+  "test_type": "HITL design review",
+  "execution_mode": "Manual",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "manual"
+  }
+}

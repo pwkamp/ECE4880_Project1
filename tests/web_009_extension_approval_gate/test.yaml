@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "WEB-009",
+  "name": "Optional graph-extension approval gate",
+  "entrypoint": "test_web_009.py",
+  "owners": [
+    "computer-console"
+  ],
+  "requirements": [
+    {
+      "jira": "SCRUM-571",
+      "uid": "SWE-WEB-MLR-609"
+    },
+    {
+      "jira": "SCRUM-573",
+      "uid": "SWE-WEB-MLR-611"
+    },
+    {
+      "jira": "SCRUM-601",
+      "uid": "SWE-WEB-LLR-627"
+    },
+    {
+      "jira": "SCRUM-602",
+      "uid": "SWE-WEB-LLR-628"
+    }
+  ],
+  "profiles": {
+    "sitl": {
+      "automation": "automated",
+      "evidence_credit": "FULL",
+      "capabilities": [
+        "python",
+        "pytest",
+        "jsonschema",
+        "pr1-console",
+        "browser",
+        "scripted-source",
+        "implementation:WEB-009:sitl"
+      ]
+    }
+  },
+  "timeout_seconds": 180,
+  "exclusive_resources": [],
+  "current_feasibility": "Runnable as absence check; features not implemented",
+  "test_type": "Requirements/configuration gate",
+  "execution_mode": "Automated plus HITL approval",
+  "implementation": {
+    "phase": 1,
+    "status": "placeholder",
+    "python_test_count": 0,
+    "pr1_vitest": false,
+    "qualification_profile": "sitl"
+  }
+}
