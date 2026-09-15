@@ -135,15 +135,21 @@ you can still demo with only Python + an ESP32.
 - **Python 3.10+** — BLE connector. 3.12/3.14 are fine.
 - **An ESP32** flashed with this repo’s `firmware/` (fake sensors are the
   default and are enough). The box must be powered and advertising.
-- **Bluetooth adapter** on the PC. Automatic PIN pairing is implemented for
-  **Windows 10/11**. Linux/macOS can often scan/connect with Bleak, but the
-  Windows pairing helper will not run; you may have to pair in the OS Bluetooth
-  settings and type the six-digit passkey there.
+- **Bluetooth adapter** on the PC. The Python connector **detects the OS at
+  startup** (`pc_client/platform_runtime.py` via `sys.platform`) and picks the
+  pairing stack — you do not choose Windows vs Linux in config.
+  - **Windows 10/11:** WinRT PIN pairing (`pc_client/windows_pairing.py`).
+    Auto-discover stays on (original design).
+  - **Linux:** BlueZ pairing via D-Bus (`pc_client/linux_pairing.py`). The
+    connector **does not auto-scan in a loop** (that was locking up laptops).
+    Use the console **Scan** then **Connect**, and type the six-digit firmware
+    PIN. Your user should be in the `bluetooth` group.
+  - **macOS:** still pair in OS Settings, then Connect (no native PIN helper).
 - **MySQL 8** if you want the chart seeded from the database (optional for a
   first BLE bring-up).
-- **One Python connector at a time.** It owns the BLE adapter and scans in a
-  loop. A second copy, or leaving it running while hammering scan, can lock up
-  the Bluetooth stack (especially on Linux).
+- **One Python connector at a time.** It owns the BLE adapter. A second copy
+  can lock up Bluetooth. On Linux, leave auto-scan off unless you set
+  `THERMOMETER_LINUX_AUTO_SCAN=1` (not recommended).
 
 Firmware passkey: copy
 `firmware/device_config.cmake.example` → gitignored
@@ -233,10 +239,20 @@ You should see Uvicorn on `http://127.0.0.1:8000`. Leave this terminal open.
 - Raw schema: <http://127.0.0.1:8000/openapi.json>
 - Health: `curl -sS http://127.0.0.1:8000/healthz`
 
-On startup the service **already scans** in the background. With one known
-device it will try to pair/connect by itself. Zero devices stay in
-`DISCOVERING`. Several unknown devices go to `SELECTION_REQUIRED` and you pick
-one from the console.
+The same `main.py` **detects the OS** (`sys.platform`) and chooses pairing:
+
+| `GET /api/v1/ble/status` field | Windows | Linux |
+| --- | --- | --- |
+| `host_os` | `windows` | `linux` |
+| `pairing_backend` | `winrt` | `bluez` |
+| `auto_discover_on_start` | `true` | `false` |
+| Idle `phase` | `DISCOVERING` (background scan) | `DISCONNECTED` (wait for **Scan**) |
+
+`DISCONNECTED` on Linux is idle, not a failure. Confirm detection with:
+
+```bash
+curl -sS http://127.0.0.1:8000/api/v1/ble/status
+```
 
 Successful enrollment writes gitignored `backend/paired_devices.csv` (plaintext
 per-device credentials). Do not commit it.
@@ -280,22 +296,119 @@ Vite proxies (see `vite.config.ts`):
 If you change `.env`, restart Vite. `VITE_*` values are baked in at dev-server
 start.
 
-### 4. Connect a thermometer from the UI
+### 4. Prepare the PC Bluetooth stack (do this before Scan)
 
-1. Power the ESP32; wait until it advertises.
-2. Click **Scan**. You want a name like `Thermometer-A1B2C3` and a MAC.
-3. If the service returns 401 / “authentication required”, enter the firmware
-   six-digit passkey and click **Connect** on that row.
-4. Watch **Device connection** status:
-   - `DISCOVERING` — no box (or BLE adapter unhappy)
-   - `PAIRING` / `CONNECTING` / `VERIFYING` — in progress
-   - `CONNECTED` with `(ready)` — protocol auth + first snapshot succeeded
-   - `AUTHENTICATION_REQUIRED` / `SELECTION_REQUIRED` — you need to act
-   - `RECONNECTING` — radio dropped; it will retry
-5. Use **Sensor display** checkboxes as the virtual buttons (`PUT /displays/1`
-   and `/displays/2`).
-6. Readouts and the 300 s chart should move. If MySQL is wired they come from
+The browser does not talk to Bluetooth. Only `backend/main.py` does. Prepare
+the **same machine** that will run Python.
+
+#### Firmware (the ESP32)
+
+1. Flash this repo’s `firmware/` (fake sensors are enough).
+2. Copy `firmware/device_config.cmake.example` → gitignored
+   `firmware/device_config.cmake` and set a **unique six-digit PIN** (ASCII
+   digits only, e.g. `482913`).
+3. The advertised name is `Thermometer-` plus a MAC suffix
+   (`Thermometer-A1B2C3`). Scan will not list a device named something else.
+4. Power the box and wait several seconds so it is advertising **before** you
+   click Scan. If it is off, Scan returns `{ "devices": [] }` — that is a
+   radio result, not a crashed connector.
+
+That same PIN is what you type in the console **Pairing passkey** field.
+
+#### Linux (BlueZ)
+
+Continuous discovery every ~2 s can wedge BlueZ on laptops, so production
+Linux **does not auto-scan**. You click **Scan** once per attempt.
+
+1. Install BlueZ if needed (`bluez`, and a working system D-Bus).
+2. Put your login in the `bluetooth` group, then **log out and back in**
+   (a new terminal is not enough until the session is restarted):
+
+   ```bash
+   sudo usermod -aG bluetooth "$USER"
+   groups   # must list bluetooth after re-login
+   ```
+
+3. Power the adapter and allow pairing:
+
+   ```bash
+   bluetoothctl show
+   ```
+
+   You want `Powered: yes`. If `Pairable: no`:
+
+   ```bash
+   bluetoothctl power on
+   bluetoothctl pairable on
+   ```
+
+4. Do **not** leave `bluetoothctl scan on` running in another terminal while
+   `main.py` is using the adapter. One owner at a time.
+5. Do **not** set `THERMOMETER_LINUX_AUTO_SCAN=1` unless you are debugging
+   Windows-style probing on a machine that can survive it.
+6. Pairing uses a BlueZ D-Bus Agent1 (`pc_client/linux_pairing.py` +
+   `dbus-fast`, pulled in with Bleak). You should not need to type the PIN
+   in `bluetoothctl` if Connect from the console succeeds.
+
+If Scan or pair fails with a D-Bus / permission error, you are usually not
+in `bluetooth`, or another process owns `hci0`.
+
+#### Windows 10/11 (WinRT)
+
+1. Turn **Bluetooth** on in Settings.
+2. You do **not** need to pair the ESP32 in Windows Settings first. The
+   connector pairs with WinRT (`pc_client/windows_pairing.py`) using the
+   six-digit PIN you send on Connect.
+3. Auto-discover stays **on**. With one known device it will try to
+   pair/connect by itself. With zero devices, `phase` stays `DISCOVERING`
+   until the box advertises. You can still click **Scan** and **Connect**.
+4. If Windows already bonded the box with the wrong PIN, forget it in
+   Settings → Bluetooth (or `DELETE /api/v1/ble/pairing/{address}`) and
+   Connect again from the console.
+
+#### macOS
+
+There is no PIN helper in this repo. Pair in macOS Bluetooth settings with
+the firmware PIN, then Scan/Connect in the console.
+
+### 5. Connect a thermometer from the UI
+
+Order matters. Python must already be on `:8000`, Vite must have been
+started with `VITE_DATA_SOURCE=ble`, and the ESP32 must be advertising.
+
+1. Open <http://localhost:5173>. Subtitle should read **Python BLE connector**.
+   The **Device connection** panel should name the detected OS (Linux/BlueZ
+   or Windows/WinRT).
+2. Power the ESP32; wait until it advertises.
+3. Type the six-digit firmware PIN in **Pairing passkey**.
+4. Click **Scan** (a few seconds). You want a row `Thermometer-XXXXXX` and a
+   MAC. Empty list = nothing with that name on the air (box off, wrong
+   firmware, Bluetooth off, or another tool already connected).
+5. Click **Connect** on that row. Status should move
+   `PAIRING` → `CONNECTING` / `VERIFYING` → **Connected**.
+6. Use **Sensor display** checkboxes as the virtual buttons
+   (`PUT /displays/1` and `/displays/2`).
+7. Readouts and the 300 s chart should move. If MySQL is wired they come from
    `temperature_samples`; otherwise from `/api/v1/ble/current`.
+
+Status meanings:
+
+| UI / `phase` | Meaning |
+| --- | --- |
+| `DISCONNECTED` | Idle (normal on Linux until Scan/Connect) |
+| `DISCOVERING` | Background or manual scan in progress |
+| `SELECTION_REQUIRED` | Several unknown devices; pick one |
+| `AUTHENTICATION_REQUIRED` | Six-digit PIN missing or rejected |
+| `PAIRING` | OS bond (WinRT or BlueZ) |
+| `CONNECTING` / `VERIFYING` | GATT + protocol auth |
+| `CONNECTED` | Link up; `ready` means first snapshot succeeded |
+| `RECONNECTING` | Radio dropped; it will retry |
+
+After a successful first enroll, `backend/paired_devices.csv` remembers the
+PIN. Later power-cycles on **Windows** can reconnect without typing it again.
+On **Linux**, click **Scan** then **Connect** if it does not resume (auto-scan
+is off). **Disconnect** drops GATT but keeps the last target; forget the OS
+bond with `DELETE /api/v1/ble/pairing/{address}` if you need a clean pair.
 
 Connect from curl if you are debugging the API without the UI:
 
@@ -311,7 +424,7 @@ curl -sS http://127.0.0.1:8000/api/v1/ble/current
 Replace the address and passkey. Connect returns **202** with an
 `operation_id`; poll `/api/v1/operations/{id}` until `state` is terminal.
 
-### 5. Checklist: “is it actually connected?”
+### 6. Checklist: “is it actually connected?”
 
 | Check | Healthy result |
 | --- | --- |
@@ -328,14 +441,17 @@ Replace the address and passkey. Connect returns **202** with an
 | --- | --- |
 | Subtitle still says mock; no Device panel | Root `.env` missing `VITE_DATA_SOURCE=ble`, or Vite not restarted |
 | Device panel: scan fails / proxy errors | Python not running on `:8000`, or a second process stole the port |
-| Phase stuck on `DISCOVERING` | ESP32 off, out of range, wrong firmware name prefix, or PC Bluetooth disabled |
+| Phase stuck on `DISCOVERING` (Windows) or `DISCONNECTED` after Scan (Linux) | ESP32 off, out of range, wrong firmware name prefix (`Thermometer-`), or PC Bluetooth disabled |
+| Scan returns `{ "devices": [] }` | Box not advertising. Linux Bluetooth permissions (`bluetooth` group) can also hide devices |
+| Linux: D-Bus / “not in group bluetooth” | `sudo usermod -aG bluetooth $USER`, then log out and back in |
+| Linux: adapter `Pairable: no` | `bluetoothctl pairable on` |
 | `401` on connect | Passkey missing/wrong; must match `firmware/device_config.cmake` |
 | `409` | Connector is busy (already connected / conflicting scan) |
 | Chart empty but status `ready` | Displays off, both probes disconnected, or `/current` has nulls |
 | Chart empty, `persistence_configured: false`, and `/current` also empty | No BLE snapshot yet — not a MySQL problem |
 | `MYSQL_URL` set but `/api/samples/latest` is 503 | Wrong password, MySQL down, or schema not applied |
 | Samples configured but row always null | Writer adapter still no-op, or history never synced |
-| Machine/Bluetooth hard-locks | Two `main.py` processes, or aggressive scanning on Linux — run **one** connector and stop it when you are done (`Ctrl+C`) |
+| Machine/Bluetooth hard-locks | Two `main.py` processes. On Linux do **not** set `THERMOMETER_LINUX_AUTO_SCAN=1`. Stop with `Ctrl+C`. |
 | Browser CORS errors to `:8000` | You called Python from the page without the Vite proxy. Use relative `/api/v1/...` |
 
 ### Switching back to mock data

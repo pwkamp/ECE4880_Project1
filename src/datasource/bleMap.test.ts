@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import {
+  connectionHint,
   frameFromBle,
   frameFromSample,
   type BleCurrent,
@@ -129,4 +130,22 @@ test('DB MISSING/NOT_RETRIEVED clear celsius without marking unplugged', () => {
   expect(frame.readings[1].celsius).toBeNull();
   expect(frame.readings[2].enabled).toBe(false);
   expect(frame.readings[2].celsius).toBeNull();
+});
+
+test('connection hint follows the BLE host OS, not the browser', () => {
+  expect(
+    connectionHint({
+      host_os: 'linux',
+      pairing_backend: 'bluez',
+      auto_discover_on_start: false,
+    }),
+  ).toMatch(/Scan/i);
+  expect(
+    connectionHint({
+      host_os: 'windows',
+      pairing_backend: 'winrt',
+      auto_discover_on_start: true,
+    }),
+  ).toMatch(/Windows/i);
+  expect(connectionHint({})).toMatch(/Thermometer-/);
 });

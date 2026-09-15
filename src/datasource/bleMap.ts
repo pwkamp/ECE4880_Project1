@@ -12,6 +12,9 @@ export interface BleStatus {
   ready: boolean;
   target: { name: string; address: string } | null;
   last_error: string | null;
+  host_os?: 'windows' | 'linux' | 'other' | string;
+  pairing_backend?: 'winrt' | 'bluez' | 'none' | string;
+  auto_discover_on_start?: boolean;
 }
 
 export interface BleSensor {
@@ -116,4 +119,29 @@ export function frameFromSample(
       2: readingFromSample(row.sensor2_c, row.sensor2_status, displays[2], 2),
     },
   };
+}
+
+/** Console copy for Scan/Connect. Uses the Python host OS, not the browser. */
+export function connectionHint(
+  status: Pick<BleStatus, 'host_os' | 'pairing_backend' | 'auto_discover_on_start'> = {},
+): string {
+  if (status.host_os === 'linux' || status.pairing_backend === 'bluez') {
+    return (
+      'Linux detected (BlueZ). The box is not scanned in a loop — click Scan, ' +
+      'then Connect with the six-digit firmware PIN. Power the ESP32 so it ' +
+      'advertises as Thermometer-XXXXXX.'
+    );
+  }
+  if (status.host_os === 'windows' || status.pairing_backend === 'winrt') {
+    return (
+      'Windows detected (WinRT pairing). Power the ESP32 so it advertises as ' +
+      'Thermometer-XXXXXX. The connector can auto-discover it; you can still ' +
+      'click Scan, then Connect with the six-digit firmware PIN.'
+    );
+  }
+  return (
+    'Power the ESP32 so it advertises as Thermometer-XXXXXX, click Scan, then ' +
+    'Connect with the six-digit firmware PIN. Windows uses WinRT pairing; ' +
+    'Linux uses BlueZ and does not auto-scan.'
+  );
 }

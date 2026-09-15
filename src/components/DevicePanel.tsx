@@ -1,9 +1,36 @@
 import { useEffect, useState } from 'react';
 import { thermometerSource } from '../datasource';
-import type { BleDevice } from '../datasource/bleMap';
+import { connectionHint, type BleDevice } from '../datasource/bleMap';
 import { supportsBle, type BleConnector, type ThermometerSource } from '../datasource/types';
 
 type BleSource = ThermometerSource & BleConnector;
+
+function phaseLabel(phase: string, ready: boolean, autoDiscover?: boolean): string {
+  if (ready) return 'Connected';
+  switch (phase) {
+    case 'DISCONNECTED':
+      return autoDiscover
+        ? 'Not connected — waiting for device'
+        : 'Not connected — click Scan';
+    case 'DISCOVERING':
+      return 'Scanning…';
+    case 'SELECTION_REQUIRED':
+      return 'Pick a device below';
+    case 'AUTHENTICATION_REQUIRED':
+      return 'Passkey required';
+    case 'PAIRING':
+      return 'Pairing…';
+    case 'CONNECTING':
+    case 'VERIFYING':
+      return 'Connecting…';
+    case 'RECONNECTING':
+      return 'Reconnecting…';
+    case 'CONNECTED':
+      return 'Connected';
+    default:
+      return phase;
+  }
+}
 
 /**
  * Scan / connect UI for the teammate Python BLE connector.
@@ -17,6 +44,7 @@ export function DevicePanel() {
 function DevicePanelInner({ source: ble }: { source: BleSource }) {
 
   const [phase, setPhase] = useState(ble.getConnectionStatus().phase);
+  const [status, setStatus] = useState(ble.getConnectionStatus());
   const [devices, setDevices] = useState<BleDevice[]>([]);
   const [passkey, setPasskey] = useState('');
   const [busy, setBusy] = useState(false);
@@ -24,14 +52,13 @@ function DevicePanelInner({ source: ble }: { source: BleSource }) {
 
   useEffect(() => {
     const id = setInterval(() => {
-      const status = ble.getConnectionStatus();
-      setPhase(status.phase);
-      if (status.last_error) setError(status.last_error);
+      const next = ble.getConnectionStatus();
+      setStatus(next);
+      setPhase(next.phase);
+      if (next.last_error) setError(next.last_error);
     }, 1000);
     return () => clearInterval(id);
   }, [ble]);
-
-  const status = ble.getConnectionStatus();
 
   async function run(fn: () => Promise<void>): Promise<void> {
     setBusy(true);
@@ -42,21 +69,19 @@ function DevicePanelInner({ source: ble }: { source: BleSource }) {
       setError(err instanceof Error ? err.message : 'request failed');
     } finally {
       setBusy(false);
-      setPhase(ble.getConnectionStatus().phase);
+      const next = ble.getConnectionStatus();
+      setStatus(next);
+      setPhase(next.phase);
     }
   }
 
   return (
     <section className="panel">
       <h2>Device connection</h2>
-      <p className="panel-hint">
-        Scan and connect through the Python BLE service. Temperatures are read
-        from the database when it is configured, otherwise from the live snapshot.
-      </p>
+      <p className="panel-hint">{connectionHint(status)}</p>
       <p className="device-status">
-        <strong>{phase}</strong>
+        <strong>{phaseLabel(phase, status.ready, status.auto_discover_on_start)}</strong>
         {status.target ? ` — ${status.target.name}` : ''}
-        {status.ready ? ' (ready)' : ''}
       </p>
       {error ? <p className="device-error">{error}</p> : null}
 

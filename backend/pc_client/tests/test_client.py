@@ -17,6 +17,8 @@ from pc_client.protocol import (
     Status,
     VisibleState,
 )
+from pc_client.platform_runtime import BleHostRuntime
+from pc_client import thermometer_client as client_mod
 from pc_client.thermometer_client import ThermometerBleClient, describe_ble_error
 
 TEST_PASSKEY = "123456"
@@ -162,6 +164,27 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
             CONFIG.client.pairing_timeout_seconds,
         )
 
+    async def test_public_pair_uses_linux_bluez_on_linux_clients(self) -> None:
+        fake = _FakeBleakClient()
+        client = ThermometerBleClient(
+            "AA:BB:CC:DD:EE:FF",
+            client_factory=lambda *_a, **_k: fake,
+            passkey=TEST_PASSKEY,
+        )
+        pair_device = AsyncMock()
+
+        with (
+            patch.object(client, "_uses_native_linux_client", return_value=True),
+            patch("pc_client.linux_pairing.pair_device", pair_device),
+        ):
+            await client.pair("000042")
+
+        pair_device.assert_awaited_once_with(
+            "AA:BB:CC:DD:EE:FF",
+            "000042",
+            CONFIG.client.pairing_timeout_seconds,
+        )
+
     async def test_public_forget_pairing_uses_explicit_windows_reset(self) -> None:
         fake = _FakeBleakClient()
         client = ThermometerBleClient(
@@ -178,6 +201,39 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
             await client.forget_pairing()
 
         forget_device.assert_awaited_once_with("AA:BB:CC:DD:EE:FF")
+
+    async def test_public_forget_pairing_uses_linux_reset(self) -> None:
+        fake = _FakeBleakClient()
+        client = ThermometerBleClient(
+            "AA:BB:CC:DD:EE:FF",
+            client_factory=lambda *_a, **_k: fake,
+            passkey=TEST_PASSKEY,
+        )
+        forget_device = AsyncMock()
+
+        with (
+            patch.object(client, "_uses_native_linux_client", return_value=True),
+            patch("pc_client.linux_pairing.forget_device", forget_device),
+        ):
+            await client.forget_pairing()
+
+        forget_device.assert_awaited_once_with("AA:BB:CC:DD:EE:FF")
+
+    def test_pairing_backend_follows_detected_host_os(self) -> None:
+        if client_mod.BleakClient is None:
+            self.skipTest("bleak is not installed")
+        client = ThermometerBleClient(
+            "AA:BB:CC:DD:EE:FF",
+            client_factory=client_mod.BleakClient,
+            passkey=TEST_PASSKEY,
+        )
+        with patch.object(client_mod, "detect_ble_host") as detect:
+            detect.return_value = BleHostRuntime("windows", "winrt", True)
+            self.assertTrue(client._uses_native_windows_client())
+            self.assertFalse(client._uses_native_linux_client())
+            detect.return_value = BleHostRuntime("linux", "bluez", False)
+            self.assertTrue(client._uses_native_linux_client())
+            self.assertFalse(client._uses_native_windows_client())
 
     async def test_client_is_always_requester_and_controls_display(self) -> None:
         fake = _FakeBleakClient()

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import sys
 from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,6 +17,7 @@ except ImportError as exc:
 else:
     BLEAK_IMPORT_ERROR = None
 
+from .platform_runtime import detect_ble_host
 from .protocol import (
     CONFIG,
     HEADER_SIZE,
@@ -204,8 +204,16 @@ class ThermometerBleClient:
             return 23
         return int(getattr(self._client, "mtu_size", 23))
 
+    def _pairing_backend(self) -> str:
+        if self._client_factory is not BleakClient:
+            return "none"
+        return detect_ble_host().pairing
+
     def _uses_native_windows_client(self) -> bool:
-        return sys.platform == "win32" and self._client_factory is BleakClient
+        return self._pairing_backend() == "winrt"
+
+    def _uses_native_linux_client(self) -> bool:
+        return self._pairing_backend() == "bluez"
 
     @property
     def _target_address(self) -> str:
@@ -240,30 +248,44 @@ class ThermometerBleClient:
         return self._passkey
 
     async def pair(self, passkey: str | None = None) -> None:
-        """Create or verify the authenticated Windows bond before connecting."""
+        """Create or verify the OS BLE bond before connecting."""
         credential = self._credential(passkey)
-        if not self._uses_native_windows_client():
+        if self._uses_native_windows_client():
+            from .windows_pairing import pair_device
+
+            async with self._pairing_lock:
+                await pair_device(
+                    self._target_address,
+                    credential,
+                    CONFIG.client.pairing_timeout_seconds,
+                )
             return
+        if self._uses_native_linux_client():
+            from .linux_pairing import pair_device
 
-        from .windows_pairing import pair_device
-
-        async with self._pairing_lock:
-            await pair_device(
-                self._target_address,
-                credential,
-                CONFIG.client.pairing_timeout_seconds,
-            )
+            async with self._pairing_lock:
+                await pair_device(
+                    self._target_address,
+                    credential,
+                    CONFIG.client.pairing_timeout_seconds,
+                )
 
     async def forget_pairing(self) -> None:
-        """Disconnect and remove this device's Windows bond on user request."""
+        """Disconnect and remove this device's OS bond on user request."""
         await self.disconnect()
-        if not self._uses_native_windows_client():
-            raise RuntimeError("resetting BLE pairing is supported only on Windows")
+        if self._uses_native_windows_client():
+            from .windows_pairing import forget_device
 
-        from .windows_pairing import forget_device
+            async with self._pairing_lock:
+                await forget_device(self._target_address)
+            return
+        if self._uses_native_linux_client():
+            from .linux_pairing import forget_device
 
-        async with self._pairing_lock:
-            await forget_device(self._target_address)
+            async with self._pairing_lock:
+                await forget_device(self._target_address)
+            return
+        raise RuntimeError("resetting BLE pairing is not supported on this platform")
 
     async def connect(
         self,
