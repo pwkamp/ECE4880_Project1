@@ -74,6 +74,13 @@ backend/.venv/
 .env.*
 !.env.example
 
+# Agent / Claude Code planning artifacts
+docs/superpowers/
+superpowers/
+.superpowers/
+
+# Per-device secrets and local runtime state
+
 # Per-device secrets and local runtime state
 /firmware/device_config.cmake
 /backend/paired_devices.csv

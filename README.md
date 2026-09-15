@@ -30,7 +30,19 @@ toggles, and the threshold-alert configuration.*
 
 ## Running it
 
-**Prerequisites:** Node.js 20+ and npm (developed on Node 24).
+**Prerequisites:** Node.js 20+ and npm (developed on Node 24). One-shot
+install (creates `.env` files and a Python venv when Python is present):
+
+```bash
+bash scripts/setup.sh
+# or: npm run setup
+npm run dev
+```
+
+`scripts/setup.sh` is not Docker: the ESP32 talks over the **host** Bluetooth
+adapter (WinRT / BlueZ), which containers do not own cleanly.
+
+If you already have dependencies:
 
 ```bash
 npm install
