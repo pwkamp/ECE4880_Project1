@@ -1,0 +1,1 @@
+This is where all the schematics/etc relating to the hardware implementation will be stored

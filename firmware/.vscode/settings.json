@@ -1,0 +1,19 @@
+{
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "idf.extensionActivationMode": "always",
+  "cmake.configureOnOpen": false,
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32"
+  },
+  "idf.buildPath": "${workspaceFolder}/build",
+  "idf.buildPathWin": "${workspaceFolder}\\build",
+  "idf.sdkconfigFilePath": "${workspaceFolder}/sdkconfig",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=**",
+    "--compile-commands-dir=${workspaceFolder}/build"
+  ],
+  "idf.flashType": "UART",
+  "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
+  "idf.portWin": "COM8"
+}

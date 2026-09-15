@@ -7,26 +7,112 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node / Vite console
 node_modules
 dist
 dist-ssr
 *.local
 server/.env
-.env
-!.env.example
-backend/.venv/
-backend/paired_devices.csv
-**/__pycache__/
-.venv/
-venv/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
+.vs/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.user
+*.workspace
+*.sln.docstates
+.history/
+
+# macOS / Windows
+.DS_Store
+.AppleDouble
+.LSOverride
+.directory
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+**/__pycache__/
+.hypothesis/
+.mypy_cache/
+.nox/
+.ruff_cache/
+.tox/
+.ccache/
+.ccache-tmp/
+*.egg-info/
+wheelhouse/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+test-results.xml
+htmlcov/
+.venv/
+venv/
+env/
+backend/.venv/
+
+# Env files (keep templates)
+.env
+.env.*
+!.env.example
+
+# Per-device secrets and local runtime state
+/firmware/device_config.cmake
+/backend/paired_devices.csv
+backend/paired_devices.csv
+/backend/.paired_devices.csv.*.tmp
+
+# Build artifacts
+**/build/
+**/build-*/
+**/out/
+build/
+/generated/
+*.o
+*.obj
+*.a
+*.lib
+*.out
+*.exe
+*.bin
+*.elf
+*.map
+flasher_args.json
+sdkconfig.old
+sdkconfig
+
+# ESP-IDF
+/components/.idf/
+**/components/.idf/
+managed_components/
+.espressif/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+
+# Language servers
+.clangd/
+.ccls-cache/
+compile_commands.json

@@ -1,8 +1,9 @@
 # Thermometer backend
 
 This directory contains the reusable `pc_client` package, the production
-localhost REST service in `main.py`, and the gitignored per-PC credential
-registry. It consumes the repository-level `../protocol` definition.
+localhost REST service in `main.py`, the MySQL adapter, and the gitignored
+per-PC credential registry. It consumes the repository-level `../protocol`
+definition.
 
 ## Install and run
 
@@ -33,13 +34,23 @@ The REST service listens on `127.0.0.1:8000`. `GET /api/v1/ble/status` reports
 Full Scan → PIN → Connect steps, adapter setup, and troubleshooting live in
 the repository root README section **Connecting the console to BLE and MySQL**.
 
+Run the Tk hardware test tool with:
+
 ```powershell
 .venv\Scripts\python.exe -m pc_client.gui
+```
+
+```bash
+.venv/bin/python -m pc_client.gui
 ```
 
 `paired_devices.csv` is created beside `main.py` after successful enrollment.
 It contains plaintext per-device credentials and is explicitly excluded by the
 root `.gitignore`.
+
+To persist samples, set
+`THERMOMETER_DATABASE_ADAPTER_FACTORY=pc_client.mysql_adapter:create_adapter`
+plus `THERMOMETER_DB_*` (see `backend/database/README.md`).
 
 ## Tests
 

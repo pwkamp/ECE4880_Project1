@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "firmware",
+      "path": "firmware"
+    },
+    {
+      "name": "backend",
+      "path": "backend"
+    },
+    {
+      "name": "protocol",
+      "path": "protocol"
+    },
+    {
+      "name": "docs",
+      "path": "docs"
+    }
+  ],
+  "settings": {
+    "idf.saveLastProjectConfiguration": true
+  }
+}

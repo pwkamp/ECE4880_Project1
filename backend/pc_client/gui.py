@@ -11,6 +11,7 @@ from tkinter import messagebox, simpledialog, ttk
 from typing import Any, Coroutine
 
 from .ble_service import OperationState, ThermometerBleService
+from .database_adapter import load_database_adapter
 from .protocol import CONFIG, CurrentSnapshot, VisibleState
 from .thermometer_client import HistorySync, describe_ble_error
 
@@ -39,6 +40,7 @@ class BleWorker:
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         self.service = ThermometerBleService(
+            database=load_database_adapter(),
             event_handler=self.events.put,
             # Test GUI: explicit Scan/Pair. Linux production matches this
             # (no auto-scan loop). Windows production still auto-discovers.
