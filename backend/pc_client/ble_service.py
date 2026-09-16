@@ -805,7 +805,7 @@ class ThermometerBleService:
                 ),
                 timeout=command_timeout,
             )
-        except asyncio.TimeoutError as exc:
+        except asyncio.TimeoutError:
             # WinRT can finish the GATT write (and the ESP32 acts on it) before
             # the matching read reaches us. A timed-out scheduler waiter does
             # not cancel the in-flight GATT transaction. Read the authoritative

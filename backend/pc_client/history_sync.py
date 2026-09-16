@@ -83,7 +83,16 @@ class HistorySynchronizer:
                 priority=RequestPriority.CURRENT,
             )
             anchor_time = self._utc_now()
-            await self._publish_current(anchor, anchor_time)
+            # Bounded like every other network/persistence step in this
+            # function: an unbounded await here could block past
+            # transfer_deadline indefinitely if publish_current stalls
+            # (e.g. queued behind a slow database write).
+            remaining = transfer_deadline - self._monotonic()
+            if remaining <= 0:
+                raise asyncio.TimeoutError
+            await asyncio.wait_for(
+                self._publish_current(anchor, anchor_time), timeout=remaining
+            )
         expected = tuple(meta.counts)
         retrieved = [0 for _ in expected]
         records: dict[tuple[int, int], Any] = {}
@@ -126,6 +135,12 @@ class HistorySynchronizer:
                     budget_expired = True
                     break
                 except Exception as exc:
+                    # get_history_chunk succeeding but validate_chunk rejecting
+                    # the payload must not leave `chunk` bound to the invalid
+                    # object from this attempt — otherwise, if this was the
+                    # last retry, the loop below would treat rejected data as
+                    # good instead of taking the `chunk is None` failure path.
+                    chunk = None
                     last_error = exc
                     if (
                         isinstance(exc, ProtocolError)
