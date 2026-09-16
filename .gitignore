@@ -9,10 +9,13 @@ lerna-debug.log*
 
 # Node / Vite console
 node_modules
+frontend/node_modules
 dist
+frontend/dist
 dist-ssr
 *.local
 server/.env
+frontend/server/.env
 
 # Editor directories and files
 .vscode/*
@@ -73,6 +76,8 @@ backend/.venv/
 .env
 .env.*
 !.env.example
+!frontend/.env.example
+!**/.env.example
 
 # Agent / Claude Code planning artifacts
 docs/superpowers/

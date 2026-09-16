@@ -140,6 +140,9 @@ export interface BleConnector {
     ready: boolean;
     target: { name: string; address: string } | null;
     last_error: string | null;
+    host_os?: string;
+    pairing_backend?: string;
+    auto_discover_on_start?: boolean;
   };
 }
 

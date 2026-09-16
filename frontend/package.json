@@ -1,10 +1,9 @@
 {
-  "name": "ece4880-project1",
+  "name": "ece4880-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "bash scripts/setup.sh",
     "dev": "concurrently -k -n web,api -c blue,green \"vite\" \"npm:dev:server\"",
     "dev:server": "tsx watch server/main.ts",
     "build": "tsc -b && vite build",

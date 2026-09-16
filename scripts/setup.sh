@@ -9,19 +9,19 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
-if [ ! -d node_modules ]; then
-  npm install
+if [ ! -d frontend/node_modules ]; then
+  (cd frontend && npm install)
 else
-  echo "node_modules already present; skipping npm install"
+  echo "frontend/node_modules already present; skipping npm install"
 fi
 
-if [ ! -f .env ]; then
-  cp .env.example .env
-  echo "Wrote .env from .env.example (default mock data)."
+if [ ! -f frontend/.env ]; then
+  cp frontend/.env.example frontend/.env
+  echo "Wrote frontend/.env from frontend/.env.example (default mock data)."
 fi
-if [ ! -f server/.env ] && [ -f server/.env.example ]; then
-  cp server/.env.example server/.env
-  echo "Wrote server/.env from server/.env.example."
+if [ ! -f frontend/server/.env ] && [ -f frontend/server/.env.example ]; then
+  cp frontend/server/.env.example frontend/server/.env
+  echo "Wrote frontend/server/.env from frontend/server/.env.example."
 fi
 
 PYTHON=""
@@ -47,7 +47,7 @@ else
 fi
 
 echo
-echo "Start the console:  npm run dev"
-echo "BLE mode:           set VITE_DATA_SOURCE=ble in .env, restart npm run dev,"
+echo "Start the console:  cd frontend && npm run dev"
+echo "BLE mode:           set VITE_DATA_SOURCE=ble in frontend/.env, restart npm run dev,"
 echo "                    and run backend/main.py in a second terminal."
 echo "Host Bluetooth is required for a real ESP32; that is why this is not Dockerized."
