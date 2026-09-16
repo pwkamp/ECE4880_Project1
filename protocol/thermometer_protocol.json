@@ -10,8 +10,8 @@
       "maximum": 1000
     },
     "preferred_connection": {
-      "minimum_interval_ms": 200,
-      "maximum_interval_ms": 200,
+      "minimum_interval_ms": 50,
+      "maximum_interval_ms": 50,
       "peripheral_latency": 1,
       "supervision_timeout_ms": 6000
     }
@@ -64,7 +64,7 @@
     "poll_tolerance_seconds": 0.1,
     "history_sync_budget_seconds": 10.0,
     "history_chunk_retry_count": 2,
-    "display_command_timeout_seconds": 0.9,
+    "display_command_timeout_seconds": 5.0,
     "completed_operation_retention_seconds": 600.0,
     "persistence_queue_capacity": 300,
     "credential_registry_filename": "paired_devices.csv"
@@ -82,6 +82,7 @@
     "byte_order": "little",
     "response_flag": 1,
     "max_history_records_per_chunk": 32,
+    "max_compact_history_records_per_chunk": 72,
     "opcodes": {
       "get_current": 1,
       "set_display": 2,
@@ -89,7 +90,8 @@
       "get_history_chunk": 4,
       "auth_begin": 5,
       "auth_prove": 6,
-      "reset_bond": 7
+      "reset_bond": 7,
+      "get_history_chunk_compact": 8
     },
     "status_codes": {
       "success": 0,
@@ -164,6 +166,10 @@
       ],
       "history_record": [
         { "name": "sequence", "type": "u32" },
+        { "name": "temperature_centi_c", "type": "i16" },
+        { "name": "data_status", "type": "u8" }
+      ],
+      "compact_history_record": [
         { "name": "temperature_centi_c", "type": "i16" },
         { "name": "data_status", "type": "u8" }
       ],

@@ -199,7 +199,7 @@ static int handle_gap_event(struct ble_gap_event *event, void *argument)
     case BLE_GAP_EVENT_CONN_UPDATE:
         if (ble_gap_conn_find(event->conn_update.conn_handle, &description) ==
             0) {
-            ESP_LOGI(TAG,
+            ESP_LOGW(TAG,
                      "connection parameters: status=%d interval=%u latency=%u timeout=%u",
                      event->conn_update.status, description.conn_itvl,
                      description.conn_latency,
@@ -208,7 +208,7 @@ static int handle_gap_event(struct ble_gap_event *event, void *argument)
         return 0;
 
     case BLE_GAP_EVENT_MTU:
-        ESP_LOGI(TAG, "negotiated ATT MTU=%u", event->mtu.value);
+        ESP_LOGW(TAG, "negotiated ATT MTU=%u", event->mtu.value);
         return 0;
 
     case BLE_GAP_EVENT_REPEAT_PAIRING:

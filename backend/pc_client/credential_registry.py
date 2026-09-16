@@ -26,10 +26,15 @@ CSV_FIELDS = (
     "enrolled_at_utc",
     "last_connected_at_utc",
 )
+REGISTRY_PATH_ENV = "THERMOMETER_CREDENTIAL_REGISTRY_PATH"
 
 
 def default_registry_path() -> Path:
-    """Return a path beside backend/main.py, independent of the current directory."""
+    """Return the configured registry path or the file beside backend/main.py."""
+
+    override = os.environ.get(REGISTRY_PATH_ENV, "").strip()
+    if override:
+        return Path(override).expanduser()
 
     backend_root = Path(__file__).resolve().parents[1]
     return backend_root / CONFIG.service.credential_registry_filename

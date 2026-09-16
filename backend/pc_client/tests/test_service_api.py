@@ -1,6 +1,8 @@
+from dataclasses import replace
 from datetime import datetime, timezone
 import unittest
 import warnings
+from unittest import mock
 
 warnings.filterwarnings("ignore", message="Using `httpx` with `starlette.testclient`.*")
 from fastapi.testclient import TestClient
@@ -154,6 +156,78 @@ class ServiceApiTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.client_context.__exit__(None, None, None)
 
+    def test_cors_is_disabled_by_default(self):
+        with mock.patch.dict("os.environ", {"THERMOMETER_CORS_ORIGINS": ""}):
+            with TestClient(create_app(StubService())) as client:
+                response = client.get(
+                    "/healthz", headers={"Origin": "http://127.0.0.1:5173"}
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("access-control-allow-origin", response.headers)
+
+    def test_configured_loopback_origin_is_allowed(self):
+        with mock.patch.dict(
+            "os.environ",
+            {
+                "THERMOMETER_CORS_ORIGINS": (
+                    "http://127.0.0.1:5173,http://localhost:5173"
+                )
+            },
+        ):
+            with TestClient(create_app(StubService())) as client:
+                response = client.get(
+                    "/healthz", headers={"Origin": "http://127.0.0.1:5173"}
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["access-control-allow-origin"],
+            "http://127.0.0.1:5173",
+        )
+
+    def test_cors_preflight_allows_frontend_control_request(self):
+        with mock.patch.dict(
+            "os.environ",
+            {"THERMOMETER_CORS_ORIGINS": "http://localhost:5173"},
+        ):
+            with TestClient(create_app(StubService())) as client:
+                response = client.options(
+                    "/api/v1/ble/displays/1",
+                    headers={
+                        "Origin": "http://localhost:5173",
+                        "Access-Control-Request-Method": "PUT",
+                        "Access-Control-Request-Headers": "content-type",
+                    },
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["access-control-allow-origin"],
+            "http://localhost:5173",
+        )
+
+    def test_cors_does_not_allow_an_unconfigured_origin(self):
+        with mock.patch.dict(
+            "os.environ",
+            {"THERMOMETER_CORS_ORIGINS": "http://127.0.0.1:5173"},
+        ):
+            with TestClient(create_app(StubService())) as client:
+                response = client.get(
+                    "/healthz", headers={"Origin": "http://localhost:5173"}
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("access-control-allow-origin", response.headers)
+
+    def test_cors_rejects_non_loopback_configuration(self):
+        with mock.patch.dict(
+            "os.environ",
+            {"THERMOMETER_CORS_ORIGINS": "https://example.com"},
+        ):
+            with self.assertRaisesRegex(RuntimeError, "loopback|localhost"):
+                create_app(StubService())
+
     def test_lifecycle_and_read_endpoints(self):
         self.assertTrue(self.service.started)
         health = self.client.get("/healthz")
@@ -166,7 +240,24 @@ class ServiceApiTests(unittest.TestCase):
         self.assertIn(status.json()["host_os"], ("windows", "linux", "other"))
         self.assertIn(status.json()["pairing_backend"], ("winrt", "bluez", "none"))
         self.assertIn("auto_discover_on_start", status.json())
+        self.assertIsNone(status.json()["history_sync"])
+        self.assertEqual(
+            status.json()["displays"],
+            [{"sensor_id": 1, "enabled": True}, {"sensor_id": 2, "enabled": False}],
+        )
         self.assertEqual(current.json()["snapshot"]["sensors"][0]["temperature_c"], 20.5)
+
+    def test_status_reports_last_history_recovery_summary(self):
+        summary = {
+            "state": "COMPLETE", "expected_counts": [300, 300],
+            "retrieved_counts": [300, 300], "sample_count": 300,
+            "elapsed_seconds": 5.2, "persisted": True,
+        }
+        status = replace(self.service.get_status(), history_sync=summary)
+        with mock.patch.object(self.service, "get_status", return_value=status):
+            response = self.client.get("/api/v1/ble/status")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["history_sync"], summary)
 
     def test_all_control_endpoints_return_their_contracts(self):
         scan = self.client.post("/api/v1/ble/scan")

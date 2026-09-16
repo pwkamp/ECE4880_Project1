@@ -38,7 +38,7 @@ interface Sample {
  * A fixed-scale chart recorder.
  *
  *  - Drawable Y is 0–60 C; the default view is the spec window 10–50 C.
- *  - X axis is "seconds ago", 300 on the left to 0 on the right.
+ *  - X axis is "seconds ago", 320 on the left to 0 on the right.
  *  - New points enter at the right; the trace scrolls left; old points fall off.
  *  - Missing data (switch off / unplugged / display off) is drawn as a
  *    hatched band in the sensor's colour. Off-scale readings (outside 0–60 C)
@@ -136,6 +136,7 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       ctx.fillStyle = AXIS_TEXT;
       ctx.fillText(String(s), x, plot.bottom + 14);
     }
+    ctx.fillText(String(WINDOW_S), xFor(WINDOW_S), plot.bottom + 14);
 
     ctx.strokeStyle = '#bdbdbd';
     ctx.strokeRect(plot.left, plot.top, plotW, plotH);

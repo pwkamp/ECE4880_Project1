@@ -9,22 +9,20 @@ function phaseLabel(phase: string, ready: boolean, autoDiscover?: boolean): stri
   if (ready) return 'Connected';
   switch (phase) {
     case 'DISCONNECTED':
-      return autoDiscover
-        ? 'Not connected — waiting for device'
-        : 'Not connected — click Scan';
+      return autoDiscover ? 'Not connected - waiting for device' : 'Not connected - click Scan';
     case 'DISCOVERING':
-      return 'Scanning…';
+      return 'Scanning...';
     case 'SELECTION_REQUIRED':
       return 'Pick a device below';
     case 'AUTHENTICATION_REQUIRED':
       return 'Passkey required';
     case 'PAIRING':
-      return 'Pairing…';
+      return 'Pairing...';
     case 'CONNECTING':
     case 'VERIFYING':
-      return 'Connecting…';
+      return 'Connecting...';
     case 'RECONNECTING':
-      return 'Reconnecting…';
+      return 'Reconnecting...';
     case 'CONNECTED':
       return 'Connected';
     default:
@@ -32,20 +30,18 @@ function phaseLabel(phase: string, ready: boolean, autoDiscover?: boolean): stri
   }
 }
 
-/**
- * Scan / connect UI for the teammate Python BLE connector.
- * Hidden when the mock data source is active.
- */
 export function DevicePanel() {
   if (!supportsBle(thermometerSource)) return null;
   return <DevicePanelInner source={thermometerSource} />;
 }
 
-function DevicePanelInner({ source: ble }: { source: BleSource }) {
-
-  const [phase, setPhase] = useState(ble.getConnectionStatus().phase);
+export function DevicePanelInner({ source: ble }: { source: BleSource }) {
   const [status, setStatus] = useState(ble.getConnectionStatus());
   const [devices, setDevices] = useState<BleDevice[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState(
+    ble.getConnectionStatus().target?.address ?? '',
+  );
+  const [needsPasskeyFor, setNeedsPasskeyFor] = useState<string | null>(null);
   const [passkey, setPasskey] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,11 +50,21 @@ function DevicePanelInner({ source: ble }: { source: BleSource }) {
     const id = setInterval(() => {
       const next = ble.getConnectionStatus();
       setStatus(next);
-      setPhase(next.phase);
-      if (next.last_error) setError(next.last_error);
+      setSelectedAddress((address) => address || next.target?.address || '');
     }, 1000);
     return () => clearInterval(id);
   }, [ble]);
+
+  const available = [...devices];
+  if (status.target && !available.some((device) => device.address === status.target?.address)) {
+    available.unshift({ ...status.target, rssi: null });
+  }
+  const selected = selectedAddress || (available.length === 1 ? available[0].address : '');
+  const needsPasskey =
+    needsPasskeyFor === selected ||
+    (status.target?.address === selected &&
+      (status.credential_state === 'MISSING' || status.credential_state === 'REJECTED') &&
+      status.phase === 'AUTHENTICATION_REQUIRED');
 
   async function run(fn: () => Promise<void>): Promise<void> {
     setBusy(true);
@@ -71,7 +77,30 @@ function DevicePanelInner({ source: ble }: { source: BleSource }) {
       setBusy(false);
       const next = ble.getConnectionStatus();
       setStatus(next);
-      setPhase(next.phase);
+      setSelectedAddress((address) => address || next.target?.address || '');
+    }
+  }
+
+  async function connect(): Promise<void> {
+    if (!selected) return;
+    const credential = passkey.trim();
+    if (needsPasskey && !/^\d{6}$/.test(credential)) {
+      setError('Enter the six-digit firmware passkey.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await ble.connect(selected, needsPasskey ? credential : undefined);
+      setNeedsPasskeyFor(null);
+      setPasskey('');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'connection failed';
+      if (/passkey|PIN|credential/i.test(message)) setNeedsPasskeyFor(selected);
+      setError(message);
+    } finally {
+      setBusy(false);
+      setStatus(ble.getConnectionStatus());
     }
   }
 
@@ -80,75 +109,93 @@ function DevicePanelInner({ source: ble }: { source: BleSource }) {
       <h2>Device connection</h2>
       <p className="panel-hint">{connectionHint(status)}</p>
       <p className="device-status">
-        <strong>{phaseLabel(phase, status.ready, status.auto_discover_on_start)}</strong>
-        {status.target ? ` — ${status.target.name}` : ''}
+        <strong>{phaseLabel(status.phase, status.ready, status.auto_discover_on_start)}</strong>
+        {status.target ? ` - ${status.target.name}` : ''}
       </p>
-      {error ? <p className="device-error">{error}</p> : null}
+      {status.ready && status.history_sync ? (
+        <p className="panel-hint" role="status">
+          {status.history_sync.state === 'RUNNING'
+            ? `Recovering ESP32 history: ${Math.round((status.history_sync.progress ?? 0) * 100)}%`
+            : status.history_sync.state === 'COMPLETE'
+              ? `History recovered: ${status.history_sync.sample_count ?? 0} seconds ${status.history_sync.persisted ? 'saved to MySQL' : 'retrieved (MySQL not configured)'} in ${status.history_sync.elapsed_seconds?.toFixed(1) ?? '?'} s.`
+              : `History recovery ${status.history_sync.state.toLowerCase()}: ${status.history_sync.retrieved_counts?.join('/') ?? 'unknown'} of ${status.history_sync.expected_counts?.join('/') ?? 'unknown'} sensor records. ${status.history_sync.failure_reason ?? ''}`}
+        </p>
+      ) : null}
+      {error ?? status.last_error ? (
+        <p className="device-error" role="alert">{error ?? status.last_error}</p>
+      ) : null}
 
       <div className="btn-row">
         <button
           type="button"
           disabled={busy}
-          onClick={() =>
-            run(async () => {
-              setDevices(await ble.scan());
-            })
-          }
+          onClick={() => void run(async () => {
+            const found = await ble.scan();
+            setDevices(found);
+            setSelectedAddress((address) =>
+              address || status.target?.address || found[0]?.address || '',
+            );
+          })}
         >
           Scan
         </button>
         <button
           type="button"
-          disabled={busy || !status.connected}
-          onClick={() => run(() => ble.disconnect())}
+          disabled={busy || !selected || (needsPasskey && !/^\d{6}$/.test(passkey.trim()))}
+          onClick={() => void connect()}
         >
-          Disconnect
+          Connect
         </button>
         <button
           type="button"
-          disabled={busy}
-          onClick={() => run(() => ble.reconnect())}
+          disabled={busy || (!status.connected && !status.desired_connected)}
+          onClick={() => void run(() => ble.disconnect())}
         >
-          Reconnect
+          Disconnect
         </button>
       </div>
 
       <label className="field-block">
-        Pairing passkey (6 digits, if asked)
-        <input
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          value={passkey}
-          onChange={(e) => setPasskey(e.target.value)}
-          placeholder="123456"
-        />
-      </label>
-
-      {devices.length === 0 ? (
-        <p className="panel-hint">No scan results yet.</p>
-      ) : (
-        <ul className="device-list">
-          {devices.map((d) => (
-            <li key={d.address}>
-              <span>
-                {d.name}{' '}
-                <code>{d.address}</code>
-                {d.rssi != null ? ` (${d.rssi} dBm)` : ''}
-              </span>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  run(() => ble.connect(d.address, passkey || undefined))
-                }
-              >
-                Connect
-              </button>
-            </li>
+        Available thermometers
+        <select
+          value={selected}
+          disabled={busy || available.length === 0}
+          onChange={(event) => {
+            setSelectedAddress(event.target.value);
+            setNeedsPasskeyFor(null);
+            setPasskey('');
+            setError(null);
+          }}
+        >
+          {available.length === 0 ? <option value="">Scan for devices</option> : null}
+          {available.map((device) => (
+            <option value={device.address} key={device.address}>
+              {device.name} ({device.address})
+            </option>
           ))}
-        </ul>
-      )}
+        </select>
+      </label>
+      {needsPasskey ? (
+        <label className="field-block">
+          Pairing passkey (6 digits)
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={6}
+            pattern="[0-9]{6}"
+            value={passkey}
+            onChange={(event) => setPasskey(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !busy) {
+                event.preventDefault();
+                void connect();
+              }
+            }}
+            placeholder="123456"
+          />
+        </label>
+      ) : null}
     </section>
   );
 }

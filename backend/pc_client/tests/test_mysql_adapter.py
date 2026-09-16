@@ -43,6 +43,7 @@ def make_sample(
 class _FakeCursor:
     def __init__(self, fetchone_result=None, fetchall_result=None, raise_on_execute=None):
         self.executed = []
+        self.mogrified = []
         self._fetchone_result = fetchone_result
         self._fetchall_result = fetchall_result or []
         self._raise_on_execute = raise_on_execute
@@ -57,6 +58,15 @@ class _FakeCursor:
         self.executed.append((sql, params))
         if self._raise_on_execute is not None:
             raise self._raise_on_execute
+
+    async def executemany(self, sql, params):
+        self.executed.append((sql, params))
+        if self._raise_on_execute is not None:
+            raise self._raise_on_execute
+
+    def mogrify(self, template, params):
+        self.mogrified.append(params)
+        return "(" + ", ".join(repr(value) for value in params) + ")"
 
     async def fetchone(self):
         return self._fetchone_result
@@ -112,9 +122,10 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result.persisted)
         sql, params = cursor.executed[0]
         self.assertIn("INSERT INTO temperature_samples", sql)
+        self.assertIn("observed_at_utc", sql)
         self.assertEqual(
             params,
-            (77, 10, 20.0, "VALID", 22.0, "VALID", 21.0, True, "LIVE", None),
+            (77, 10, datetime(2026, 1, 1), 20.0, "VALID", 22.0, "VALID", 21.0, True, "LIVE", None),
         )
 
     async def test_missing_interval_sample_has_null_average_and_failure_reason(
@@ -135,8 +146,31 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
         _, params = cursor.executed[0]
         self.assertEqual(
             params,
-            (None, None, 20.0, "VALID", 22.0, "VALID", None, False, "PROVISIONAL", "poll timed out"),
+            (None, None, datetime(2026, 1, 1), 20.0, "VALID", 22.0, "VALID", None, False, "PROVISIONAL", "poll timed out"),
         )
+
+    async def test_recovered_history_keeps_its_original_sample_time(self) -> None:
+        cursor = _FakeCursor()
+        adapter = make_adapter_with_cursor(cursor)
+        sampled_at = datetime(2026, 1, 1, 12, 34, 56, tzinfo=timezone.utc)
+        batch = HistoryBatch(
+            device=None,
+            boot_id=77,
+            previous_boot_id=77,
+            new_boot=False,
+            samples=(make_sample(source="HISTORY", observed_at_utc=sampled_at),),
+            expected_counts=(1, 1),
+            retrieved_counts=(1, 1),
+            complete=True,
+            elapsed_seconds=0.5,
+            failure_reason=None,
+        )
+
+        await adapter.upsert_history(batch)
+
+        sql, _ = cursor.executed[0]
+        self.assertIn("observed_at_utc", sql)
+        self.assertEqual(cursor.mogrified[0][2], datetime(2026, 1, 1, 12, 34, 56))
 
     async def test_duplicate_sample_is_rejected_not_raised(self) -> None:
         duplicate_error = pymysql.err.IntegrityError(1062, "Duplicate entry")
@@ -173,30 +207,20 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(boot_id, 42)
 
-    async def test_upsert_history_counts_inserted_and_duplicate_rows(self) -> None:
-        adapter = MySQLDatabaseAdapter(
-            host="localhost", port=3306, user="u", password="p", database="thermometer"
-        )
-        calls = {"n": 0}
-
-        async def fake_insert(sample):
-            calls["n"] += 1
-            if calls["n"] == 2:
-                raise pymysql.err.IntegrityError(1062, "Duplicate entry")
-
-        adapter._insert_sample = fake_insert
+    async def test_upsert_history_batches_300_rows_and_merges_only_partial_history(self) -> None:
+        cursor = _FakeCursor()
+        adapter = make_adapter_with_cursor(cursor)
         batch = HistoryBatch(
             device=None,
             boot_id=77,
             previous_boot_id=None,
             new_boot=False,
-            samples=(
-                make_sample(sample_seq=1, source="HISTORY"),
-                make_sample(sample_seq=2, source="HISTORY"),
-                make_sample(sample_seq=3, source="HISTORY"),
+            samples=tuple(
+                make_sample(sample_seq=seq, source="HISTORY")
+                for seq in range(1, 301)
             ),
-            expected_counts=(3, 3),
-            retrieved_counts=(3, 3),
+            expected_counts=(300, 300),
+            retrieved_counts=(300, 300),
             complete=True,
             elapsed_seconds=0.5,
             failure_reason=None,
@@ -205,8 +229,22 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
         result = await adapter.upsert_history(batch)
 
         self.assertTrue(result.persisted)
-        self.assertIn("2 inserted", result.detail)
-        self.assertIn("1 already present", result.detail)
+        self.assertEqual(len(cursor.executed), 3)
+        self.assertEqual(len(cursor.mogrified), 300)
+        self.assertTrue(all("AS incoming ON DUPLICATE KEY UPDATE" in sql for sql, _ in cursor.executed))
+        self.assertTrue(all("record_source = 'HISTORY'" in sql for sql, _ in cursor.executed))
+        self.assertTrue(all("sensor1_status = 'NOT_RETRIEVED'" in sql for sql, _ in cursor.executed))
+        self.assertTrue(all("incoming.sensor1_c" in sql for sql, _ in cursor.executed))
+        self.assertIn("300 samples", result.detail)
+
+    async def test_upsert_history_write_error_propagates(self) -> None:
+        cursor = _FakeCursor(raise_on_execute=pymysql.err.OperationalError(2006, "gone away"))
+        adapter = make_adapter_with_cursor(cursor)
+        batch = HistoryBatch(None, 77, None, False, (make_sample(source="HISTORY"),),
+                             (1, 1), (1, 1), True, 0.1, None)
+
+        with self.assertRaises(pymysql.err.OperationalError):
+            await adapter.upsert_history(batch)
 
     async def test_connection_state_and_display_result_are_documented_noops(
         self,
@@ -246,7 +284,7 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
         result = await adapter.reconcile_provisional_intervals(batch)
 
         self.assertTrue(result.configured)
-        self.assertFalse(result.persisted)
+        self.assertTrue(result.persisted)
 
     async def test_reconcile_deletes_provisional_rows_matched_by_history_timestamp(
         self,
@@ -306,7 +344,7 @@ class MySQLAdapterTests(unittest.IsolatedAsyncioTestCase):
 
         result = await adapter.reconcile_provisional_intervals(batch)
 
-        self.assertFalse(result.persisted)
+        self.assertTrue(result.persisted)
         self.assertEqual(len(cursor.executed), 1)  # SELECT only, no DELETE issued
 
 

@@ -87,6 +87,20 @@ class ProtocolTests(unittest.TestCase):
                 )
             )
 
+    def test_compact_history_reconstructs_wrapping_sequences(self) -> None:
+        packet = build_history_chunk_request(
+            7, 1, 0xFFFFFFFF, 2, compact=True
+        )
+        self.assertEqual(packet[1], Opcode.GET_HISTORY_CHUNK_COMPACT)
+        records = struct.pack("<hBhB", 2150, DataStatus.VALID, 0, DataStatus.DISCONNECTED)
+        payload = struct.pack("<BIBB", 1, 0xFFFFFFFF, 2, 3) + records
+        chunk = decode_history_chunk(
+            parse_response(make_response(Opcode.GET_HISTORY_CHUNK_COMPACT, 7, payload))
+        )
+        self.assertEqual([record.sequence for record in chunk.records], [0xFFFFFFFF, 0])
+        self.assertEqual(chunk.records[0].temperature_c, 21.5)
+        self.assertIsNone(chunk.records[1].temperature_c)
+
     def test_rejects_response_with_wrong_request_id(self) -> None:
         with self.assertRaises(ProtocolError):
             parse_response(

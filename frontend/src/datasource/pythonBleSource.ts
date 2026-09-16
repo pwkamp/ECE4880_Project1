@@ -1,6 +1,5 @@
 import { BleApiClient } from './bleClient';
 import {
-  frameFromBle,
   frameFromSample,
   type BleStatus,
   type SampleRow,
@@ -12,8 +11,9 @@ import type {
   ThermometerFrame,
   ThermometerSource,
 } from './types';
+import { WINDOW_S } from '../lib/chartScroll';
 
-const HISTORY_MS = 360_000;
+const HISTORY_MS = (WINDOW_S + 10) * 1000;
 const DEFAULT_INTERVAL_MS = 1000;
 
 const OFFLINE_STATUS: BleStatus = {
@@ -44,8 +44,9 @@ export interface PythonBleSourceOptions {
  * ThermometerSource backed by the teammate Python BLE connector.
  *
  * Device scan/connect/display go to FastAPI (`/api/v1/ble/*`). Temperature
- * samples are read from MySQL via `/api/samples` when that reader is
- * configured; otherwise the live BLE `/current` snapshot is used.
+ * All plotted/current temperatures come from MySQL via `/api/samples`.
+ * The browser never asks the ESP32 for current or history data; the backend
+ * owns polling, reconnect recovery, and history synchronization.
  */
 export class PythonBleSource implements ThermometerSource, BleConnector {
   private readonly client: BleApiClient;
@@ -54,6 +55,9 @@ export class PythonBleSource implements ThermometerSource, BleConnector {
   private history: ThermometerFrame[] = [];
   private lastStatus: BleStatus = OFFLINE_STATUS;
   private displays: Record<SensorId, boolean> = { 1: true, 2: true };
+  private displayLocks = new Set<SensorId>();
+  private confirmedOverrides = new Map<SensorId, { enabled: boolean; until: number }>();
+  private lastSample: SampleRow | null = null;
   private listeners = new Set<(frame: ThermometerFrame) => void>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private inFlight = false;
@@ -75,22 +79,23 @@ export class PythonBleSource implements ThermometerSource, BleConnector {
     return this.lastStatus;
   }
 
-  setSensorEnabled(sensorId: SensorId, enabled: boolean): void {
-    this.displays[sensorId] = enabled;
-    const prev = this.last.readings[sensorId];
-    this.last = {
-      ...this.last,
-      readings: {
-        ...this.last.readings,
-        [sensorId]: {
-          ...prev,
-          enabled,
-          celsius: enabled ? prev.celsius : null,
-        },
-      },
-    };
-    this.emit(this.last);
-    void this.client.setDisplay(sensorId, enabled).catch(() => undefined);
+  async setSensorEnabled(sensorId: SensorId, enabled: boolean): Promise<void> {
+    if (this.displayLocks.has(sensorId)) return;
+    this.displayLocks.add(sensorId);
+    try {
+      const confirmed = await this.client.setDisplay(sensorId, enabled);
+      this.displays[sensorId] = confirmed.enabled;
+      this.confirmedOverrides.set(sensorId, {
+        enabled: confirmed.enabled,
+        until: Date.now() + 3_000,
+      });
+      this.updateFrame();
+      if (confirmed.enabled !== enabled) {
+        throw new Error(`Sensor ${sensorId} did not confirm the requested display state`);
+      }
+    } finally {
+      this.displayLocks.delete(sensorId);
+    }
   }
 
   subscribe(listener: (frame: ThermometerFrame) => void): () => void {
@@ -101,8 +106,7 @@ export class PythonBleSource implements ThermometerSource, BleConnector {
   }
 
   getHistory(seconds: number): ThermometerFrame[] {
-    const now = this.last.timestamp || Date.now();
-    const cutoff = now - seconds * 1000;
+    const cutoff = Date.now() - seconds * 1000;
     return this.history.filter((f) => f.timestamp >= cutoff);
   }
 
@@ -127,17 +131,20 @@ export class PythonBleSource implements ThermometerSource, BleConnector {
 
   async connect(address: string, passkey?: string): Promise<void> {
     await this.client.connect(address, passkey);
-    await this.tick();
+    this.lastStatus = await this.client.getStatus();
+    this.updateFrame();
   }
 
   async disconnect(): Promise<void> {
     await this.client.disconnect();
-    await this.tick();
+    this.lastStatus = await this.client.getStatus();
+    this.updateFrame();
   }
 
   async reconnect(): Promise<void> {
     await this.client.reconnect();
-    await this.tick();
+    this.lastStatus = await this.client.getStatus();
+    this.updateFrame();
   }
 
   private async tick(): Promise<void> {
@@ -146,63 +153,56 @@ export class PythonBleSource implements ThermometerSource, BleConnector {
     try {
       try {
         this.lastStatus = await this.client.getStatus();
+        for (const display of this.lastStatus.displays ?? []) {
+          if (display.sensor_id !== 1 && display.sensor_id !== 2) continue;
+          const id = display.sensor_id;
+          if (this.displayLocks.has(id)) continue;
+          const confirmed = this.confirmedOverrides.get(id);
+          if (confirmed && confirmed.enabled !== display.enabled && Date.now() < confirmed.until) {
+            continue;
+          }
+          this.confirmedOverrides.delete(id);
+          this.displays[id] = display.enabled;
+        }
       } catch {
         this.lastStatus = { ...OFFLINE_STATUS, last_error: 'status unreachable' };
       }
 
       try {
-        const current = await this.client.getCurrent();
-        if (current.snapshot) {
-          for (const sensor of current.snapshot.sensors) {
-            if (sensor.sensor_id === 1 || sensor.sensor_id === 2) {
-              this.displays[sensor.sensor_id] = sensor.display_enabled;
-            }
-          }
-        }
-        const sample = await this.client.getSamplesLatest();
-        if (this.history.length === 0) {
-          await this.seedHistoryFromDb();
-        }
-        const switchState: SwitchState = this.lastStatus.ready ? 'on' : 'off';
-        const frame = sample
-          ? frameFromSample(sample, this.displays, switchState)
-          : frameFromBle(current, this.lastStatus);
-        this.ingest(frame);
+        this.lastSample = await this.client.getSamplesLatest();
       } catch {
-        this.ingest(offlineFrame());
+        this.lastSample = null;
       }
+      try {
+        const rows = await this.client.getSamplesHistory(WINDOW_S);
+        this.history = rows.map((row) =>
+          frameFromSample(row, this.displays, 'on'),
+        );
+      } catch {
+        // Keep previously read MySQL rows until the sample reader recovers.
+      }
+      if (this.lastSample) {
+        const frame = frameFromSample(this.lastSample, this.displays, 'on');
+        const last = this.history[this.history.length - 1];
+        if (!last || last.timestamp < frame.timestamp) this.history.push(frame);
+        else if (last.timestamp === frame.timestamp) this.history[this.history.length - 1] = frame;
+      }
+      this.updateFrame();
     } finally {
       this.inFlight = false;
     }
   }
 
-  private async seedHistoryFromDb(): Promise<void> {
-    let rows: SampleRow[] = [];
-    try {
-      rows = await this.client.getSamplesHistory(300);
-    } catch {
-      return;
-    }
-    if (rows.length === 0) return;
+  private updateFrame(): void {
     const switchState: SwitchState = this.lastStatus.ready ? 'on' : 'off';
-    this.history = rows.map((row) =>
-      frameFromSample(row, this.displays, switchState),
-    );
-  }
-
-  private ingest(frame: ThermometerFrame): void {
-    this.last = frame;
-    const prev = this.history[this.history.length - 1];
-    if (prev && prev.timestamp === frame.timestamp) {
-      this.history[this.history.length - 1] = frame;
-    } else {
-      this.history.push(frame);
-    }
-    const cutoff = frame.timestamp - HISTORY_MS;
+    this.last = this.lastSample
+      ? frameFromSample(this.lastSample, this.displays, switchState)
+      : offlineFrame();
+    const cutoff = Date.now() - HISTORY_MS;
     while (this.history.length > 0 && this.history[0].timestamp < cutoff) {
       this.history.shift();
     }
-    this.emit(frame);
+    this.emit(this.last);
   }
 
   private emit(frame: ThermometerFrame): void {

@@ -1,4 +1,5 @@
 import { MockThermometerSource } from './mockThermometerSource';
+import { BleApiClient } from './bleClient';
 import { PythonBleSource } from './pythonBleSource';
 import type { ThermometerSource } from './types';
 
@@ -12,7 +13,13 @@ import type { ThermometerSource } from './types';
  */
 export const thermometerSource: ThermometerSource =
   import.meta.env.VITE_DATA_SOURCE === 'ble'
-    ? new PythonBleSource()
+    ? new PythonBleSource({
+        client: new BleApiClient(
+          import.meta.env.VITE_BLE_API_BASE?.trim()
+            ? { bleBase: import.meta.env.VITE_BLE_API_BASE.trim() }
+            : {},
+        ),
+      })
     : new MockThermometerSource();
 
 export * from './types';

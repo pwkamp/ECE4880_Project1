@@ -1,9 +1,9 @@
 import { SCALE_C } from './temperature';
 
-/** Chart-recorder window, in seconds. */
-export const WINDOW_S = 300;
+/** Five-minute ESP32 buffer plus room for the required 10-second recovery. */
+export const WINDOW_S = 320;
 
-/** Horizontal scale: wide enough that a laptop viewport cannot show all 300 s at once. */
+/** Horizontal scale: the full recovery window remains scrollable on a laptop. */
 export const PX_PER_SECOND = 8;
 
 /** Drawable Y range. The spec window (10–50 C) is the default view; 0 C and 60 C are a scroll away. */

@@ -24,6 +24,10 @@ static QueueHandle_t s_sensor_events;
 static TaskHandle_t s_state_task;
 static TaskHandle_t s_sensor_tasks[THERMOMETER_SENSOR_COUNT];
 static sensor_runtime_t s_sensors[THERMOMETER_SENSOR_COUNT];
+/* Frozen by GET_HISTORY_META so sampling cannot overwrite the backlog while
+ * the BLE central reads it. This costs roughly 5 KiB for two 300-slot rings. */
+static thermometer_history_buffer_t s_history_snapshot[THERMOMETER_SENSOR_COUNT];
+static bool s_history_snapshot_valid;
 static uint32_t s_boot_id;
 static uint32_t s_latest_sequence;
 static bool s_started;
@@ -188,6 +192,8 @@ esp_err_t thermometer_start(void)
     }
 
     memset(s_sensors, 0, sizeof(s_sensors));
+    memset(s_history_snapshot, 0, sizeof(s_history_snapshot));
+    s_history_snapshot_valid = false;
     for (size_t sensor_index = 0; sensor_index < THERMOMETER_SENSOR_COUNT;
          ++sensor_index) {
         history_buffer_init(&s_sensors[sensor_index].history);
@@ -282,10 +288,13 @@ void thermometer_get_history_meta(thermometer_history_meta_t *meta)
     for (size_t sensor_index = 0; sensor_index < THERMOMETER_SENSOR_COUNT;
          ++sensor_index) {
         const sensor_runtime_t *sensor = &s_sensors[sensor_index];
-        meta->counts[sensor_index] = history_buffer_count(&sensor->history);
+        s_history_snapshot[sensor_index] = sensor->history;
+        meta->counts[sensor_index] =
+            history_buffer_count(&s_history_snapshot[sensor_index]);
         meta->oldest_sequences[sensor_index] =
-            history_buffer_oldest_sequence(&sensor->history);
+            history_buffer_oldest_sequence(&s_history_snapshot[sensor_index]);
     }
+    s_history_snapshot_valid = true;
     xSemaphoreGive(s_state_mutex);
 }
 
@@ -365,7 +374,9 @@ bool thermometer_copy_history(uint8_t sensor_id, uint32_t start_sequence,
 
     xSemaphoreTake(s_state_mutex, portMAX_DELAY);
     const bool copied = history_buffer_copy(
-        &s_sensors[sensor_id - 1U].history, start_sequence, requested_count,
+        s_history_snapshot_valid ? &s_history_snapshot[sensor_id - 1U]
+                                 : &s_sensors[sensor_id - 1U].history,
+        start_sequence, requested_count,
         records, copied_count);
     xSemaphoreGive(s_state_mutex);
     return copied;

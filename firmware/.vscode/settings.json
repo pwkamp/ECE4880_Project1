@@ -1,6 +1,7 @@
 {
   "C_Cpp.intelliSenseEngine": "disabled",
   "idf.extensionActivationMode": "always",
+  "idf.enableCCache": false,
   "cmake.configureOnOpen": false,
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
@@ -11,9 +12,10 @@
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
-    "--compile-commands-dir=${workspaceFolder}/build"
+    "--compile-commands-dir=c:\\Users\\Peter\\Documents\\Code\\SeniorDesign1\\ECE4880_Project1\\firmware\\build"
   ],
   "idf.flashType": "UART",
   "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
-  "idf.portWin": "COM8"
+  "idf.portWin": "COM8",
+  "clangd.path": "C:\\Espressif\\tools\\esp-clangd\\esp-21.1.3_20260408\\esp-clangd\\bin\\clangd.exe"
 }

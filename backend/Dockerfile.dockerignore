@@ -1,0 +1,15 @@
+.git
+.pytest_cache
+.venv
+backend/.venv
+build
+**/build
+backend/.env
+backend/.runtime
+backend/__pycache__
+backend/pc_client/__pycache__
+backend/pc_client/tests/__pycache__
+frontend/node_modules
+frontend/dist
+firmware/sdkconfig
+firmware/device_config.cmake

@@ -204,6 +204,7 @@ LAYOUT_STRUCTS = {name: _layout_struct(name) for name in _LAYOUTS}
 HEADER = LAYOUT_STRUCTS["header"]
 HEADER_SIZE = HEADER.size
 HISTORY_RECORD = LAYOUT_STRUCTS["history_record"]
+COMPACT_HISTORY_RECORD = LAYOUT_STRUCTS["compact_history_record"]
 HISTORY_CHUNK_PREFIX = LAYOUT_STRUCTS["history_chunk_prefix"]
 
 PROTOCOL_VERSION = CONFIG.protocol_version
@@ -214,6 +215,9 @@ RESPONSE_CHARACTERISTIC_UUID = CONFIG.response_characteristic_uuid.lower()
 RESPONSE_FLAG = int(CONFIG.protocol["response_flag"])
 MAX_HISTORY_RECORDS_PER_CHUNK = int(
     CONFIG.protocol["max_history_records_per_chunk"]
+)
+MAX_COMPACT_HISTORY_RECORDS_PER_CHUNK = int(
+    CONFIG.protocol["max_compact_history_records_per_chunk"]
 )
 
 # The JSON is the authority for every wire value used by both implementations.
@@ -380,20 +384,25 @@ def build_authentication_proof_request(request_id: int, proof: bytes) -> bytes:
 
 
 def build_history_chunk_request(
-    request_id: int, sensor_id: int, start_sequence: int, count: int
+    request_id: int, sensor_id: int, start_sequence: int, count: int,
+    *, compact: bool = False,
 ) -> bytes:
     _validate_sensor_id(sensor_id)
     if not 0 <= start_sequence <= 0xFFFFFFFF:
         raise ValueError("start_sequence must fit in an unsigned 32-bit integer")
-    if not 1 <= count <= MAX_HISTORY_RECORDS_PER_CHUNK:
-        raise ValueError(f"count must be between 1 and {MAX_HISTORY_RECORDS_PER_CHUNK}")
+    maximum = (MAX_COMPACT_HISTORY_RECORDS_PER_CHUNK if compact
+               else MAX_HISTORY_RECORDS_PER_CHUNK)
+    if not 1 <= count <= maximum:
+        raise ValueError(f"count must be between 1 and {maximum}")
     payload = _pack_layout(
         "history_chunk_request",
         sensor_id=sensor_id,
         start_sequence=start_sequence,
         record_count=count,
     )
-    return build_request(Opcode.GET_HISTORY_CHUNK, request_id, payload)
+    opcode = (Opcode.GET_HISTORY_CHUNK_COMPACT if compact
+              else Opcode.GET_HISTORY_CHUNK)
+    return build_request(opcode, request_id, payload)
 
 
 def parse_response(
@@ -528,8 +537,11 @@ def decode_history_meta(response: Response) -> HistoryMeta:
 
 
 def decode_history_chunk(response: Response) -> HistoryChunk:
-    if response.opcode is not Opcode.GET_HISTORY_CHUNK:
-        raise ProtocolError("response is not GET_HISTORY_CHUNK")
+    if response.opcode not in (Opcode.GET_HISTORY_CHUNK, Opcode.GET_HISTORY_CHUNK_COMPACT):
+        raise ProtocolError("response is not a history chunk")
+    compact = response.opcode is Opcode.GET_HISTORY_CHUNK_COMPACT
+    layout_name = "compact_history_record" if compact else "history_record"
+    record_size = COMPACT_HISTORY_RECORD.size if compact else HISTORY_RECORD.size
     if len(response.payload) < HISTORY_CHUNK_PREFIX.size:
         raise ProtocolError("history chunk is shorter than its prefix")
 
@@ -540,19 +552,19 @@ def decode_history_chunk(response: Response) -> HistoryChunk:
         _validate_sensor_id(prefix["sensor_id"])
     except ValueError as exc:
         raise ProtocolError(str(exc)) from exc
-    if prefix["record_size"] != HISTORY_RECORD.size:
+    if prefix["record_size"] != record_size:
         raise ProtocolError("history record size does not match the shared layout")
     expected_length = (
-        HISTORY_CHUNK_PREFIX.size + prefix["record_count"] * HISTORY_RECORD.size
+        HISTORY_CHUNK_PREFIX.size + prefix["record_count"] * record_size
     )
     if len(response.payload) != expected_length:
         raise ProtocolError("history chunk contains an incomplete record")
 
     records: list[HistoryRecordValue] = []
     for record_index in range(prefix["record_count"]):
-        offset = HISTORY_CHUNK_PREFIX.size + record_index * HISTORY_RECORD.size
+        offset = HISTORY_CHUNK_PREFIX.size + record_index * record_size
         values = _unpack_layout(
-            "history_record", response.payload[offset : offset + HISTORY_RECORD.size]
+            layout_name, response.payload[offset : offset + record_size]
         )
         try:
             data_status = DataStatus(values["data_status"])
@@ -562,7 +574,8 @@ def decode_history_chunk(response: Response) -> HistoryChunk:
             ) from exc
         records.append(
             HistoryRecordValue(
-                sequence=values["sequence"],
+                sequence=(prefix["start_sequence"] + record_index) & 0xFFFFFFFF
+                if compact else values["sequence"],
                 temperature_c=(
                     values["temperature_centi_c"] / 100
                     if data_status is DataStatus.VALID

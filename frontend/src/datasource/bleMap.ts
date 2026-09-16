@@ -12,9 +12,22 @@ export interface BleStatus {
   ready: boolean;
   target: { name: string; address: string } | null;
   last_error: string | null;
+  desired_connected?: boolean;
+  credential_state?: 'MISSING' | 'AVAILABLE' | 'VERIFIED' | 'REJECTED';
+  displays?: Array<{ sensor_id: number; enabled: boolean }>;
   host_os?: 'windows' | 'linux' | 'other' | string;
   pairing_backend?: 'winrt' | 'bluez' | 'none' | string;
   auto_discover_on_start?: boolean;
+  history_sync?: {
+    state: 'RUNNING' | 'COMPLETE' | 'INCOMPLETE' | 'FAILED' | 'CANCELLED';
+    progress?: number;
+    expected_counts?: number[];
+    retrieved_counts?: number[];
+    sample_count?: number;
+    elapsed_seconds?: number;
+    persisted?: boolean;
+    failure_reason?: string | null;
+  } | null;
 }
 
 export interface BleSensor {

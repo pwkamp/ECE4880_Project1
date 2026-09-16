@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from datetime import datetime
+import os
 from typing import Any, AsyncIterator
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Path, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, SecretStr
 
@@ -91,9 +94,16 @@ class StatusResponse(BaseModel):
     persistence_pending: int
     persistence_capacity: int
     persistence_overflow_count: int
+    history_sync: dict[str, Any] | None
     host_os: str
     pairing_backend: str
     auto_discover_on_start: bool
+    displays: list["DisplayStatusResponse"]
+
+
+class DisplayStatusResponse(BaseModel):
+    sensor_id: int
+    enabled: bool
 
 
 class ScanResponse(BaseModel):
@@ -164,8 +174,11 @@ def _snapshot_json(snapshot: CurrentSnapshot | None) -> dict[str, Any] | None:
     }
 
 
-def _status_json(service_status: ServiceStatus) -> dict[str, Any]:
+def _status_json(
+    service_status: ServiceStatus, current: CurrentDiagnostic | None = None
+) -> dict[str, Any]:
     host = detect_ble_host()
+    snapshot = current.snapshot if current is not None else None
     return {
         "phase": service_status.phase.value,
         "desired_connected": service_status.desired_connected,
@@ -190,9 +203,18 @@ def _status_json(service_status: ServiceStatus) -> dict[str, Any]:
         "persistence_pending": service_status.persistence_pending,
         "persistence_capacity": service_status.persistence_capacity,
         "persistence_overflow_count": service_status.persistence_overflow_count,
+        "history_sync": service_status.history_sync,
         "host_os": host.family,
         "pairing_backend": host.pairing,
         "auto_discover_on_start": host.auto_discover_on_start,
+        "displays": (
+            [
+                {"sensor_id": sensor.sensor_id, "enabled": sensor.display_enabled}
+                for sensor in snapshot.sensors
+            ]
+            if snapshot is not None
+            else []
+        ),
     }
 
 
@@ -233,6 +255,34 @@ def _display_json(display: ConfirmedDisplayResult) -> dict[str, Any]:
     }
 
 
+def _configured_cors_origins() -> list[str]:
+    """Return exact, loopback-only browser origins configured for local Windows use."""
+
+    raw_origins = os.environ.get("THERMOMETER_CORS_ORIGINS", "")
+    origins: list[str] = []
+    for value in raw_origins.split(","):
+        origin = value.strip().rstrip("/")
+        if not origin:
+            continue
+        parsed = urlsplit(origin)
+        if (
+            parsed.scheme != "http"
+            or parsed.hostname not in {"127.0.0.1", "localhost"}
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise RuntimeError(
+                "THERMOMETER_CORS_ORIGINS accepts only exact http://localhost "
+                "or http://127.0.0.1 origins"
+            )
+        if origin not in origins:
+            origins.append(origin)
+    return origins
+
+
 def create_app(service: ThermometerBleService | None = None) -> FastAPI:
     """Create one API application owning exactly one BLE service instance."""
 
@@ -254,6 +304,15 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
         version=str(CONFIG.protocol_version),
         lifespan=lifespan,
     )
+    cors_origins = _configured_cors_origins()
+    if cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=cors_origins,
+            allow_credentials=False,
+            allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allow_headers=["Content-Type", "Authorization"],
+        )
 
     def controller(request: Request) -> ThermometerBleService:
         return request.app.state.ble_service
@@ -316,7 +375,8 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
 
     @app.get("/api/v1/ble/status", response_model=StatusResponse)
     async def get_ble_status(request: Request) -> dict[str, Any]:
-        return _status_json(controller(request).get_status())
+        ble = controller(request)
+        return _status_json(ble.get_status(), ble.get_current())
 
     @app.post("/api/v1/ble/scan", response_model=ScanResponse)
     async def scan(request: Request) -> dict[str, Any]:

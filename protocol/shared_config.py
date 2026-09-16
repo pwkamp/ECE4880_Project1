@@ -213,6 +213,7 @@ def load_and_validate(path: Path) -> dict[str, Any]:
         "history_chunk_request",
         "history_chunk_prefix",
         "history_record",
+        "compact_history_record",
         "auth_begin_response",
         "auth_prove_request",
     }
@@ -230,5 +231,11 @@ def load_and_validate(path: Path) -> dict[str, Any]:
     maximum_packet_size = header_size + prefix_size + maximum_records * record_size
     if maximum_packet_size > bluetooth["preferred_att_mtu"] - 1:
         raise ValueError("maximum history response does not fit one ATT Read Response")
+    compact_records = protocol.get("max_compact_history_records_per_chunk", 0)
+    if not 1 <= compact_records <= 255:
+        raise ValueError("max_compact_history_records_per_chunk must be between 1 and 255")
+    compact_size, _ = layout_details(layouts["compact_history_record"])
+    if header_size + prefix_size + compact_records * compact_size > bluetooth["preferred_att_mtu"] - 1:
+        raise ValueError("maximum compact history response does not fit one ATT Read Response")
 
     return config

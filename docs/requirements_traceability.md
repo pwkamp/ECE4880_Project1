@@ -47,7 +47,7 @@ system-level requirements.
 | INT-LLR-400..406 | SCRUM-507..513 | Implemented | Custom service discovery, no notifications, request IDs/header, GET_CURRENT, and validated SET_DISPLAY response. |
 | INT-LLR-407..410 | SCRUM-514..517 | Implemented | Metadata-first, sequence-addressed, complete-record, MTU-safe chunked history. |
 | INT-LLR-411..415 | SCRUM-518..522 | Implemented | MTU adaptation, status/version rejection, authenticated bonding, and automatic reconnect discovery. |
-| INT-LLR-416 | SCRUM-646 | Acceptance pending | A 0.9 s connector timeout and display priority are enforced; final physical-LCD end-to-end measurement remains. |
+| INT-LLR-416 | SCRUM-646 | Acceptance pending | Display priority and a post-timeout device-state confirmation prevent false errors; the five-second acknowledgement guard does not replace the one-second physical-actuation acceptance measurement. |
 
 Protocol layout, opcodes, statuses, UUIDs, and timing are defined once in
 `protocol/thermometer_protocol.json`. Python loads it directly; firmware CMake

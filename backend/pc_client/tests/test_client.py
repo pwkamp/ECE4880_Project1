@@ -1,6 +1,7 @@
 import asyncio
 import struct
 import unittest
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from pc_client.protocol import (
@@ -121,8 +122,46 @@ class _PausedWriteBleakClient(_FakeBleakClient):
 
 
 class ClientTests(unittest.IsolatedAsyncioTestCase):
+    async def test_cancelled_gatt_open_disposes_partial_winrt_client(self) -> None:
+        started = asyncio.Event()
+        never_finishes = asyncio.Event()
+
+        class StalledClient(_FakeBleakClient):
+            async def connect(self):
+                self.operations.append("connect")
+                started.set()
+                await never_finishes.wait()
+
+        fake = StalledClient()
+        client = ThermometerBleClient(
+            "fake", client_factory=lambda *_a, **_k: fake, passkey=TEST_PASSKEY
+        )
+        task = asyncio.create_task(client.connect(authenticate=False))
+        await started.wait()
+        task.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await task
+        self.assertEqual(fake.operations, ["connect", "disconnect"])
+        self.assertIsNone(client._client)
+
     def test_blank_platform_error_gets_a_useful_name(self) -> None:
         self.assertEqual(describe_ble_error(OSError()), "OSError")
+
+    def test_uses_negotiated_characteristic_mtu_when_bluez_reports_default(self) -> None:
+        fake = _FakeBleakClient()
+        fake.mtu_size = 23
+        fake.services = SimpleNamespace(
+            get_characteristic=lambda _uuid: SimpleNamespace(
+                max_write_without_response_size=244
+            )
+        )
+        client = ThermometerBleClient(
+            "fake", client_factory=lambda *_a, **_k: fake, passkey=TEST_PASSKEY
+        )
+        client._client = fake
+
+        self.assertEqual(client.mtu_size, 247)
+        self.assertGreater(client.records_per_chunk(), 1)
 
     async def test_connection_uses_stock_bleak_without_implicit_pairing(self) -> None:
         captured_options: dict[str, object] = {}
@@ -360,9 +399,44 @@ class ClientTests(unittest.IsolatedAsyncioTestCase):
             "fake", client_factory=lambda *_a, **_k: fake, passkey=TEST_PASSKEY
         )
         await client.connect(authenticate=False)
-        self.assertEqual(client.records_per_chunk(), 32)
+        self.assertEqual(client.records_per_chunk(), 72)
         fake.mtu_size = 23
-        self.assertEqual(client.records_per_chunk(), 1)
+        self.assertEqual(client.records_per_chunk(), 2)
+        await client.close()
+
+    async def test_compact_history_falls_back_to_legacy_firmware(self) -> None:
+        class LegacyClient(_FakeBleakClient):
+            async def write_gatt_char(self, uuid, packet, response):
+                self.operations.append("write")
+                _version, opcode, request_id, _length, _status, _flags = HEADER.unpack_from(packet)
+                sensor_id, start, count = struct.unpack("<BIB", packet[8:])
+                if opcode == Opcode.GET_HISTORY_CHUNK_COMPACT:
+                    self.response = HEADER.pack(
+                        PROTOCOL_VERSION, opcode, request_id, 0,
+                        Status.INVALID_COMMAND, RESPONSE_FLAG,
+                    )
+                    return
+                self.assert_legacy_count = count
+                records = b"".join(
+                    struct.pack("<IhB", start + offset, 2000, 0)
+                    for offset in range(count)
+                )
+                payload = struct.pack("<BIBB", sensor_id, start, count, 7) + records
+                self.response = HEADER.pack(
+                    PROTOCOL_VERSION, opcode, request_id, len(payload),
+                    Status.SUCCESS, RESPONSE_FLAG,
+                ) + payload
+
+        fake = LegacyClient()
+        client = ThermometerBleClient(
+            "fake", client_factory=lambda *_a, **_k: fake, passkey=TEST_PASSKEY
+        )
+        await client.connect(authenticate=False)
+        self.assertEqual(client.records_per_chunk(), 72)
+        chunk = await client.get_history_chunk(1, 1, 72)
+        self.assertEqual(len(chunk.records), 32)
+        self.assertEqual(client.records_per_chunk(), 32)
+        self.assertEqual(fake.assert_legacy_count, 32)
         await client.close()
 
 if __name__ == "__main__":

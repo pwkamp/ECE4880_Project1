@@ -1,3 +1,5 @@
+import type { BleStatus } from './bleMap';
+
 /**
  * The contract between the computer app and the "third box".
  *
@@ -73,7 +75,7 @@ export interface ThermometerSource {
    * Virtual button press: turn a sensor's display on or off from the computer.
    * Must be reflected in the stream within 1 second.
    */
-  setSensorEnabled(sensorId: SensorId, enabled: boolean): void;
+  setSensorEnabled(sensorId: SensorId, enabled: boolean): void | Promise<void>;
 
   /**
    * Subscribe to the ~1 Hz frame stream. Returns an unsubscribe function.
@@ -134,16 +136,7 @@ export interface BleConnector {
   connect(address: string, passkey?: string): Promise<void>;
   disconnect(): Promise<void>;
   reconnect(): Promise<void>;
-  getConnectionStatus(): {
-    phase: string;
-    connected: boolean;
-    ready: boolean;
-    target: { name: string; address: string } | null;
-    last_error: string | null;
-    host_os?: string;
-    pairing_backend?: string;
-    auto_discover_on_start?: boolean;
-  };
+  getConnectionStatus(): BleStatus;
 }
 
 export function supportsBle(

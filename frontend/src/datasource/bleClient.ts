@@ -1,5 +1,5 @@
 import type { SensorId } from './types';
-import type { BleCurrent, BleDevice, BleStatus, SampleRow } from './bleMap';
+import type { BleDevice, BleStatus, SampleRow } from './bleMap';
 
 export interface BleApiClientOptions {
   fetchFn?: typeof fetch;
@@ -58,12 +58,8 @@ export class BleApiClient {
     return this.requestJson<BleStatus>(`${this.bleBase}/status`);
   }
 
-  async getCurrent(): Promise<BleCurrent> {
-    return this.requestJson<BleCurrent>(`${this.bleBase}/current`);
-  }
-
-  async setDisplay(sensorId: SensorId, enabled: boolean): Promise<void> {
-    await this.requestJson(`${this.bleBase}/displays/${sensorId}`, {
+  async setDisplay(sensorId: SensorId, enabled: boolean): Promise<{ enabled: boolean }> {
+    return this.requestJson<{ enabled: boolean }>(`${this.bleBase}/displays/${sensorId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled }),

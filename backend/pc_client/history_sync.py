@@ -19,6 +19,7 @@ from .protocol import (
     HistoryChunk,
     ProtocolError,
     ServiceConfig,
+    Status,
 )
 from .thermometer_client import HistorySync, TimedHistoryRecord, describe_ble_error
 
@@ -31,7 +32,7 @@ class HistoryRetrieval:
 
 
 class HistorySynchronizer:
-    """Retrieve recent records round-robin until complete or out of budget."""
+    """Retrieve oldest records first before the device's ring overwrites them."""
 
     def __init__(
         self,
@@ -57,16 +58,32 @@ class HistorySynchronizer:
         self._publish_current = publish_current
 
     async def synchronize(self, operation: Any) -> HistoryRetrieval:
-        # History synchronization rule: metadata first, recent-first chunks,
-        # round-robin sensors, bounded retries, and one overall time budget.
+        # A full ring overwrites its oldest record every second. Fetching the
+        # newest records first makes a complete 300-second transfer impossible:
+        # the oldest metadata snapshot has vanished by the time we reach it.
+        # Read both sensors oldest-first, still alternating between them.
         settings = self._settings()
         started = self._monotonic()
         deadline = started + settings.history_sync_budget_seconds
+        # Leave time inside the end-to-end budget for the database upsert.
+        transfer_deadline = deadline - min(1.0, settings.history_sync_budget_seconds * 0.1)
+        anchor, anchor_time = self._current_anchor()
         meta = await self._call(
             "history metadata",
             lambda: self._client().get_history_meta(),
-            deadline,
+            transfer_deadline,
         )
+        if anchor is None or anchor_time is None or anchor.boot_id != meta.boot_id:
+            # Resolve the timestamp before transfer. A disconnect or exhausted
+            # deadline must not discard records already retrieved.
+            anchor = await self._call(
+                "history time anchor",
+                lambda: self._client().get_current(),
+                transfer_deadline,
+                priority=RequestPriority.CURRENT,
+            )
+            anchor_time = self._utc_now()
+            await self._publish_current(anchor, anchor_time)
         expected = tuple(meta.counts)
         retrieved = [0 for _ in expected]
         records: dict[tuple[int, int], Any] = {}
@@ -76,25 +93,20 @@ class HistorySynchronizer:
             if count > 0
         )
         remaining = {sensor_id: expected[sensor_id - 1] for sensor_id in pending}
-        newest = {
-            sensor_id: (
-                meta.oldest_sequences[sensor_id - 1]
-                + expected[sensor_id - 1]
-                - 1
-            )
-            & 0xFFFFFFFF
+        next_sequence = {
+            sensor_id: meta.oldest_sequences[sensor_id - 1]
             for sensor_id in pending
         }
         failures: list[str] = []
         total_expected = sum(expected)
         budget_expired = False
 
-        while pending and self._monotonic() < deadline:
+        while pending and self._monotonic() < transfer_deadline:
             sensor_id = pending.popleft()
             request_count = min(
                 self._client().records_per_chunk(), remaining[sensor_id]
             )
-            start_sequence = (newest[sensor_id] - request_count + 1) & 0xFFFFFFFF
+            start_sequence = next_sequence[sensor_id]
             chunk: HistoryChunk | None = None
             last_error: Exception | None = None
             for _attempt in range(settings.history_chunk_retry_count + 1):
@@ -104,7 +116,7 @@ class HistorySynchronizer:
                         lambda sid=sensor_id, start=start_sequence, count=request_count: (
                             self._client().get_history_chunk(sid, start, count)
                         ),
-                        deadline,
+                        transfer_deadline,
                     )
                     self.validate_chunk(
                         chunk, sensor_id, start_sequence, request_count
@@ -115,9 +127,49 @@ class HistorySynchronizer:
                     break
                 except Exception as exc:
                     last_error = exc
+                    if (
+                        isinstance(exc, ProtocolError)
+                        and exc.status is Status.NOT_AVAILABLE
+                    ):
+                        # A ring slot that has been overwritten cannot become
+                        # available again by retrying the same sequence.
+                        break
             if budget_expired:
                 break
             if chunk is None:
+                if (
+                    isinstance(last_error, ProtocolError)
+                    and last_error.status is Status.NOT_AVAILABLE
+                    and self._monotonic() < transfer_deadline
+                ):
+                    # Pre-snapshot firmware can overwrite the oldest slot
+                    # between metadata and the first chunk. Recover the
+                    # surviving suffix instead of abandoning this sensor at
+                    # 0%, while reporting that the original 300 were lost.
+                    try:
+                        fresh_meta = await self._call(
+                            "refreshed history metadata",
+                            lambda: self._client().get_history_meta(),
+                            transfer_deadline,
+                        )
+                    except Exception as exc:
+                        failures.append(
+                            f"sensor {sensor_id} metadata refresh: "
+                            f"{describe_ble_error(exc)}"
+                        )
+                    else:
+                        if fresh_meta.boot_id == meta.boot_id:
+                            fresh_oldest = fresh_meta.oldest_sequences[sensor_id - 1]
+                            lost = (fresh_oldest - start_sequence) & 0xFFFFFFFF
+                            if 0 < lost < remaining[sensor_id]:
+                                remaining[sensor_id] -= lost
+                                next_sequence[sensor_id] = fresh_oldest
+                                failures.append(
+                                    f"sensor {sensor_id}: {lost} oldest record(s) "
+                                    "were overwritten before retrieval"
+                                )
+                                pending.append(sensor_id)
+                                continue
                 failures.append(
                     f"sensor {sensor_id}: "
                     f"{describe_ble_error(last_error or RuntimeError('unknown history error'))}"
@@ -128,7 +180,9 @@ class HistorySynchronizer:
                 records[(sensor_id, record.sequence)] = record
             retrieved[sensor_id - 1] += len(chunk.records)
             remaining[sensor_id] -= len(chunk.records)
-            newest[sensor_id] = (start_sequence - 1) & 0xFFFFFFFF
+            next_sequence[sensor_id] = (
+                start_sequence + len(chunk.records)
+            ) & 0xFFFFFFFF
             operation.progress = (
                 sum(retrieved) / total_expected if total_expected else 1.0
             )
@@ -141,22 +195,6 @@ class HistorySynchronizer:
         if pending or budget_expired:
             failures.append("history synchronization exceeded its time budget")
 
-        anchor, anchor_time = self._current_anchor()
-        if self._monotonic() < deadline:
-            try:
-                anchor = await self._call(
-                    "history time anchor",
-                    lambda: self._client().get_current(),
-                    deadline,
-                    priority=RequestPriority.CURRENT,
-                )
-                anchor_time = self._utc_now()
-                await self._publish_current(anchor, anchor_time)
-            except Exception as exc:
-                failures.append(f"time anchor: {describe_ble_error(exc)}")
-
-        if anchor is None or anchor_time is None:
-            raise RuntimeError("no current snapshot is available as a history anchor")
         if anchor.boot_id != meta.boot_id:
             failures.append("device rebooted during history synchronization")
 
