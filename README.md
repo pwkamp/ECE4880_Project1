@@ -4,8 +4,8 @@ ESP32 firmware, Python BLE connector, MySQL schema, and the computer console.
 
 ## Computer console
 
-The **computer** component of the ECE:4880 dual-sensor networked thermometer
-system.
+The web app lives in [`frontend/`](frontend/). The **computer** component of
+the ECE:4880 dual-sensor networked thermometer system.
 
 > The console defaults to **mock data**. Point it at the Python BLE
 > connector with `VITE_DATA_SOURCE=ble` (see
@@ -35,7 +35,7 @@ install (creates `.env` files and a Python venv when Python is present):
 
 ```bash
 bash scripts/setup.sh
-# or: npm run setup
+cd frontend
 npm run dev
 ```
 
@@ -45,6 +45,7 @@ adapter (WinRT / BlueZ), which containers do not own cleanly.
 If you already have dependencies:
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
@@ -55,16 +56,16 @@ save; `Ctrl+C` stops it.
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Run the console in development |
-| `npm test` | Unit tests: alert logic, readout logic, mock data source, an App render smoke test (13 tests) |
-| `npm run build` | Type-check + production build into `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run lint` | oxlint |
+| `cd frontend && npm run dev` | Run the console in development |
+| `cd frontend && npm test` | Unit tests: alert logic, readout logic, mock data source, an App render smoke test |
+| `cd frontend && npm run build` | Type-check + production build into `frontend/dist/` |
+| `cd frontend && npm run preview` | Serve the production build locally |
+| `cd frontend && npm run lint` | oxlint |
 
 No cloud services, API keys, or internet access are required for the default
 console (mock data + logged SMS).
 
-The web console is the product. `npm run dev` is how you run it. BLE and MySQL
+The web console lives in [`frontend/`](frontend/). `cd frontend && npm run dev` is how you run it. BLE and MySQL
 are optional extra processes you start **in addition** to that, not instead of
 it.
 
@@ -98,8 +99,8 @@ directly.
 
 | Process | Command | Bind | Role |
 | --- | --- | --- | --- |
-| Web console | `npm run dev` (Vite half) | `http://localhost:5173` | UI: readouts, chart, scan/connect panel, alerts |
-| Alert + sample reader | `npm run dev` (started automatically) | `127.0.0.1:8787` | SMS delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
+| Web console | `cd frontend && npm run dev` (Vite half) | `http://localhost:5173` | UI: readouts, chart, scan/connect panel, alerts |
+| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | SMS delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
 | BLE connector | `backend/.venv/bin/python main.py` | `127.0.0.1:8000` | Scan, pair, connect, poll the box at 1 Hz, **write** samples through a DB adapter |
 | MySQL | `mysqld` / local MySQL | `127.0.0.1:3306` | Stores 1 Hz rows the console charts from |
 | ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of temperatures (fake-sensor firmware is fine for demo) |
@@ -203,14 +204,14 @@ GRANT SELECT, INSERT, UPDATE ON thermometer.* TO 'thermo'@'127.0.0.1';
 FLUSH PRIVILEGES;
 ```
 
-The **reader** URL goes in `server/.env` (this repo’s Node service):
+The **reader** URL goes in `frontend/server/.env` (the Node service):
 
 ```
 MYSQL_URL=mysql://thermo:pick-a-password@127.0.0.1:3306/thermometer
 ```
 
-Copy `server/.env.example` → `server/.env` if you do not have one yet.
-`server/.env` is gitignored.
+Copy `frontend/server/.env.example` → `frontend/server/.env` if you do not have one yet.
+`frontend/server/.env` is gitignored.
 
 The **writer** is not this Node URL. Before `python main.py`, set the
 in-repo adapter from the merged database PRs:
@@ -234,7 +235,7 @@ That adapter implements `ThermometerDatabaseAdapter` in
 Confirm the reader without the UI:
 
 ```bash
-# after npm run dev is up, or curl the Node port directly
+# after `cd frontend && npm run dev` is up, or curl the Node port directly
 curl -sS http://127.0.0.1:8787/api/samples/latest
 # { "configured": false, "row": null }     → MYSQL_URL unset
 # { "configured": true, "row": { ... } }   → reader on; row may still be null if empty
@@ -286,17 +287,18 @@ Optional Tk hardware tool (not the web UI):
 
 ### 3. Point the web console at BLE (the web app is still required)
 
-The console **defaults to mock data** so `npm run dev` alone still works for UI
-work. To use the Python service, create a **repo-root** `.env` (gitignored;
+The console **defaults to mock data** so `cd frontend && npm run dev` alone still works for UI
+work. To use the Python service, create **`frontend/.env`** (gitignored;
 Vite only reads it at startup):
 
 ```
 VITE_DATA_SOURCE=ble
 ```
 
-There is a template in [`.env.example`](.env.example). Then:
+There is a template in [`frontend/.env.example`](frontend/.env.example). Then:
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
@@ -314,7 +316,7 @@ Vite proxies (see `vite.config.ts`):
 | `/api/v1/*` | `http://127.0.0.1:8000/api/v1/*` | Python BLE |
 | `/api/*` (everything else, e.g. `/api/notify`, `/api/samples`) | `http://127.0.0.1:8787/api/*` | Node SMS + MySQL reader |
 
-If you change `.env`, restart Vite. `VITE_*` values are baked in at dev-server
+If you change `frontend/.env`, restart Vite. `VITE_*` values are baked in at dev-server
 start.
 
 ### 4. Prepare the PC Bluetooth stack (do this before Scan)
@@ -395,7 +397,7 @@ the firmware PIN, then Scan/Connect in the console.
 ### 5. Connect a thermometer from the UI
 
 Order matters. Python must already be on `:8000`, Vite must have been
-started with `VITE_DATA_SOURCE=ble`, and the ESP32 must be advertising.
+started from `frontend/` with `VITE_DATA_SOURCE=ble`, and the ESP32 must be advertising.
 
 1. Open <http://localhost:5173>. Subtitle should read **Python BLE connector**.
    The **Device connection** panel should name the detected OS (Linux/BlueZ
@@ -460,7 +462,7 @@ Replace the address and passkey. Connect returns **202** with an
 
 | Symptom | Likely cause |
 | --- | --- |
-| Subtitle still says mock; no Device panel | Root `.env` missing `VITE_DATA_SOURCE=ble`, or Vite not restarted |
+| Subtitle still says mock; no Device panel | `frontend/.env` missing `VITE_DATA_SOURCE=ble`, or Vite not restarted |
 | Device panel: scan fails / proxy errors | Python not running on `:8000`, or a second process stole the port |
 | Phase stuck on `DISCOVERING` (Windows) or `DISCONNECTED` after Scan (Linux) | ESP32 off, out of range, wrong firmware name prefix (`Thermometer-`), or PC Bluetooth disabled |
 | Scan returns `{ "devices": [] }` | Box not advertising. Linux Bluetooth permissions (`bluetooth` group) can also hide devices |
@@ -477,17 +479,17 @@ Replace the address and passkey. Connect returns **202** with an
 
 ### Switching back to mock data
 
-Remove `VITE_DATA_SOURCE=ble` from `.env` (or set it to anything other than
-`ble`) and restart `npm run dev`. You do not need Python or MySQL. Demo
+Remove `VITE_DATA_SOURCE=ble` from `frontend/.env` (or set it to anything other than
+`ble`) and restart `npm run dev` from `frontend/`. You do not need Python or MySQL. Demo
 controls come back. This is the default for UI work.
 
 ## Running with SMS alerts
 
-`npm run dev` starts the web app **and** a small delivery service
-(`server/`, on `127.0.0.1:8787`). The browser evaluates alerts against the
+`cd frontend && npm run dev` starts the web app **and** a small delivery service
+(`frontend/server/`, on `127.0.0.1:8787`). The browser evaluates alerts against the
 mock sensor data as usual and POSTs each HIGH/LOW transition to the service.
 
-Delivery mode is set by `server/.env` (copy from `server/.env.example`):
+Delivery mode is set by `frontend/server/.env` (copy from `frontend/server/.env.example`):
 
 | `SMS_MODE` | Behaviour | Needs |
 | --- | --- | --- |
@@ -503,8 +505,8 @@ watch the **api** terminal for a line like
 `Text message sent to +15555550123: "Temperature high: …"` and the app's Alert
 activity panel for the delivery badge.
 
-If `ALERT_API_TOKEN` is set in `server/.env`, also set
-`VITE_ALERT_API_TOKEN` (same value) in a root `.env` file so the frontend
+If `ALERT_API_TOKEN` is set in `frontend/server/.env`, also set
+`VITE_ALERT_API_TOKEN` (same value) in `frontend/.env` so the console
 can authenticate.
 
 ---
@@ -765,7 +767,7 @@ optional `ThermometerSimControls`.
 
 ### 6. Where the app and the box run
 
-The console is a static site. On demo day, run `npm run dev` (or serve
+The console is a static site. On demo day, from `frontend/` run `npm run dev` (or serve
 `npm run build` output) on the lab computer, with the box on the **same LAN**.
 Note: a browser page served over **https** cannot open an insecure `ws://` — so
 either serve the console over plain `http` on the LAN, or terminate `wss://`

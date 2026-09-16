@@ -5,6 +5,10 @@
       "path": "firmware"
     },
     {
+      "name": "frontend",
+      "path": "frontend"
+    },
+    {
       "name": "backend",
       "path": "backend"
     },
