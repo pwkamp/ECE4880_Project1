@@ -52,6 +52,7 @@ class SharedConfigTests(unittest.TestCase):
         self.assertEqual(
             firmware_settings["idf.buildPathWin"], "${workspaceFolder}\\build"
         )
+        self.assertIs(firmware_settings["idf.enableCCache"], False)
         self.assertEqual(
             firmware_settings["idf.sdkconfigFilePath"],
             "${workspaceFolder}/sdkconfig",

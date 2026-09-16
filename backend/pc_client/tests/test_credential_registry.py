@@ -1,6 +1,8 @@
 import csv
+import os
 import tempfile
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,9 +16,21 @@ from pc_client.credential_registry import (
 
 class CredentialRegistryTests(unittest.TestCase):
     def test_default_csv_is_beside_main(self) -> None:
-        backend_root = Path(__file__).resolve().parents[2]
-        self.assertEqual(default_registry_path(), backend_root / "paired_devices.csv")
-        self.assertTrue((backend_root / "main.py").exists())
+        with mock.patch.dict(
+            os.environ, {"THERMOMETER_CREDENTIAL_REGISTRY_PATH": ""}
+        ):
+            backend_root = Path(__file__).resolve().parents[2]
+            self.assertEqual(default_registry_path(), backend_root / "paired_devices.csv")
+            self.assertTrue((backend_root / "main.py").exists())
+
+    def test_registry_path_can_be_overridden_for_a_container_volume(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {"THERMOMETER_CREDENTIAL_REGISTRY_PATH": "/state/paired_devices.csv"},
+        ):
+            self.assertEqual(
+                default_registry_path(), Path("/state/paired_devices.csv")
+            )
 
     def test_verified_credentials_round_trip_and_preserve_leading_zero(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

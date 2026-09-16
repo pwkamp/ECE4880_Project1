@@ -102,6 +102,7 @@ class FakeClient:
         self.release_first_chunk = asyncio.Event()
         self.pause_first_chunk = False
         self.chunk_failures_remaining = 0
+        self.chunk_failure_status = Status.INTERNAL_ERROR
         self.slow_chunk_seconds = 0.0
         self.disconnected_callback = None
         self.authentication_error = None
@@ -158,7 +159,7 @@ class FakeClient:
             self.chunk_failures_remaining -= 1
             from pc_client.protocol import ProtocolError, Status
 
-            raise ProtocolError("ring advanced", Status.NOT_AVAILABLE)
+            raise ProtocolError("temporary history error", self.chunk_failure_status)
         if self.slow_chunk_seconds:
             await asyncio.sleep(self.slow_chunk_seconds)
         if self.pause_first_chunk and not self.first_chunk_started.is_set():
@@ -373,7 +374,7 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(status.target.address, self.device.address)
         self.assertEqual(len(self.clients), 1)
 
-    async def test_history_is_metadata_first_recent_first_and_round_robin(self):
+    async def test_history_is_metadata_first_oldest_first_and_round_robin(self):
         service = self.make_service([], auto=False)
         await service.start()
         operation = await service.connect(self.device)
@@ -387,12 +388,57 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertLess(meta_index, calls.index(chunk_calls[0]))
         self.assertEqual(
             chunk_calls[:4],
-            ["chunk:1:9:2", "chunk:2:9:2", "chunk:1:7:2", "chunk:2:7:2"],
+            ["chunk:1:7:2", "chunk:2:7:2", "chunk:1:9:2", "chunk:2:9:2"],
         )
         batch = self.database.history[0]
         self.assertTrue(batch.complete)
         self.assertEqual(batch.expected_counts, (4, 4))
         self.assertEqual(batch.retrieved_counts, (4, 4))
+
+    async def test_full_300_second_history_becomes_300_database_rows(self):
+        class FullHistoryClient(FakeClient):
+            def __init__(self, target):
+                super().__init__(target)
+                self.sequence = 300
+
+            async def get_history_meta(self):
+                self.calls.append("meta")
+                return HistoryMeta(77, 300, (300, 300), (1, 1))
+
+            def records_per_chunk(self):
+                return 32
+
+        def client_factory(target):
+            client = FullHistoryClient(target)
+            self.clients.append(client)
+            return client
+
+        self.client_factory = client_factory
+        service = self.make_service([], auto=False)
+        await service.start()
+        operation = await service.connect(self.device)
+        await service.wait_for_operation(operation.operation_id, 1)
+        await wait_until(lambda: bool(self.database.history))
+
+        batch = self.database.history[0]
+        self.assertTrue(batch.complete)
+        self.assertEqual(batch.retrieved_counts, (300, 300))
+        self.assertEqual(len(batch.samples), 300)
+        self.assertEqual(
+            [sample.sample_sequence for sample in batch.samples],
+            list(range(1, 301)),
+        )
+        self.assertTrue(all(len(sample.sensor_readings) == 2 for sample in batch.samples))
+        self.assertEqual(
+            (batch.samples[-1].observed_at_utc - batch.samples[0].observed_at_utc).total_seconds(),
+            299,
+        )
+        await wait_until(lambda: service._history_task is None)
+        summary = service.get_status().history_sync
+        self.assertEqual(summary["state"], "COMPLETE")
+        self.assertEqual(summary["sample_count"], 300)
+        self.assertEqual(summary["retrieved_counts"], [300, 300])
+        self.assertTrue(summary["persisted"])
 
     async def test_display_preempts_history_between_chunks(self):
         service = self.make_service([], auto=False)
@@ -415,13 +461,53 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
 
         calls = client.calls
         first_chunk = max(
-            index for index, value in enumerate(calls) if value == "chunk:1:9:2"
+            index for index, value in enumerate(calls) if value == "chunk:1:7:2"
         )
         display_index = calls.index("display:1:True", first_chunk)
-        next_chunk = calls.index("chunk:2:9:2", first_chunk + 1)
+        next_chunk = calls.index("chunk:2:7:2", first_chunk + 1)
         self.assertLess(display_index, next_chunk)
         self.assertTrue(display.result.display_enabled)
         self.assertEqual(duplicate.operation_id, history_operation.operation_id)
+
+    async def test_late_display_reply_is_confirmed_from_device_state(self):
+        class SlowDisplayClient(FakeClient):
+            display_enabled = False
+
+            async def set_display(self, sensor_id, enabled):
+                await asyncio.sleep(0.25)
+                self.display_enabled = enabled
+                return await super().set_display(sensor_id, enabled)
+
+            async def get_current(self):
+                current = await super().get_current()
+                return replace(
+                    current,
+                    sensors=(
+                        replace(
+                            current.sensors[0],
+                            visible_state=(VisibleState.ON if self.display_enabled else VisibleState.OFF),
+                            display_enabled=self.display_enabled,
+                        ),
+                        current.sensors[1],
+                    ),
+                )
+
+        def client_factory(target):
+            client = SlowDisplayClient(target)
+            self.clients.append(client)
+            return client
+
+        self.client_factory = client_factory
+        service = self.make_service([], auto=False)
+        await service.start()
+        connection = await service.connect(self.device)
+        await service.wait_for_operation(connection.operation_id, 1)
+        await wait_until(lambda: bool(self.database.history) and service._history_task is None)
+
+        confirmed = await service.set_display(1, True)
+
+        self.assertTrue(confirmed.result.display_enabled)
+        self.assertTrue(self.clients[0].display_enabled)
 
     async def test_history_retries_a_chunk_twice_before_succeeding(self):
         service = self.make_service([], auto=False)
@@ -443,8 +529,25 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
             OperationState.SUCCEEDED,
             getattr(completed, "error", None),
         )
-        self.assertEqual(client.calls.count("chunk:1:9:2"), 3)
+        self.assertEqual(client.calls.count("chunk:1:7:2"), 3)
         self.assertTrue(completed.result["complete"])
+
+    async def test_incomplete_automatic_history_sync_retries_in_backend(self):
+        def client_factory(target):
+            client = FakeClient(target)
+            client.chunk_failures_remaining = 3
+            self.clients.append(client)
+            return client
+
+        self.client_factory = client_factory
+        service = self.make_service([self.device])
+        await service.start()
+        await wait_until(lambda: service.is_ready)
+        await wait_until(lambda: len(self.database.history) >= 2)
+
+        self.assertFalse(self.database.history[0].complete)
+        self.assertTrue(self.database.history[1].complete)
+        self.assertEqual(self.database.history[1].boot_id, 77)
 
     async def test_history_budget_persists_and_reports_partial_results(self):
         service = self.make_service([], auto=False)
@@ -485,12 +588,19 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         service = self.make_service([self.device])
         await service.start()
         await wait_until(lambda: service.is_connected)
+        await wait_until(
+            lambda: bool(self.database.history) and service._history_task is None
+        )
+        self.database.history.clear()
         self.clients[0].is_connected = False
 
         await wait_until(lambda: len(self.clients) >= 2 and service.is_connected)
+        await wait_until(lambda: bool(self.database.history))
 
         self.assertTrue(service.get_status().desired_connected)
         self.assertEqual(service.target.address, self.device.address)
+        self.assertEqual(self.database.history[0].boot_id, 77)
+        self.assertIn("meta", self.clients[1].calls)
 
     async def test_failed_gatt_open_returns_to_reconnect_probe_and_recovers(self):
         class FirstConnectFails(FakeClient):
@@ -514,8 +624,21 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(status.phase, ConnectionPhase.CONNECTED)
         self.assertEqual(status.retry_count, 0)
 
-    async def test_reconnect_waits_for_restarted_device_and_refreshes_target(self):
+    async def test_reconnect_tries_known_target_after_missed_advertisement(self):
         visible_devices = [self.device]
+        class VisibleOnlyClient(FakeClient):
+            async def connect(self, *_args, **_kwargs):
+                self.calls.append("connect")
+                if not visible_devices:
+                    raise RuntimeError("temporarily not advertising")
+                self.is_connected = True
+
+        def client_factory(target):
+            client = VisibleOnlyClient(target)
+            self.clients.append(client)
+            return client
+
+        self.client_factory = client_factory
         service = self.make_service(visible_devices)
         await service.start()
         await wait_until(lambda: service.is_ready)
@@ -527,14 +650,14 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         await wait_until(
             lambda: service.get_status().phase is ConnectionPhase.RECONNECTING
         )
-        await asyncio.sleep(FAST_SETTINGS.auto_discovery_interval_seconds * 2)
+        await wait_until(lambda: len(self.clients) >= 2)
 
-        # No second GATT client is created while the selected address is not
-        # advertising. This avoids repeatedly opening a stale Windows object.
-        self.assertEqual(len(self.clients), 1)
+        # Windows scans can miss bonded devices. A direct bounded GATT attempt
+        # is still made and its failure is retried without user intervention.
+        self.assertGreaterEqual(len(self.clients), 2)
         refreshed_transport = object()
         visible_devices.append(replace(self.device, device=refreshed_transport))
-        await wait_until(lambda: len(self.clients) == 2 and service.is_ready)
+        await wait_until(lambda: service.is_ready)
 
         self.assertIs(service._target.device, refreshed_transport)
         self.assertEqual(service.get_status().phase, ConnectionPhase.CONNECTED)
@@ -810,10 +933,12 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         await scan_started.wait()
         manual_scan = asyncio.create_task(service.scan())
         await asyncio.sleep(0)
+        # Assert the manual request joined the in-flight watcher before
+        # releasing it; a later scheduled automatic probe is allowed.
+        self.assertEqual(call_count, 1)
         release_scan.set()
 
         self.assertEqual(await manual_scan, [])
-        self.assertEqual(call_count, 1)
 
     async def test_manual_selection_wins_over_in_flight_discovery(self):
         scan_started = asyncio.Event()

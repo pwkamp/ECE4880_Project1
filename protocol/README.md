@@ -21,3 +21,9 @@ The test suite validates the JSON, Python packet layouts, opcodes and statuses,
 then generates a temporary firmware header and compares its packet sizes and
 constants with the Python implementation. A normal `idf.py build` separately
 verifies the real firmware generation dependency.
+
+`GET_HISTORY_CHUNK_COMPACT` (opcode 8) returns contiguous sequences using the
+chunk's `start_sequence` plus each record's index; a record carries only a
+signed centi-degree temperature and data status. Up to 72 records fit in one
+247-byte ATT response. The backend tries it first and falls back to the
+original opcode 4 if older firmware returns `INVALID_COMMAND`.

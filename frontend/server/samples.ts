@@ -54,7 +54,7 @@ export async function createMysqlSampleStore(url: string): Promise<SampleStore> 
   return {
     async latest() {
       const [rows] = await pool.query(
-        `SELECT ${SELECT_COLS} FROM temperature_samples ORDER BY observed_at_utc DESC LIMIT 1`,
+        `SELECT ${SELECT_COLS} FROM temperature_samples ORDER BY observed_at_utc DESC, id DESC LIMIT 1`,
       );
       const list = rows as Record<string, unknown>[];
       return list[0] ? parseSampleRow(list[0]) : null;
@@ -64,7 +64,7 @@ export async function createMysqlSampleStore(url: string): Promise<SampleStore> 
       const [rows] = await pool.query(
         `SELECT ${SELECT_COLS} FROM temperature_samples
          WHERE observed_at_utc >= UTC_TIMESTAMP() - INTERVAL ? SECOND
-         ORDER BY observed_at_utc ASC`,
+         ORDER BY observed_at_utc ASC, id ASC`,
         [window],
       );
       return (rows as Record<string, unknown>[]).map(parseSampleRow);

@@ -19,19 +19,34 @@ if (-not (Test-Path device_config.cmake)) {
     Copy-Item device_config.cmake.example device_config.cmake
 }
 # Set a unique six-digit passkey in device_config.cmake.
-idf.py set-target esp32
-idf.py build
+idf.py --no-ccache build
 ```
 
 The local `device_config.cmake`, generated `sdkconfig`, build directory, and
 firmware binaries are ignored by the repository. Commit
 `device_config.cmake.example` and the two `sdkconfig.defaults` files instead.
 
+History recovery now freezes a copy of both 300-record rings when the backend
+requests history metadata. Rebuild and reflash after updating this firmware;
+an ESP32 still running the earlier firmware may return `NOT_AVAILABLE` for the
+oldest record while its live ring advances, leaving history recovery at 0%.
+This revision also adds a compact history response and requests a 50 ms BLE
+connection interval. Reflash before measuring the 300-second recovery time.
+The normal ESP-IDF build and the VS Code Build button both use `build/`.
+The VS Code configuration disables `ccache`; use `--no-ccache` for the same
+behavior in an ESP-IDF terminal on this Windows setup.
+After moving this repository from another checkout, old generated compiler
+flags can contain two `picolibc.specs` paths and fail with a duplicate-spec
+error. In that case, back up or clean only the generated `build/` directory
+once, then run the normal build again. Do not edit `toolchain/cflags` by hand.
+
 Flash and monitor the board with the appropriate port:
 
 ```powershell
 idf.py -p COM5 flash monitor
 ```
+
+Replace `COM5` with the ESP32's actual serial port.
 
 ## Firmware tests
 
@@ -41,8 +56,7 @@ compiles all selected firmware modules, links the application, and checks the
 partition size:
 
 ```powershell
-idf.py fullclean
-idf.py build
+idf.py --no-ccache build
 idf.py size
 ```
 
@@ -66,3 +80,23 @@ and cannot be run by `master_test.py`.
 
 Real sensor and display files are integration stubs; fake sensors and the LED
 display simulator are the default working backends.
+
+## Full cross-platform integration
+
+The firmware itself stays on the ESP32 and is built/flashed from the native
+Windows or Linux host. MySQL and the web application are containerized on both
+platforms; the BLE backend is native on Windows and containerized with host
+BlueZ access on Linux. Keep the default **Deterministic simulated sensors**
+selection, set the six-digit PIN in `device_config.cmake`, and flash before
+starting the backend:
+
+```bash
+idf.py set-target esp32
+idf.py build
+idf.py -p /dev/ttyUSB0 flash monitor
+```
+
+After the board advertises as `Thermometer-XXXXXX`, follow
+[`docs/integration-test.md`](../docs/integration-test.md) to start the three
+components and verify the complete BLE-to-graph path using the PC's built-in
+Bluetooth adapter.

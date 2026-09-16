@@ -287,7 +287,7 @@ static size_t handle_get_history_meta(uint8_t opcode, uint16_t request_id,
 static size_t handle_get_history_chunk(const uint8_t *payload,
                                        size_t payload_length, uint8_t opcode,
                                        uint16_t request_id, uint8_t *response,
-                                       size_t response_capacity)
+                                       size_t response_capacity, bool compact)
 {
     if (payload_length != PROTOCOL_HISTORY_CHUNK_REQUEST_SIZE) {
         return finish_response(response, opcode, request_id,
@@ -309,14 +309,18 @@ static size_t handle_get_history_chunk(const uint8_t *payload,
                                PROTOCOL_STATUS_INVALID_VALUE, 0U);
     }
 
-    if (requested_count > PROTOCOL_MAX_HISTORY_RECORDS) {
-        requested_count = PROTOCOL_MAX_HISTORY_RECORDS;
+    const size_t max_records = compact ? PROTOCOL_MAX_COMPACT_HISTORY_RECORDS
+                                       : PROTOCOL_MAX_HISTORY_RECORDS;
+    const size_t record_size = compact ? PROTOCOL_COMPACT_HISTORY_RECORD_SIZE
+                                       : PROTOCOL_HISTORY_RECORD_SIZE;
+    if (requested_count > max_records) {
+        requested_count = max_records;
     }
     const size_t packet_overhead =
         PROTOCOL_HEADER_SIZE + PROTOCOL_HISTORY_CHUNK_PREFIX_SIZE;
     const size_t records_that_fit = response_capacity > packet_overhead
                                         ? (response_capacity - packet_overhead) /
-                                              PROTOCOL_HISTORY_RECORD_SIZE
+                                              record_size
                                         : 0U;
     if (requested_count > records_that_fit) {
         requested_count = records_that_fit;
@@ -326,7 +330,7 @@ static size_t handle_get_history_chunk(const uint8_t *payload,
                                PROTOCOL_STATUS_INTERNAL_ERROR, 0U);
     }
 
-    thermometer_history_record_t records[PROTOCOL_MAX_HISTORY_RECORDS];
+    thermometer_history_record_t records[PROTOCOL_MAX_COMPACT_HISTORY_RECORDS];
     size_t copied_count = 0U;
     if (!thermometer_copy_history(sensor_id, start_sequence, requested_count,
                                   records, &copied_count)) {
@@ -341,25 +345,33 @@ static size_t handle_get_history_chunk(const uint8_t *payload,
     result[PROTOCOL_HISTORY_CHUNK_PREFIX_RECORD_COUNT_OFFSET] =
         (uint8_t)copied_count;
     result[PROTOCOL_HISTORY_CHUNK_PREFIX_RECORD_SIZE_OFFSET] =
-        PROTOCOL_HISTORY_RECORD_SIZE;
+        (uint8_t)record_size;
 
     uint8_t *encoded_records = result + PROTOCOL_HISTORY_CHUNK_PREFIX_SIZE;
     for (size_t record_index = 0; record_index < copied_count;
          ++record_index) {
         uint8_t *encoded_record =
-            encoded_records + record_index * PROTOCOL_HISTORY_RECORD_SIZE;
-        write_u32(encoded_record + PROTOCOL_HISTORY_RECORD_SEQUENCE_OFFSET,
-                  records[record_index].sequence);
-        write_i16(encoded_record +
-                      PROTOCOL_HISTORY_RECORD_TEMPERATURE_CENTI_C_OFFSET,
-                  records[record_index].temperature_centi_c);
-        encoded_record[PROTOCOL_HISTORY_RECORD_DATA_STATUS_OFFSET] =
-            (uint8_t)records[record_index].data_status;
+            encoded_records + record_index * record_size;
+        if (compact) {
+            write_i16(encoded_record +
+                          PROTOCOL_COMPACT_HISTORY_RECORD_TEMPERATURE_CENTI_C_OFFSET,
+                      records[record_index].temperature_centi_c);
+            encoded_record[PROTOCOL_COMPACT_HISTORY_RECORD_DATA_STATUS_OFFSET] =
+                (uint8_t)records[record_index].data_status;
+        } else {
+            write_u32(encoded_record + PROTOCOL_HISTORY_RECORD_SEQUENCE_OFFSET,
+                      records[record_index].sequence);
+            write_i16(encoded_record +
+                          PROTOCOL_HISTORY_RECORD_TEMPERATURE_CENTI_C_OFFSET,
+                      records[record_index].temperature_centi_c);
+            encoded_record[PROTOCOL_HISTORY_RECORD_DATA_STATUS_OFFSET] =
+                (uint8_t)records[record_index].data_status;
+        }
     }
 
     const size_t response_payload_length =
         PROTOCOL_HISTORY_CHUNK_PREFIX_SIZE +
-        copied_count * PROTOCOL_HISTORY_RECORD_SIZE;
+        copied_count * record_size;
     return finish_response(response, opcode, request_id,
                            PROTOCOL_STATUS_SUCCESS, response_payload_length);
 }
@@ -451,7 +463,11 @@ size_t protocol_process_request(protocol_session_t *session,
     case PROTOCOL_OP_GET_HISTORY_CHUNK:
         return handle_get_history_chunk(payload, payload_length, opcode,
                                         request_id, response,
-                                        response_capacity);
+                                        response_capacity, false);
+    case PROTOCOL_OP_GET_HISTORY_CHUNK_COMPACT:
+        return handle_get_history_chunk(payload, payload_length, opcode,
+                                        request_id, response,
+                                        response_capacity, true);
     case PROTOCOL_OP_RESET_BOND:
         if (payload_length != 0U) {
             return finish_response(response, opcode, request_id,

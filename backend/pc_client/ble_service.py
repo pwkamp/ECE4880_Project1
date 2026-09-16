@@ -164,6 +164,7 @@ class ServiceStatus:
     persistence_pending: int = 0
     persistence_capacity: int = 0
     persistence_overflow_count: int = 0
+    history_sync: dict[str, Any] | None = None
 
 
 class ThermometerBleService:
@@ -227,6 +228,7 @@ class ThermometerBleService:
         self._last_boot_id: int | None = None
         self._history_previous_boot_id: int | None = None
         self._history_is_new_boot = False
+        self._last_history_sync: dict[str, Any] | None = None
         self._last_database_error: str | None = None
         self._database_errors: dict[str, str] = {}
 
@@ -742,6 +744,14 @@ class ThermometerBleService:
             if operation.state in {OperationState.QUEUED, OperationState.RUNNING}
         )
         persistence_health = self._persistence.health
+        history_sync = self._last_history_sync
+        if self._history_operation_id is not None:
+            operation = self._operations.get(self._history_operation_id)
+            if operation is not None and operation.state is OperationState.RUNNING:
+                history_sync = {
+                    "state": "RUNNING",
+                    "progress": operation.progress,
+                }
         return ServiceStatus(
             phase=state.phase,
             desired_connected=state.desired_connected,
@@ -768,6 +778,7 @@ class ThermometerBleService:
             persistence_pending=persistence_health.pending,
             persistence_capacity=persistence_health.capacity,
             persistence_overflow_count=persistence_health.overflow_count,
+            history_sync=history_sync,
         )
 
     def get_current(self) -> CurrentDiagnostic:
@@ -795,9 +806,33 @@ class ThermometerBleService:
                 timeout=command_timeout,
             )
         except asyncio.TimeoutError as exc:
-            raise DisplayTimeoutError(
-                "the ESP32 did not confirm the display state before the timeout"
-            ) from exc
+            # WinRT can finish the GATT write (and the ESP32 acts on it) before
+            # the matching read reaches us. A timed-out scheduler waiter does
+            # not cancel the in-flight GATT transaction. Read the authoritative
+            # device state once it drains instead of reporting a false failure.
+            try:
+                confirmation = await asyncio.wait_for(
+                    self._submit_ble(
+                        RequestPriority.CURRENT,
+                        f"confirm display {sensor_id}",
+                        lambda: self._required_client().get_current(),
+                    ),
+                    timeout=max(2.0, command_timeout),
+                )
+                sensor = next(
+                    sensor for sensor in confirmation.sensors
+                    if sensor.sensor_id == sensor_id
+                )
+                if sensor.display_enabled != enabled:
+                    raise ValueError("device state did not match requested display state")
+                result = DisplayResult(
+                    sensor_id, sensor.visible_state, sensor.display_enabled
+                )
+                await self._publish_current_snapshot(confirmation, self._utc_now())
+            except (asyncio.TimeoutError, RuntimeError, StopIteration, ValueError) as confirm_exc:
+                raise DisplayTimeoutError(
+                    "the ESP32 did not confirm the display state before the timeout"
+                ) from confirm_exc
 
         observed_at = self._utc_now()
         identity = self.target
@@ -1493,6 +1528,12 @@ class ThermometerBleService:
                     timeout=remaining_budget,
                 )
                 persisted = upsert.persisted and reconcile.persisted
+                if self.database.persistence_configured and not persisted:
+                    failures.append(
+                        "history persistence failed: "
+                        f"{upsert.detail or 'upsert incomplete'}; "
+                        f"{reconcile.detail or 'reconciliation incomplete'}"
+                    )
             except asyncio.TimeoutError:
                 failures.append("history persistence exceeded its time budget")
         else:
@@ -1583,8 +1624,10 @@ class ThermometerBleService:
             assert self._history_operation_id is not None
             return self._operations[self._history_operation_id]
         operation = self._new_operation(f"history_sync:{source}")
+        self._last_history_sync = None
         operation.state = OperationState.RUNNING
         operation.updated_at_utc = self._utc_now()
+        target_generation = self._target_generation
         self._history_operation_id = operation.operation_id
         self._history_task = asyncio.create_task(
             self._synchronize_history(operation), name="thermometer-history-sync"
@@ -1592,14 +1635,34 @@ class ThermometerBleService:
         self._track_background(self._history_task)
 
         def finished(task: asyncio.Task[HistorySync]) -> None:
+            retry = False
             if task.cancelled():
                 self._cancel_operation(operation.operation_id, "history sync cancelled")
+                self._last_history_sync = {
+                    "state": "CANCELLED",
+                    "failure_reason": "history sync cancelled",
+                }
             else:
                 error = task.exception()
                 if error is not None:
                     self._fail_operation(operation, error)
+                    self._last_history_sync = {
+                        "state": "FAILED",
+                        "failure_reason": describe_ble_error(error),
+                    }
+                    retry = True
                 else:
                     history = task.result()
+                    retry = not history.complete
+                    self._last_history_sync = {
+                        "state": "COMPLETE" if history.complete else "INCOMPLETE",
+                        "expected_counts": list(history.expected_counts),
+                        "retrieved_counts": list(history.retrieved_counts),
+                        "sample_count": len({record.sequence for record in history.records}),
+                        "elapsed_seconds": history.elapsed_seconds,
+                        "persisted": history.persisted,
+                        "failure_reason": history.failure_reason,
+                    }
                     self._succeed_operation(
                         operation,
                         {
@@ -1607,12 +1670,31 @@ class ThermometerBleService:
                             "retrieved_counts": list(history.retrieved_counts),
                             "complete": history.complete,
                             "elapsed_seconds": history.elapsed_seconds,
+                            "sample_count": self._last_history_sync["sample_count"],
+                            "persisted": history.persisted,
                             "failure_reason": history.failure_reason,
                         },
                     )
             if self._history_task is task:
                 self._history_task = None
                 self._history_operation_id = None
+            if source == "automatic" and retry and self._started:
+                async def retry_when_ready() -> None:
+                    await self._sleep(
+                        max(0.1, self.settings.auto_discovery_interval_seconds)
+                    )
+                    if (
+                        self._started
+                        and self.is_ready
+                        and target_generation == self._target_generation
+                    ):
+                        self._start_history_sync("automatic")
+
+                self._track_background(
+                    asyncio.create_task(
+                        retry_when_ready(), name="thermometer-history-retry"
+                    )
+                )
 
         self._history_task.add_done_callback(finished)
         return operation
@@ -1867,9 +1949,19 @@ class ThermometerBleService:
     ) -> DiscoveredThermometer | None:
         """Rediscover one selected ESP32 before reopening its GATT link."""
 
-        devices = await self._scan_for_devices(
-            self.settings.startup_scan_timeout_seconds
-        )
+        try:
+            devices = await self._scan_for_devices(
+                self.settings.startup_scan_timeout_seconds
+            )
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            LOGGER.warning(
+                "reconnect scan failed for %s; trying known target: %s",
+                selected_target.address,
+                describe_ble_error(exc),
+            )
+            devices = []
         if (
             not self._desired_connected
             or selected_generation != self._target_generation
@@ -1886,9 +1978,17 @@ class ThermometerBleService:
             None,
         )
         if refreshed is None:
-            raise ServiceUnavailableError(
-                f"selected thermometer {selected_target.address} is not advertising"
+            # A short WinRT scan can miss an already-bonded peripheral even
+            # though a direct GATT open succeeds (the same path used by the
+            # manual Connect button). A missed advertisement is not proof
+            # that the selected device is unavailable. Retain the address and
+            # let the bounded connection attempt decide.
+            LOGGER.info(
+                "selected thermometer %s was absent from the reconnect scan; "
+                "trying its known address directly",
+                selected_target.address,
             )
+            refreshed = selected_target
 
         self._transition(
             ConnectionPhase.RECONNECTING,

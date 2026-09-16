@@ -23,7 +23,9 @@ from .protocol import (
     HEADER_SIZE,
     HISTORY_CHUNK_PREFIX,
     HISTORY_RECORD,
+    COMPACT_HISTORY_RECORD,
     MAX_HISTORY_RECORDS_PER_CHUNK,
+    MAX_COMPACT_HISTORY_RECORDS_PER_CHUNK,
     REQUEST_CHARACTERISTIC_UUID,
     RESPONSE_CHARACTERISTIC_UUID,
     SERVICE_UUID,
@@ -36,6 +38,7 @@ from .protocol import (
     Opcode,
     ProtocolError,
     Response,
+    Status,
     build_authentication_proof_request,
     build_history_chunk_request,
     build_request,
@@ -137,6 +140,7 @@ class ThermometerBleClient:
         self._client_factory = client_factory or BleakClient
         self._passkey = validate_passkey(passkey) if passkey is not None else None
         self._disconnected_callback = disconnected_callback
+        self._compact_history_supported: bool | None = None
         self._client: Any | None = None
         self._connect_lock = asyncio.Lock()
         self._pairing_lock = asyncio.Lock()
@@ -202,6 +206,22 @@ class ThermometerBleClient:
     def mtu_size(self) -> int:
         if self._client is None:
             return 23
+        # BlueZ/Bleak may expose only the minimum 23-byte client MTU even
+        # after a larger exchange. On BlueZ 5.62+, the characteristic's
+        # max_write_without_response_size reflects the negotiated MTU - 3.
+        # This property is available even when our request characteristic
+        # itself uses write-with-response. Do not claim a larger MTU unless
+        # the transport actually reports it.
+        services = getattr(self._client, "services", None)
+        get_characteristic = getattr(services, "get_characteristic", None)
+        if callable(get_characteristic):
+            characteristic = get_characteristic(REQUEST_CHARACTERISTIC_UUID)
+            if characteristic is not None:
+                reported = getattr(
+                    characteristic, "max_write_without_response_size", None
+                )
+                if isinstance(reported, int) and reported > 20:
+                    return reported + 3
         return int(getattr(self._client, "mtu_size", 23))
 
     def _pairing_backend(self) -> str:
@@ -322,6 +342,17 @@ class ThermometerBleClient:
                 }
 
             client = self._client_factory(self.target, **client_options)
+            async def dispose_partial_client() -> None:
+                # wait_for() in the service cancels this coroutine at its
+                # recovery deadline. Even if connect() never completed,
+                # WinRT can already hold a GATT session/service objects.
+                # self._client is not assigned yet, so close() cannot release
+                # that partial backend.
+                with suppress(Exception):
+                    await asyncio.wait_for(
+                        client.disconnect(), timeout=min(3.0, self.connect_timeout)
+                    )
+
             try:
                 await client.connect()
                 # Enumerate every service, then select ours.  On Windows this
@@ -335,15 +366,11 @@ class ThermometerBleClient:
                             "device does not expose thermometer service "
                             f"{SERVICE_UUID}; verify that the latest firmware is running"
                         )
+            except asyncio.CancelledError:
+                await dispose_partial_client()
+                raise
             except Exception as exc:
-                try:
-                    # Also clean partially-created WinRT services when the
-                    # backend no longer reports an active transport.
-                    await client.disconnect()
-                except Exception:
-                    # A cleanup failure must not replace the operation that
-                    # actually made connection or discovery fail.
-                    pass
+                await dispose_partial_client()
                 raise RuntimeError(
                     "GATT connection/service discovery failed: "
                     f"{describe_ble_error(exc)}"
@@ -463,20 +490,39 @@ class ThermometerBleClient:
     async def get_history_chunk(
         self, sensor_id: int, start_sequence: int, count: int
     ) -> HistoryChunk:
-        request_id = self._next_request_id()
-        response = await self._exchange_packet(
-            build_history_chunk_request(
-                request_id, sensor_id, start_sequence, count
-            ),
-            Opcode.GET_HISTORY_CHUNK,
-            request_id,
-        )
-        return decode_history_chunk(response)
+        compact = self._compact_history_supported is not False
+        while True:
+            request_id = self._next_request_id()
+            opcode = (Opcode.GET_HISTORY_CHUNK_COMPACT if compact
+                      else Opcode.GET_HISTORY_CHUNK)
+            requested = min(count, self.records_per_chunk())
+            try:
+                response = await self._exchange_packet(
+                    build_history_chunk_request(
+                        request_id, sensor_id, start_sequence, requested,
+                        compact=compact,
+                    ),
+                    opcode,
+                    request_id,
+                )
+            except ProtocolError as exc:
+                if compact and exc.status is Status.INVALID_COMMAND:
+                    # Older firmware uses the original seven-byte record.
+                    self._compact_history_supported = False
+                    compact = False
+                    continue
+                raise
+            self._compact_history_supported = compact
+            return decode_history_chunk(response)
 
     def records_per_chunk(self) -> int:
         # An ATT Read Response spends one byte on its standard opcode.
         att_read_response_header_size = 1
         value_capacity = max(0, self.mtu_size - att_read_response_header_size)
         protocol_overhead = HEADER_SIZE + HISTORY_CHUNK_PREFIX.size
-        mtu_count = (value_capacity - protocol_overhead) // HISTORY_RECORD.size
-        return max(1, min(MAX_HISTORY_RECORDS_PER_CHUNK, mtu_count))
+        compact = self._compact_history_supported is not False
+        record_size = COMPACT_HISTORY_RECORD.size if compact else HISTORY_RECORD.size
+        maximum = (MAX_COMPACT_HISTORY_RECORDS_PER_CHUNK if compact
+                   else MAX_HISTORY_RECORDS_PER_CHUNK)
+        mtu_count = (value_capacity - protocol_overhead) // record_size
+        return max(1, min(maximum, mtu_count))

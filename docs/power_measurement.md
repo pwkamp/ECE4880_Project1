@@ -18,6 +18,12 @@ the intended sensors and display attached:
 | Display enabled/disabled | Current delta and command latency |
 
 In a diagnostic build also record minimum free heap and each application task's
-stack high-water mark. Keep the 0.9-second display response and ten-second
-recovery/history budgets as hard constraints. If peripheral latency 1 violates
-either limit in hardware testing, set it back to 0 in the shared JSON.
+stack high-water mark. The 50 ms preferred BLE connection interval is intended
+to make history transfer fast; measure its connected-idle current against the
+previous 200 ms setting before treating it as a production power configuration.
+The central may negotiate a different interval. Measure display actuation
+against the one-second target and history recovery against the ten-second target.
+The five-second connector
+confirmation timeout tolerates late WinRT acknowledgements; it does not change
+the display-actuation target. If peripheral latency 1 violates either measured
+target, set it back to 0 in the shared JSON.

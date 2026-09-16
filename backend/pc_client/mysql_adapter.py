@@ -34,10 +34,47 @@ _DUPLICATE_ENTRY_ERRNO = 1062
 
 _INSERT_SAMPLE_SQL = """
     INSERT INTO temperature_samples
-        (boot_id, sample_seq, sensor1_c, sensor1_status, sensor2_c, sensor2_status,
+        (boot_id, sample_seq, observed_at_utc, sensor1_c, sensor1_status, sensor2_c, sensor2_status,
          average_c, average_valid, record_source, failure_reason)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
+
+_HISTORY_INSERT_PREFIX = _INSERT_SAMPLE_SQL.split("VALUES", 1)[0] + "VALUES "
+_HISTORY_ROW_TEMPLATE = "(" + ", ".join(["%s"] * 11) + ")"
+# MySQL 8.4 deprecates VALUES(column) in duplicate updates. The row alias
+# works with manually composed multi-row INSERTs; each row is escaped by
+# aiomysql's own cursor.mogrify, never interpolated from untrusted text.
+# LIVE rows stay untouched. Partial HISTORY rows gain fields from later
+# retries. Assignments are ordered so the average sees both merged sensors.
+_HISTORY_UPSERT_SUFFIX = """
+    AS incoming ON DUPLICATE KEY UPDATE
+        sensor1_c = IF(temperature_samples.record_source = 'HISTORY'
+                       AND temperature_samples.sensor1_status = 'NOT_RETRIEVED'
+                       AND incoming.sensor1_status <> 'NOT_RETRIEVED',
+                       incoming.sensor1_c, temperature_samples.sensor1_c),
+        sensor1_status = IF(temperature_samples.record_source = 'HISTORY'
+                            AND temperature_samples.sensor1_status = 'NOT_RETRIEVED'
+                            AND incoming.sensor1_status <> 'NOT_RETRIEVED',
+                            incoming.sensor1_status, temperature_samples.sensor1_status),
+        sensor2_c = IF(temperature_samples.record_source = 'HISTORY'
+                       AND temperature_samples.sensor2_status = 'NOT_RETRIEVED'
+                       AND incoming.sensor2_status <> 'NOT_RETRIEVED',
+                       incoming.sensor2_c, temperature_samples.sensor2_c),
+        sensor2_status = IF(temperature_samples.record_source = 'HISTORY'
+                            AND temperature_samples.sensor2_status = 'NOT_RETRIEVED'
+                            AND incoming.sensor2_status <> 'NOT_RETRIEVED',
+                            incoming.sensor2_status, temperature_samples.sensor2_status),
+        average_c = IF(temperature_samples.record_source = 'HISTORY'
+                       AND temperature_samples.sensor1_c IS NOT NULL
+                       AND temperature_samples.sensor2_c IS NOT NULL,
+                       ROUND((temperature_samples.sensor1_c + temperature_samples.sensor2_c) / 2, 2),
+                       temperature_samples.average_c),
+        average_valid = IF(temperature_samples.record_source = 'HISTORY'
+                           AND temperature_samples.sensor1_c IS NOT NULL
+                           AND temperature_samples.sensor2_c IS NOT NULL,
+                           1, temperature_samples.average_valid)
+"""
+_HISTORY_BATCH_SIZE = 100
 
 
 def _as_naive_utc(value: datetime) -> datetime:
@@ -62,6 +99,7 @@ def _sample_params(sample: SampleRecord) -> tuple:
     return (
         sample.boot_id,
         sample.sample_sequence,
+        _as_naive_utc(sample.observed_at_utc),
         sensor1.temperature_c,
         sensor1.status,
         sensor2.temperature_c,
@@ -168,25 +206,23 @@ class MySQLDatabaseAdapter:
         return PersistenceResult(True, True)
 
     async def upsert_history(self, batch: HistoryBatch) -> PersistenceResult:
-        # Stretch scope (SCRUM-369): a plain best-effort insert per record.
-        # Re-synced ranges legitimately overlap already-stored rows, so a
-        # duplicate here is expected and skipped rather than treated as a
-        # persistence failure; a genuine write error still propagates.
-        inserted = 0
-        duplicates = 0
-        for sample in batch.samples:
-            try:
-                await self._insert_sample(sample)
-                inserted += 1
-            except pymysql.err.IntegrityError as exc:
-                if exc.args and exc.args[0] == _DUPLICATE_ENTRY_ERRNO:
-                    duplicates += 1
-                    continue
-                raise
+        # One round trip/commit per 100 rows keeps database work well inside
+        # the history sync deadline, even across Docker Desktop's host bridge.
+        async with self._acquire() as conn:
+            async with conn.cursor() as cur:
+                for offset in range(0, len(batch.samples), _HISTORY_BATCH_SIZE):
+                    samples = batch.samples[offset : offset + _HISTORY_BATCH_SIZE]
+                    values = ", ".join(
+                        cur.mogrify(_HISTORY_ROW_TEMPLATE, _sample_params(sample))
+                        for sample in samples
+                    )
+                    await cur.execute(
+                        _HISTORY_INSERT_PREFIX + values + _HISTORY_UPSERT_SUFFIX
+                    )
         return PersistenceResult(
             True,
-            inserted > 0,
-            f"history batch: {inserted} inserted, {duplicates} already present",
+            True,
+            f"history batch: {len(batch.samples)} samples stored or already present",
         )
 
     async def reconcile_provisional_intervals(
@@ -201,7 +237,7 @@ class MySQLDatabaseAdapter:
         # is strictly better data for the same real-world second, so the
         # placeholder is deleted rather than merged/updated in place.
         if not batch.samples:
-            return PersistenceResult(True, False, "no history samples to reconcile against")
+            return PersistenceResult(True, True, "no history samples to reconcile against")
 
         tolerance = timedelta(seconds=CONFIG.device.sample_period_ms / 1000.0 / 2)
         sample_times = sorted(
@@ -238,7 +274,7 @@ class MySQLDatabaseAdapter:
 
         return PersistenceResult(
             True,
-            bool(stale_ids),
+            True,
             f"removed {len(stale_ids)} provisional row(s) superseded by recovered history",
         )
 

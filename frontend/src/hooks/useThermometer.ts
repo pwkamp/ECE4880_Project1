@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { thermometerSource } from '../datasource';
 import type { ThermometerFrame } from '../datasource/types';
+import { WINDOW_S } from '../lib/chartScroll';
 
 /** The chart-recorder window, in seconds. */
-export const WINDOW_SECONDS = 300;
+export const WINDOW_SECONDS = WINDOW_S;
 
 export interface ThermometerState {
   /** The latest frame. */
@@ -15,7 +16,7 @@ export interface ThermometerState {
 function trim(history: ThermometerFrame[], now: number): ThermometerFrame[] {
   const cutoff = now - WINDOW_SECONDS * 1000;
   const start = history.findIndex((f) => f.timestamp >= cutoff);
-  return start <= 0 ? history : history.slice(start);
+  return start < 0 ? [] : start === 0 ? history : history.slice(start);
 }
 
 /**

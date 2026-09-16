@@ -83,7 +83,7 @@ export default function App() {
       </section>
 
       <section className="chart-section">
-        <h2>Temperature history &mdash; last 300 s</h2>
+        <h2>Temperature history &mdash; 300 s buffer + reconnect recovery</h2>
         <ChartRecorder history={history} nowMs={frame.timestamp} unit={unit} />
       </section>
 

@@ -101,6 +101,7 @@ def generate_header(
             f"#define THERMOMETER_PROTOCOL_VERSION {protocol['version']}U",
             f"#define PROTOCOL_RESPONSE_FLAG {protocol['response_flag']}U",
             f"#define PROTOCOL_MAX_HISTORY_RECORDS {protocol['max_history_records_per_chunk']}U",
+            f"#define PROTOCOL_MAX_COMPACT_HISTORY_RECORDS {protocol['max_compact_history_records_per_chunk']}U",
         ]
     )
     for group_name, prefix in (
@@ -124,10 +125,11 @@ def generate_header(
     header_size, _ = layout_details(layouts["header"])
     prefix_size, _ = layout_details(layouts["history_chunk_prefix"])
     record_size, _ = layout_details(layouts["history_record"])
-    maximum_packet_size = (
-        header_size
-        + prefix_size
-        + protocol["max_history_records_per_chunk"] * record_size
+    compact_record_size, _ = layout_details(layouts["compact_history_record"])
+    maximum_packet_size = max(
+        header_size + prefix_size + protocol["max_history_records_per_chunk"] * record_size,
+        header_size + prefix_size
+        + protocol["max_compact_history_records_per_chunk"] * compact_record_size,
     )
     lines.extend(("", f"#define PROTOCOL_MAX_PACKET_SIZE {maximum_packet_size}U", ""))
     return "\n".join(lines)

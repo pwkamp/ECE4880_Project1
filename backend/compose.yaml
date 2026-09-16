@@ -1,0 +1,111 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in backend/.env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?set MYSQL_DATABASE in backend/.env}
+      MYSQL_USER: ${MYSQL_USER:?set MYSQL_USER in backend/.env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in backend/.env}
+      TZ: UTC
+    command: ["--default-time-zone=+00:00"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    ports:
+      - "127.0.0.1:${MYSQL_HOST_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --host=127.0.0.1 --user=root --password=\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+    restart: unless-stopped
+    networks: [thermometer]
+
+  backend:
+    profiles: [linux]
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      THERMOMETER_API_HOST: 0.0.0.0
+      THERMOMETER_DATABASE_ADAPTER_FACTORY: pc_client.mysql_adapter:create_adapter
+      THERMOMETER_DB_HOST: ${MYSQL_HOST:-mysql}
+      THERMOMETER_DB_PORT: ${MYSQL_PORT:-3306}
+      THERMOMETER_DB_USER: ${MYSQL_USER:?set MYSQL_USER in backend/.env}
+      THERMOMETER_DB_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in backend/.env}
+      THERMOMETER_DB_NAME: ${MYSQL_DATABASE:?set MYSQL_DATABASE in backend/.env}
+      THERMOMETER_CREDENTIAL_REGISTRY_PATH: /state/paired_devices.csv
+      DBUS_SYSTEM_BUS_ADDRESS: unix:path=/run/dbus/system_bus_socket
+      BLEAK_DBUS_AUTH_UID: "0"
+      TZ: UTC
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+      - ./.runtime:/state
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import json, urllib.request;
+          data=json.load(urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2));
+          assert data['ready'] and data['persistence_configured'] and data['database_adapter_available']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks: [thermometer]
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_DATA_SOURCE: ble
+      VITE_BLE_API_BASE: ${VITE_BLE_API_BASE:-}
+      FRONTEND_HOST: 0.0.0.0
+      BACKEND_PROXY_TARGET: ${BACKEND_PROXY_TARGET:-http://backend:8000}
+      FRONTEND_SERVER_PROXY_TARGET: ${FRONTEND_SERVER_PROXY_TARGET:-http://127.0.0.1:8787}
+      MYSQL_URL: mysql://${MYSQL_USER:?set MYSQL_USER in backend/.env}:${MYSQL_PASSWORD:?set MYSQL_PASSWORD in backend/.env}@${MYSQL_HOST:-mysql}:${MYSQL_PORT:-3306}/${MYSQL_DATABASE:?set MYSQL_DATABASE in backend/.env}
+      SMS_MODE: console
+      PORT: 8787
+      TZ: UTC
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:5173"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          Promise.all([
+            fetch('http://127.0.0.1:5173/api/health'),
+            fetch('http://127.0.0.1:5173/api/samples/latest')
+          ])
+          .then(async ([health, samples]) => {
+            if (!health.ok || !samples.ok || !(await samples.json()).configured) process.exit(1)
+          })
+          .catch(() => process.exit(1))
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks: [thermometer]
+
+networks:
+  thermometer:
+    driver: bridge
+
+volumes:
+  mysql-data:

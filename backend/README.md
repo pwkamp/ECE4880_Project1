@@ -5,6 +5,42 @@ localhost REST service in `main.py`, the MySQL adapter, and the gitignored
 per-PC credential registry. It consumes the repository-level `../protocol`
 definition.
 
+## Full integration on Windows and Linux
+
+MySQL runs in Docker on both platforms. On Windows, this service runs natively
+and Bleak uses WinRT with the PC's built-in Bluetooth adapter. On Linux, the
+service runs in the `linux` Compose profile and reaches host BlueZ through the
+system D-Bus socket. Neither path needs a dedicated dongle or USB/IP.
+
+From the repository root, use the launcher for the host OS:
+
+```powershell
+.\backend\run.ps1
+```
+
+```bash
+bash backend/run.sh
+```
+
+On its first run, the script copies `backend/.env.example` to the gitignored
+`backend/.env`. That file is the single configuration source for both host
+paths. Each backend start intentionally runs `docker compose down
+--volumes`, recreates the MySQL schema, waits for MySQL to become healthy, and
+then starts the BLE API on <http://127.0.0.1:8000>.
+To restart the backend without deleting recorded samples, stop its running
+terminal and use `backend/run.ps1 -KeepDatabase` on Windows or
+`bash backend/run.sh --keep-db` on Linux. The default remains a clean reset.
+
+On Linux, the backend container connects to host BlueZ through
+`/run/dbus/system_bus_socket`; it is not privileged and does not receive the
+host HCI device directly. On Windows, `run.ps1` prepares `backend/.venv` and
+runs `main.py` natively. Enrollment data on both systems is stored under the
+gitignored `backend/.runtime/`, separately from the reset database.
+
+Start the matching frontend launcher from a second terminal. The complete
+setup and acceptance checklist is in
+[`docs/integration-test.md`](../docs/integration-test.md).
+
 ## Install and run
 
 Python 3.10 or newer. The same `main.py` detects the OS (`sys.platform`) and
@@ -44,13 +80,21 @@ Run the Tk hardware test tool with:
 .venv/bin/python -m pc_client.gui
 ```
 
-`paired_devices.csv` is created beside `main.py` after successful enrollment.
-It contains plaintext per-device credentials and is explicitly excluded by the
-root `.gitignore`.
+For a manual native start, `paired_devices.csv` is created beside `main.py`
+after successful enrollment. It contains plaintext per-device credentials and
+is excluded from Git. Both integration launchers instead use
+`THERMOMETER_CREDENTIAL_REGISTRY_PATH` to keep the same file under persistent,
+gitignored `backend/.runtime/`.
 
 To persist samples, set
 `THERMOMETER_DATABASE_ADAPTER_FACTORY=pc_client.mysql_adapter:create_adapter`
 plus `THERMOMETER_DB_*` (see `backend/database/README.md`).
+
+`THERMOMETER_API_HOST` and `THERMOMETER_API_PORT` can override the default
+loopback endpoint. The Linux container binds `0.0.0.0` internally but publishes
+the service only on host loopback. `THERMOMETER_CORS_ORIGINS` enables an exact,
+loopback-only browser allowlist for the Windows frontend and is disabled by
+default.
 
 ## Tests
 
