@@ -42,8 +42,8 @@ class BleWorker:
         self.service = ThermometerBleService(
             database=load_database_adapter(),
             event_handler=self.events.put,
-            # The test GUI keeps its explicit Scan/Pair & Connect workflow.
-            # The production service uses automatic startup discovery.
+            # Test GUI: explicit Scan/Pair. Linux production matches this
+            # (no auto-scan loop). Windows production still auto-discovers.
             auto_discover_on_start=False,
         )
         try:

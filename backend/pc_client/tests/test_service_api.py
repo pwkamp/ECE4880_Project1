@@ -163,6 +163,9 @@ class ServiceApiTests(unittest.TestCase):
         self.assertEqual(health.status_code, 200)
         self.assertTrue(health.json()["ready"])
         self.assertEqual(status.json()["target"]["address"], ADDRESS)
+        self.assertIn(status.json()["host_os"], ("windows", "linux", "other"))
+        self.assertIn(status.json()["pairing_backend"], ("winrt", "bluez", "none"))
+        self.assertIn("auto_discover_on_start", status.json())
         self.assertEqual(current.json()["snapshot"]["sensors"][0]["temperature_c"], 20.5)
 
     def test_all_control_endpoints_return_their_contracts(self):

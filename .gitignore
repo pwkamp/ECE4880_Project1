@@ -1,22 +1,93 @@
-# macOS
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node / Vite console
+node_modules
+dist
+dist-ssr
+*.local
+server/.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.vs/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.user
+*.workspace
+*.sln.docstates
+.history/
+
+# macOS / Windows
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Directory metadata
 .directory
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Temporary files
-*~
-*.swp
-*.swo
-*.bak
-*.tmp
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+**/__pycache__/
+.hypothesis/
+.mypy_cache/
+.nox/
+.ruff_cache/
+.tox/
+.ccache/
+.ccache-tmp/
+*.egg-info/
+wheelhouse/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+test-results.xml
+htmlcov/
+.venv/
+venv/
+env/
+backend/.venv/
 
-# Log files
-*.log
+# Env files (keep templates)
+.env
+.env.*
+!.env.example
 
-# Build artifacts and directories
+# Agent / Claude Code planning artifacts
+docs/superpowers/
+superpowers/
+.superpowers/
+
+# Per-device secrets and local runtime state
+
+# Per-device secrets and local runtime state
+/firmware/device_config.cmake
+/backend/paired_devices.csv
+backend/paired_devices.csv
+/backend/.paired_devices.csv.*.tmp
+
+# Build artifacts
 **/build/
 **/build-*/
 **/out/
@@ -27,10 +98,7 @@ build/
 *.a
 *.lib
 *.out
-# Host-side utilities compiled on Windows
 *.exe
-
-# ESP-IDF specific build outputs
 *.bin
 *.elf
 *.map
@@ -38,76 +106,20 @@ flasher_args.json
 sdkconfig.old
 sdkconfig
 
-# ESP-IDF dependencies
-# For older versions or manual component management
+# ESP-IDF
 /components/.idf/
 **/components/.idf/
-# For modern ESP-IDF component manager
 managed_components/
-# If ESP-IDF tools are installed/referenced locally to the project
 .espressif/
 
-# CMake generated files
+# CMake
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
 
-# Python environment files
-*.pyc
-*.pyo
-*.pyd
-__pycache__/
-.hypothesis/
-.mypy_cache/
-.nox/
-.ruff_cache/
-.tox/
-.ccache/
-.ccache-tmp/
-*.egg-info/
-dist/
-wheelhouse/
-
-# Virtual environment folders
-venv/
-.venv/
-env/
-.env
-.env.*
-!.env.example
-
-# Per-device secrets and local runtime state
-/firmware/device_config.cmake
-/backend/paired_devices.csv
-/backend/.paired_devices.csv.*.tmp
-
-# Test and coverage output
-.pytest_cache/
-.coverage
-.coverage.*
-coverage.xml
-test-results.xml
-htmlcov/
-
-# Language Servers
+# Language servers
 .clangd/
 .ccls-cache/
 compile_commands.json
-
-# Windows specific
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# User-specific configuration files
-*.user
-.history/
-.idea/
-.vs/
-# General workspace files from IDEs and editors
-*.workspace
-# Visual Studio user-specific files
-*.suo
-*.sln.docstates

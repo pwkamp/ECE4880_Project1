@@ -23,7 +23,10 @@ from .ble_service import (
     TrackedOperation,
 )
 from .database_adapter import load_database_adapter
+from .linux_pairing import LinuxPairingError
+from .platform_runtime import detect_ble_host, production_service_kwargs
 from .protocol import CONFIG, CurrentSnapshot
+from .windows_pairing import WindowsPairingError
 
 
 class AddressRequest(BaseModel):
@@ -88,6 +91,9 @@ class StatusResponse(BaseModel):
     persistence_pending: int
     persistence_capacity: int
     persistence_overflow_count: int
+    host_os: str
+    pairing_backend: str
+    auto_discover_on_start: bool
 
 
 class ScanResponse(BaseModel):
@@ -159,6 +165,7 @@ def _snapshot_json(snapshot: CurrentSnapshot | None) -> dict[str, Any] | None:
 
 
 def _status_json(service_status: ServiceStatus) -> dict[str, Any]:
+    host = detect_ble_host()
     return {
         "phase": service_status.phase.value,
         "desired_connected": service_status.desired_connected,
@@ -183,6 +190,9 @@ def _status_json(service_status: ServiceStatus) -> dict[str, Any]:
         "persistence_pending": service_status.persistence_pending,
         "persistence_capacity": service_status.persistence_capacity,
         "persistence_overflow_count": service_status.persistence_overflow_count,
+        "host_os": host.family,
+        "pairing_backend": host.pairing,
+        "auto_discover_on_start": host.auto_discover_on_start,
     }
 
 
@@ -228,7 +238,10 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        controller = service or ThermometerBleService(database=load_database_adapter())
+        controller = service or ThermometerBleService(
+            database=load_database_adapter(),
+            **production_service_kwargs(),
+        )
         app.state.ble_service = controller
         await controller.start()
         try:
@@ -252,6 +265,18 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
     @app.exception_handler(ServiceUnavailableError)
     async def unavailable_handler(
         _request: Request, exc: ServiceUnavailableError
+    ) -> JSONResponse:
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
+
+    @app.exception_handler(LinuxPairingError)
+    async def linux_pairing_handler(
+        _request: Request, exc: LinuxPairingError
+    ) -> JSONResponse:
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
+
+    @app.exception_handler(WindowsPairingError)
+    async def windows_pairing_handler(
+        _request: Request, exc: WindowsPairingError
     ) -> JSONResponse:
         return JSONResponse(status_code=503, content={"detail": str(exc)})
 
