@@ -134,7 +134,7 @@ class BleWorker:
     def disconnect(self) -> None:
         self._submit(self._disconnect())
 
-    async def _disconnect(self, announce: bool = True) -> None:
+    async def _disconnect(self) -> None:
         assert self.service is not None
         await self.service.disconnect()
 

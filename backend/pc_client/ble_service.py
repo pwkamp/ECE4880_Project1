@@ -1498,9 +1498,6 @@ class ThermometerBleService:
                 raise ServiceUnavailableError(str(exc)) from exc
             raise
 
-    def _fail_queued_requests(self, error: Exception) -> None:
-        self._scheduler.fail_pending(error)
-
     async def _synchronize_history(self, operation: TrackedOperation) -> HistorySync:
         retrieval = await self._history_synchronizer.synchronize(operation)
         history = replace(
