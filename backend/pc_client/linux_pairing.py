@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Protocol
 
+from .credential_registry import normalize_mac_address as _normalize_mac_address
+
 
 class LinuxPairingError(RuntimeError):
     """Raised when BlueZ cannot create or remove the authenticated bond."""
@@ -24,14 +26,10 @@ class BlueZBackend(Protocol):
 
 
 def normalize_address(address: str) -> str:
-    compact = "".join(character for character in address if character.isalnum())
-    if len(compact) != 12:
-        raise LinuxPairingError(f"invalid Bluetooth address: {address}")
     try:
-        int(compact, 16)
+        return _normalize_mac_address(address)
     except ValueError as exc:
-        raise LinuxPairingError(f"invalid Bluetooth address: {address}") from exc
-    return ":".join(compact[i : i + 2] for i in range(0, 12, 2)).upper()
+        raise LinuxPairingError(str(exc)) from exc
 
 
 def device_object_path(adapter_path: str, address: str) -> str:

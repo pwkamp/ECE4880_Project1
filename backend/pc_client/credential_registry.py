@@ -40,7 +40,13 @@ def default_registry_path() -> Path:
     return backend_root / CONFIG.service.credential_registry_filename
 
 
-def normalize_mac_address(address: str) -> str:
+def mac_address_hex(address: str) -> str:
+    """Validate a Bluetooth address and return it as 12 uppercase hex digits, no separators.
+
+    Shared by every OS-specific pairing backend so address validation lives
+    in exactly one place; each caller wraps ValueError in its own error type.
+    """
+
     compact = "".join(character for character in address if character.isalnum())
     if len(compact) != 12:
         raise ValueError(f"invalid Bluetooth address: {address}")
@@ -48,7 +54,11 @@ def normalize_mac_address(address: str) -> str:
         int(compact, 16)
     except ValueError as exc:
         raise ValueError(f"invalid Bluetooth address: {address}") from exc
-    compact = compact.upper()
+    return compact.upper()
+
+
+def normalize_mac_address(address: str) -> str:
+    compact = mac_address_hex(address)
     return ":".join(compact[index : index + 2] for index in range(0, 12, 2))
 
 
