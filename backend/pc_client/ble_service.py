@@ -11,7 +11,6 @@ import inspect
 import logging
 import time
 import uuid
-from contextlib import suppress
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -451,15 +450,8 @@ class ThermometerBleService:
             self._pending_connect_operation_id = None
         await self._cancel_history("service stopped")
 
-        for task in (self._manager_task, self._poll_task):
-            if task is not None:
-                task.cancel()
-        for task in tuple(self._background_tasks):
-            task.cancel()
-        await asyncio.gather(
-            *(task for task in (self._manager_task, self._poll_task) if task),
-            *tuple(self._background_tasks),
-            return_exceptions=True,
+        await self._cancel_and_await(
+            self._manager_task, self._poll_task, *self._background_tasks
         )
         self._manager_task = None
         self._poll_task = None
@@ -480,9 +472,7 @@ class ThermometerBleService:
                 await asyncio.wait_for(self._state_publish_queue.join(), timeout=1.0)
             except asyncio.TimeoutError:
                 LOGGER.warning("timed out flushing connection-state publications")
-            self._state_publisher_task.cancel()
-            with suppress(asyncio.CancelledError):
-                await self._state_publisher_task
+            await self._cancel_and_await(self._state_publisher_task)
             self._state_publisher_task = None
         await self._persistence.stop()
         try:
@@ -640,14 +630,7 @@ class ThermometerBleService:
             LifecycleEventType.INTENT_CHANGED, "explicit disconnect requested"
         )
         await self._cancel_history("explicitly disconnected")
-        if (
-            self._connection_attempt_task is not None
-            and not self._connection_attempt_task.done()
-        ):
-            self._connection_attempt_task.cancel()
-            await asyncio.gather(
-                self._connection_attempt_task, return_exceptions=True
-            )
+        await self._cancel_and_await(self._connection_attempt_task)
         await self._close_client()
         self._last_current = CurrentDiagnostic(
             False, self._last_current.received_at_utc, None, "explicitly disconnected"
@@ -805,7 +788,7 @@ class ThermometerBleService:
                 ),
                 timeout=command_timeout,
             )
-        except asyncio.TimeoutError as exc:
+        except asyncio.TimeoutError:
             # WinRT can finish the GATT write (and the ESP32 acts on it) before
             # the matching read reaches us. A timed-out scheduler waiter does
             # not cancel the in-flight GATT transaction. Read the authoritative
@@ -1498,9 +1481,6 @@ class ThermometerBleService:
                 raise ServiceUnavailableError(str(exc)) from exc
             raise
 
-    def _fail_queued_requests(self, error: Exception) -> None:
-        self._scheduler.fail_pending(error)
-
     async def _synchronize_history(self, operation: TrackedOperation) -> HistorySync:
         retrieval = await self._history_synchronizer.synchronize(operation)
         history = replace(
@@ -1699,15 +1679,25 @@ class ThermometerBleService:
         self._history_task.add_done_callback(finished)
         return operation
 
+    async def _cancel_and_await(self, *tasks: asyncio.Task | None) -> None:
+        """Cancel each task and wait for it to finish, swallowing the outcome.
+
+        Another shutdown/reconnect path may already be awaiting the same
+        task, and a task can finish with its own error just before
+        cancellation lands — either outcome must be consumed here, not
+        leaked to the loop.
+        """
+        pending = [task for task in tasks if task is not None and not task.done()]
+        for task in pending:
+            task.cancel()
+        if pending:
+            await asyncio.gather(*pending, return_exceptions=True)
+
     async def _cancel_history(self, reason: str) -> None:
         task = self._history_task
         if task is None or task.done():
             return
-        task.cancel()
-        # Another shutdown/reconnect path may be waiting on the same task, and
-        # a task can finish with its own error just before cancellation lands.
-        # Teardown must consume either outcome instead of leaking it to the loop.
-        await asyncio.gather(task, return_exceptions=True)
+        await self._cancel_and_await(task)
         if self._history_operation_id:
             self._cancel_operation(self._history_operation_id, reason)
         self._history_task = None

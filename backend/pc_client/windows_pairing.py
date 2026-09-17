@@ -12,6 +12,8 @@ from contextlib import suppress
 from enum import Enum, auto
 from typing import Any
 
+from .credential_registry import mac_address_hex
+
 try:
     from winrt.windows.devices.bluetooth import BluetoothLEDevice
     from winrt.windows.devices.enumeration import (
@@ -66,11 +68,8 @@ def _status_name(value: Any) -> str:
 
 
 def _address_as_integer(address: str) -> int:
-    compact = "".join(character for character in address if character.isalnum())
-    if len(compact) != 12:
-        raise WindowsPairingError(f"invalid Bluetooth address: {address}")
     try:
-        return int(compact, 16)
+        return int(mac_address_hex(address), 16)
     except ValueError as exc:
         raise WindowsPairingError(f"invalid Bluetooth address: {address}") from exc
 

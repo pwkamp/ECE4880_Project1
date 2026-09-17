@@ -1,6 +1,14 @@
 param([switch]$KeepDatabase)
 
-$ErrorActionPreference = "Stop"
+# Not "Stop": docker compose/mysql write normal progress and warnings to
+# stderr (image pulls, container start/stop, "using a password on the
+# command line" notices), and PowerShell 5.1 treats any stderr line from a
+# native command as a terminating error under "Stop", regardless of exit
+# code. Every native call below is already checked explicitly via
+# $LASTEXITCODE, and Fail() uses `throw`, which terminates unconditionally
+# either way, so "Stop" was never load-bearing for this script's own error
+# handling -- only for misreading normal Docker output as fatal.
+$ErrorActionPreference = "Continue"
 
 $BackendDir = $PSScriptRoot
 $ComposeFile = Join-Path $BackendDir "compose.yaml"

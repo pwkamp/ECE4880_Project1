@@ -63,6 +63,9 @@ class _InMemoryCredentials:
             pairing_passkey=passkey, device_name=device_name
         )
 
+    def delete(self, address: str) -> bool:
+        return self._records.pop(address.lower(), None) is not None
+
 
 class MockBleClient:
     """Stands in for ThermometerBleClient: a slow random walk around 21C.

@@ -16,6 +16,10 @@ from .protocol import CONFIG, CurrentSnapshot, VisibleState
 from .thermometer_client import HistorySync, describe_ble_error
 
 
+def _format_temperature_c(value: float | None) -> str:
+    return "--" if value is None else f"{value:.2f} deg C"
+
+
 class BleWorker:
     """Thin Tk/thread adapter around the production BLE service."""
 
@@ -130,7 +134,7 @@ class BleWorker:
     def disconnect(self) -> None:
         self._submit(self._disconnect())
 
-    async def _disconnect(self, announce: bool = True) -> None:
+    async def _disconnect(self) -> None:
         assert self.service is not None
         await self.service.disconnect()
 
@@ -148,10 +152,12 @@ class BleWorker:
         if self.loop is None:
             return
         assert self.service is not None
-        future = asyncio.run_coroutine_threadsafe(self.service.stop(), self.loop)
+        loop, self.loop = self.loop, None  # guard re-entrant/duplicate stop() calls
         with suppress(Exception):
+            future = asyncio.run_coroutine_threadsafe(self.service.stop(), loop)
             future.result(timeout=3)
-        self.loop.call_soon_threadsafe(self.loop.stop)
+        with suppress(Exception):
+            loop.call_soon_threadsafe(loop.stop)
         self.thread.join(timeout=3)
 
 
@@ -329,16 +335,12 @@ class ThermometerApp(tk.Tk):
         )
         self.boot_var.set(f"Boot: 0x{snapshot.boot_id:08X}")
         self.sequence_var.set(f"Sequence: {snapshot.newest_sequence}")
-        average = "--" if snapshot.average_c is None else f"{snapshot.average_c:.2f} deg C"
-        self.average_var.set(f"Visible average: {average}")
+        self.average_var.set(
+            f"Visible average: {_format_temperature_c(snapshot.average_c)}"
+        )
         for sensor in snapshot.sensors:
             sensor_id = sensor.sensor_id
-            temperature = (
-                "-- deg C"
-                if sensor.temperature_c is None
-                else f"{sensor.temperature_c:.2f} deg C"
-            )
-            self.sensor_temp[sensor_id].set(temperature)
+            self.sensor_temp[sensor_id].set(_format_temperature_c(sensor.temperature_c))
             self.sensor_state[sensor_id].set(sensor.visible_state.name)
             self.display_enabled[sensor_id] = sensor.display_enabled
             button = self.display_buttons[sensor_id]
@@ -362,9 +364,7 @@ class ThermometerApp(tk.Tk):
                     record.sampled_at.astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                     record.sensor_id,
                     record.sequence,
-                    "--"
-                    if record.temperature_c is None
-                    else f"{record.temperature_c:.2f} deg C",
+                    _format_temperature_c(record.temperature_c),
                     record.data_status.name,
                 ),
             )
