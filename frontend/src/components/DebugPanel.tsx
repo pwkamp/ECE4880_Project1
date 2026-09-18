@@ -21,7 +21,7 @@ export function DebugPanel({ frame }: Props) {
 
   return (
     <section className="panel panel-debug">
-      <h2>Demo controls (mock only)</h2>
+      <h2>Demo controls</h2>
 
       <div className="debug-group">
         <span className="debug-label">Third-box power switch</span>

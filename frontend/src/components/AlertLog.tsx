@@ -33,7 +33,7 @@ function deliveryLabel(state: DeliveryState | undefined): string | null {
   return state.reason ? `failed — ${state.reason}` : 'failed';
 }
 
-/** The visible stand-in for "a text/email would have been sent here". */
+/** The visible log of threshold alerts and email delivery status. */
 export function AlertLog({ alerts, unit, delivery }: Props) {
   return (
     <section className="panel">
@@ -51,15 +51,15 @@ export function AlertLog({ alerts, unit, delivery }: Props) {
               >
                 <div className="alert-item-head">
                   <span className="alert-tag">
-                    {a.transition === 'NORMAL' ? 'RECOVERED' : 'SIMULATED ALERT'}
+                    {a.transition === 'NORMAL' ? 'RECOVERED' : 'ALERT'}
                   </span>
                   <span className="alert-meta">{line(a, unit)}</span>
                 </div>
                 <div className="alert-item-body">
-                  Would send to <strong>{a.destination}</strong>: &ldquo;
+                  Email to <strong>{a.destination || '(no destination)'}</strong>: &ldquo;
                   {a.message}&rdquo;
                 </div>
-                {badge && <div className="alert-item-delivery">SMS: {badge}</div>}
+                {badge && <div className="alert-item-delivery">Email: {badge}</div>}
               </li>
             );
           })}

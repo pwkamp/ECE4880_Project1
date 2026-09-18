@@ -9,7 +9,7 @@ const base = {
   ruleId: 'sensor-1',
   source: 'SENSOR_1',
   transition: 'HIGH',
-  destination: '+15005550006',
+  destination: 'you@example.com',
   message: 'Temperature high: sensor above the configured maximum.',
   celsius: 34.2,
 };
@@ -26,18 +26,18 @@ function spySender(opts: { throws?: boolean } = {}) {
   return { sender, calls };
 }
 
-it('sends an SMS for a valid HIGH event', async () => {
+it('sends email for a valid HIGH event', async () => {
   const { sender, calls } = spySender();
   const out = await handleNotify(base, { sender, seen: new Set() });
   expect(out.code).toBe(200);
   expect(out.payload).toMatchObject({ status: 'sent', providerId: 'SM123' });
   expect(calls).toHaveLength(1);
-  expect(calls[0].to).toBe('+15005550006');
+  expect(calls[0].to).toBe('you@example.com');
   expect(calls[0].body).toContain('Sensor 1');
   expect(calls[0].body).toContain('34.2');
 });
 
-it('sends an SMS for a valid LOW event', async () => {
+it('sends email for a valid LOW event', async () => {
   const { sender, calls } = spySender();
   const out = await handleNotify({ ...base, transition: 'LOW' }, { sender, seen: new Set() });
   expect(out.code).toBe(200);
@@ -51,11 +51,18 @@ it('rejects a NORMAL (recovery) transition without calling the sender', async ()
   expect(calls).toHaveLength(0);
 });
 
-it('rejects a non-E.164 destination', async () => {
+it('rejects a non-email destination', async () => {
   const { sender, calls } = spySender();
   const out = await handleNotify({ ...base, destination: '5551234' }, { sender, seen: new Set() });
   expect(out.code).toBe(400);
   expect(calls).toHaveLength(0);
+});
+
+it('normalizes destination email case before sending', async () => {
+  const { sender, calls } = spySender();
+  const out = await handleNotify({ ...base, destination: 'You@Example.COM' }, { sender, seen: new Set() });
+  expect(out.code).toBe(200);
+  expect(calls[0].to).toBe('you@example.com');
 });
 
 it('rejects a malformed event (empty message)', async () => {

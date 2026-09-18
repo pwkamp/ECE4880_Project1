@@ -12,7 +12,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:5173>. Defaults to mock sensor data.
+Open <http://localhost:5173>.
 
 | Command | Purpose |
 | --- | --- |

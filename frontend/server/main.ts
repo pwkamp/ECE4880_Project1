@@ -22,7 +22,7 @@ async function main() {
   const app = createApp({ config, sender, samples });
   app.listen(config.port, '127.0.0.1', () => {
     console.log(
-      `[alert-service] http://127.0.0.1:${config.port}  (SMS_MODE=${config.mode})`,
+      `[alert-service] http://127.0.0.1:${config.port}  (EMAIL_MODE=${config.mode})`,
     );
   });
 }

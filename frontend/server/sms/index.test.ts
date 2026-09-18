@@ -4,21 +4,27 @@ import { createSmsSender } from './index.ts';
 it('returns a console sender in console mode', async () => {
   const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
   try {
-    const sender = createSmsSender({ mode: 'console', port: 8787, apiToken: null, twilio: null, mysqlUrl: null });
-    await expect(sender.send({ to: '+15005550006', body: 'x' })).resolves.toEqual({ status: 'logged' });
+    const sender = createSmsSender({ mode: 'console', port: 8787, apiToken: null, smtp: null, mysqlUrl: null });
+    await expect(sender.send({ to: 'you@example.com', body: 'x' })).resolves.toEqual({ status: 'logged' });
   } finally {
     spy.mockRestore();
   }
 });
 
-it('returns a Twilio-backed sender when live config is present', () => {
+it('returns an SMTP-backed sender when live config is present', () => {
   const sender = createSmsSender({
     mode: 'live',
     port: 8787,
     apiToken: null,
-    twilio: { accountSid: 'AC0000000000000000000000000000000000', authToken: 'tok', fromNumber: '+15005550006' },
+    smtp: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      user: 'alerts@gmail.com',
+      pass: 'app-password',
+      fromEmail: 'alerts@gmail.com',
+    },
     mysqlUrl: null,
   });
-  // Constructing the client is offline; we only assert the shape.
   expect(typeof sender.send).toBe('function');
 });

@@ -6,7 +6,7 @@ export interface SmsMessage {
 export interface SmsResult {
   /** 'sent' via a real provider; 'logged' by the console sender. */
   status: 'sent' | 'logged';
-  /** Provider-side id (Twilio message SID) when status is 'sent'. */
+  /** SMTP message id when status is 'sent'. */
   providerId?: string;
 }
 

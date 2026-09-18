@@ -1,16 +1,19 @@
 export type SmsMode = 'console' | 'test' | 'live';
 
-export interface TwilioConfig {
-  accountSid: string;
-  authToken: string;
-  fromNumber: string;
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  fromEmail: string;
 }
 
 export interface Config {
   mode: SmsMode;
   port: number;
   apiToken: string | null;
-  twilio: TwilioConfig | null;
+  smtp: SmtpConfig | null;
   /** mysql:// URL for temperature_samples. Null means the DB reader is off. */
   mysqlUrl: string | null;
 }
@@ -18,9 +21,9 @@ export interface Config {
 const MODES: readonly SmsMode[] = ['console', 'test', 'live'];
 
 export function loadConfig(env: NodeJS.ProcessEnv): Config {
-  const rawMode = env.SMS_MODE ?? 'console';
+  const rawMode = env.EMAIL_MODE ?? env.SMS_MODE ?? 'console';
   if (!MODES.includes(rawMode as SmsMode)) {
-    throw new Error(`SMS_MODE must be one of ${MODES.join(', ')} (got "${rawMode}")`);
+    throw new Error(`EMAIL_MODE must be one of ${MODES.join(', ')} (got "${rawMode}")`);
   }
   const mode = rawMode as SmsMode;
 
@@ -31,23 +34,32 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
 
   const apiToken = env.ALERT_API_TOKEN && env.ALERT_API_TOKEN.length > 0 ? env.ALERT_API_TOKEN : null;
 
-  let twilio: TwilioConfig | null = null;
+  let smtp: SmtpConfig | null = null;
   if (mode === 'test' || mode === 'live') {
-    const accountSid = env.TWILIO_ACCOUNT_SID ?? '';
-    const authToken = env.TWILIO_AUTH_TOKEN ?? '';
-    const fromNumber = env.TWILIO_FROM_NUMBER ?? '';
+    const user = env.SMTP_USER ?? '';
+    const pass = env.SMTP_PASS ?? '';
     const missing = ([
-      ['TWILIO_ACCOUNT_SID', accountSid],
-      ['TWILIO_AUTH_TOKEN', authToken],
-      ['TWILIO_FROM_NUMBER', fromNumber],
+      ['SMTP_USER', user],
+      ['SMTP_PASS', pass],
     ] as const)
       .filter(([, value]) => value.length === 0)
       .map(([name]) => name);
     if (missing.length > 0) {
-      throw new Error(`SMS_MODE=${mode} requires: ${missing.join(', ')}`);
+      throw new Error(`EMAIL_MODE=${mode} requires: ${missing.join(', ')}`);
     }
-    twilio = { accountSid, authToken, fromNumber };
+    const smtpPort = env.SMTP_PORT ? Number(env.SMTP_PORT) : 465;
+    if (!Number.isInteger(smtpPort) || smtpPort <= 0) {
+      throw new Error(`SMTP_PORT must be a positive integer (got "${env.SMTP_PORT}")`);
+    }
+    smtp = {
+      host: env.SMTP_HOST?.trim() || 'smtp.gmail.com',
+      port: smtpPort,
+      secure: env.SMTP_SECURE ? env.SMTP_SECURE === 'true' : smtpPort === 465,
+      user,
+      pass,
+      fromEmail: env.SMTP_FROM?.trim() || user,
+    };
   }
 
-  return { mode, port, apiToken, twilio, mysqlUrl: env.MYSQL_URL || null };
+  return { mode, port, apiToken, smtp, mysqlUrl: env.MYSQL_URL || null };
 }

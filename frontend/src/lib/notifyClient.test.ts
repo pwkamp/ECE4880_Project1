@@ -9,7 +9,7 @@ const event: AlertEvent = {
   ruleId: 'sensor-1',
   source: 'SENSOR_1',
   transition: 'HIGH',
-  destination: '+15005550006',
+  destination: 'you@example.com',
   message: 'Temperature high.',
   celsius: 40,
 };
@@ -29,12 +29,12 @@ test('maps a 2xx response to ok', async () => {
 test('maps a 4xx response to a failure with a reason', async () => {
   vi.stubGlobal(
     'fetch',
-    vi.fn(async () => new Response(JSON.stringify({ status: 'failed', error: 'destination is not E.164' }), { status: 400 })),
+    vi.fn(async () => new Response(JSON.stringify({ status: 'failed', error: 'destination is not a valid email' }), { status: 400 })),
   );
   expect(await notifyAlert(event)).toEqual({
     ok: false,
     status: 'failed',
-    reason: 'destination is not E.164',
+    reason: 'destination is not a valid email',
   });
 });
 

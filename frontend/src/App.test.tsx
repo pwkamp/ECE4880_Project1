@@ -35,5 +35,5 @@ test('App mounts, shows both readouts, and ticks without error', async () => {
 
   expect(container.querySelector('.chart-wrap')).not.toBeNull();
   expect(container.textContent).toContain('Threshold alerts');
-  expect(container.textContent).toContain('Demo controls (mock only)');
+  expect(container.textContent).toContain('Demo controls');
 });

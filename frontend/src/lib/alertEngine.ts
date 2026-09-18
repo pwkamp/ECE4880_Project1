@@ -13,8 +13,8 @@ import type { SensorId, ThermometerFrame } from '../datasource/types';
  *   SCRUM-624 / SWE-ALR-LLR-714  Rearm In Range
  *
  * stepAlertEngine is a pure reducer: (state, frame, rules, recipients) -> new
- * state + the alert events emitted on this frame. It is fed by the existing
- * mock frame stream via src/hooks/useAlertEngine.ts.
+ * state + the alert events emitted on this frame. It is fed by the live
+ * thermometer frame stream via src/hooks/useAlertEngine.ts.
  */
 
 /**
@@ -66,7 +66,7 @@ export interface AlertRule {
 
 export interface AlertRecipient {
   id: string;
-  /** Free-text phone number or email. Never actually contacted. */
+  /** Email address the alert is delivered to. */
   destination: string;
   enabled: boolean;
 }

@@ -15,7 +15,7 @@ function toCelsius(value: number, unit: Unit): number {
   return unit === 'C' ? value : (value - 32) * (5 / 9);
 }
 
-/** Threshold + message + destination configuration for simulated alerts. */
+/** Threshold + message + destination configuration for alerts. */
 export function AlertSettings({ config, onChange, unit }: Props) {
   const set = (patch: Partial<AlertConfig>) => onChange({ ...config, ...patch });
 
@@ -23,7 +23,7 @@ export function AlertSettings({ config, onChange, unit }: Props) {
     <section className="panel">
       <h2>Threshold alerts</h2>
       <p className="panel-hint">
-        Simulated only &mdash; no message is actually sent.
+        Sends email through Gmail SMTP when a threshold is crossed.
       </p>
 
       <label className="toggle-row">
@@ -76,9 +76,10 @@ export function AlertSettings({ config, onChange, unit }: Props) {
         />
       </label>
       <label className="field-block">
-        Destination (E.164 phone, e.g. +15555550123)
+        Destination email
         <input
-          type="text"
+          type="email"
+          placeholder="you@example.com"
           value={config.destination}
           onChange={(e) => set({ destination: e.target.value })}
         />

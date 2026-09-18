@@ -7,9 +7,8 @@ ESP32 firmware, Python BLE connector, MySQL schema, and the computer console.
 The web app lives in [`frontend/`](frontend/). The **computer** component of
 the ECE:4880 dual-sensor networked thermometer system.
 
-> The console defaults to **mock data**. Point it at the Python BLE
-> connector with `VITE_DATA_SOURCE=ble` (see
-> [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql)).
+> BLE is optional. Set `VITE_DATA_SOURCE=ble` to use the Python connector
+> (see [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql)).
 
 ---
 
@@ -57,13 +56,13 @@ save; `Ctrl+C` stops it.
 | Command | Purpose |
 | --- | --- |
 | `cd frontend && npm run dev` | Run the console in development |
-| `cd frontend && npm test` | Unit tests: alert logic, readout logic, mock data source, an App render smoke test |
+| `cd frontend && npm test` | Unit tests: alert logic, readout logic, data source, an App render smoke test |
 | `cd frontend && npm run build` | Type-check + production build into `frontend/dist/` |
 | `cd frontend && npm run preview` | Serve the production build locally |
 | `cd frontend && npm run lint` | oxlint |
 
-No cloud services, API keys, or internet access are required for the default
-console (mock data + logged SMS).
+No cloud services are required to run the console. Live email alerts need a
+Gmail App Password in `frontend/server/.env` (`EMAIL_MODE=live`).
 
 The web console lives in [`frontend/`](frontend/). `cd frontend && npm run dev` is how you run it. BLE and MySQL
 are optional extra processes you start **in addition** to that, not instead of
@@ -73,7 +72,7 @@ it.
 
 This is the full wiring guide. The React app on `:5173` stays; you add the
 Python BLE connector on `:8000` and (optionally) MySQL so live temperatures
-come from the third box instead of the in-browser mock.
+come from the third box.
 
 ### What talks to what
 
@@ -287,7 +286,7 @@ Optional Tk hardware tool (not the web UI):
 
 ### 3. Point the web console at BLE (the web app is still required)
 
-The console **defaults to mock data** so `cd frontend && npm run dev` alone still works for UI
+The console still runs with `cd frontend && npm run dev` alone for UI
 work. To use the Python service, create **`frontend/.env`** (gitignored;
 Vite only reads it at startup):
 
@@ -305,16 +304,16 @@ npm run dev
 
 Open <http://localhost:5173>. You should see:
 
-- Subtitle **Computer console — Python BLE connector** (not “mock data source”)
+- Subtitle **Computer console — Python BLE connector**
 - A **Device connection** panel (scan, passkey, connect, disconnect, reconnect)
-- **Demo controls (mock only) gone** — those only exist on the simulator
+- **Demo controls** hidden — those only exist without a BLE data source
 
 Vite proxies (see `vite.config.ts`):
 
 | Browser URL | Proxied to | Service |
 | --- | --- | --- |
 | `/api/v1/*` | `http://127.0.0.1:8000/api/v1/*` | Python BLE |
-| `/api/*` (everything else, e.g. `/api/notify`, `/api/samples`) | `http://127.0.0.1:8787/api/*` | Node SMS + MySQL reader |
+| `/api/*` (everything else, e.g. `/api/notify`, `/api/samples`) | `http://127.0.0.1:8787/api/*` | Node email + MySQL reader |
 
 If you change `frontend/.env`, restart Vite. `VITE_*` values are baked in at dev-server
 start.
@@ -462,7 +461,7 @@ Replace the address and passkey. Connect returns **202** with an
 
 | Symptom | Likely cause |
 | --- | --- |
-| Subtitle still says mock; no Device panel | `frontend/.env` missing `VITE_DATA_SOURCE=ble`, or Vite not restarted |
+| No Device panel / subtitle is not the BLE connector | `frontend/.env` missing `VITE_DATA_SOURCE=ble`, or Vite not restarted |
 | Device panel: scan fails / proxy errors | Python not running on `:8000`, or a second process stole the port |
 | Phase stuck on `DISCOVERING` (Windows) or `DISCONNECTED` after Scan (Linux) | ESP32 off, out of range, wrong firmware name prefix (`Thermometer-`), or PC Bluetooth disabled |
 | Scan returns `{ "devices": [] }` | Box not advertising. Linux Bluetooth permissions (`bluetooth` group) can also hide devices |
@@ -477,33 +476,30 @@ Replace the address and passkey. Connect returns **202** with an
 | Machine/Bluetooth hard-locks | Two `main.py` processes. On Linux do **not** set `THERMOMETER_LINUX_AUTO_SCAN=1`. Stop with `Ctrl+C`. |
 | Browser CORS errors to `:8000` | You called Python from the page without the Vite proxy. Use relative `/api/v1/...` |
 
-### Switching back to mock data
+### Switching off BLE
 
 Remove `VITE_DATA_SOURCE=ble` from `frontend/.env` (or set it to anything other than
 `ble`) and restart `npm run dev` from `frontend/`. You do not need Python or MySQL. Demo
-controls come back. This is the default for UI work.
+controls come back.
 
-## Running with SMS alerts
+## Running with email alerts
 
 `cd frontend && npm run dev` starts the web app **and** a small delivery service
 (`frontend/server/`, on `127.0.0.1:8787`). The browser evaluates alerts against the
-mock sensor data as usual and POSTs each HIGH/LOW transition to the service.
+live sensor stream and POSTs each HIGH/LOW transition to the service, which
+sends email over Gmail SMTP.
 
 Delivery mode is set by `frontend/server/.env` (copy from `frontend/server/.env.example`):
 
-| `SMS_MODE` | Behaviour | Needs |
+| `EMAIL_MODE` | Behaviour | Needs |
 | --- | --- | --- |
 | `console` (default) | Logs the message to the server console. Nothing is sent. | nothing |
-| `test` | Calls the Twilio API with **test credentials** and [magic numbers](https://www.twilio.com/docs/iam/test-credentials). Exercises the real request path without sending or charging. | Twilio test SID/token; `TWILIO_FROM_NUMBER=+15005550006` |
-| `live` | Sends a real SMS. | Twilio live SID/token, an SMS-capable Twilio number, and (on a trial account) a verified destination number |
+| `test` / `live` | Sends a real email through Gmail SMTP. | `SMTP_USER` (Gmail address) and `SMTP_PASS` (Gmail App Password) |
 
-Set the destination phone number in the app's **Threshold alerts** panel
-(E.164 format, e.g. `+15551234567`). The default destination is already a
-valid dummy E.164 number. To test end to end in `console` mode:
-open the app, use the **Demo controls** to pin a sensor above 50 °C, and
-watch the **api** terminal for a line like
-`Text message sent to +15555550123: "Temperature high: …"` and the app's Alert
-activity panel for the delivery badge.
+Set the destination in the app's **Threshold alerts** panel (an email address).
+To test end to end in `live` mode: open the app, use the **Demo controls** to
+pin a sensor above the max threshold, and watch **Alert activity** for
+`Email: sent`. Check spam if it does not arrive.
 
 If `ALERT_API_TOKEN` is set in `frontend/server/.env`, also set
 `VITE_ALERT_API_TOKEN` (same value) in `frontend/.env` so the console
@@ -540,22 +536,22 @@ can authenticate.
 
 **Threshold alerts**
 - Configure max threshold, min threshold, an independent custom message for
-  each, and an E.164 destination phone number.
-- Crossing a threshold logs a `SIMULATED ALERT` entry and POSTs the event to
+  each, and a destination email address.
+- Crossing a threshold logs an `ALERT` entry and POSTs the event to
   the local delivery service (see
-  [Running with SMS alerts](#running-with-sms-alerts)). In the default
-  `console` mode the service logs the SMS and does not send anything.
+  [Running with email alerts](#running-with-email-alerts)). In `live` mode
+  the service sends email through Gmail SMTP.
 - Fires **once per crossing**, not every second. Re-arms only after the reading
   returns inside the band.
 
-**Demo controls** (bottom panel, mock data only)
+**Demo controls** (bottom panel, when BLE is not connected)
 - Flip the third-box power switch on/off.
 - Unplug / re-plug each sensor.
 - Spike a sensor to 60 °C or drop it to 0 °C (off-scale), then resume.
 - Reset everything.
 
 These are how you demonstrate spec compliance without hardware. They disappear
-automatically once a real data source is connected.
+automatically once a BLE data source is connected.
 
 ---
 
@@ -579,7 +575,7 @@ business logic depend only on that interface — never on the mock.
 ```
 
 The active source is chosen in [`src/datasource/index.ts`](src/datasource/index.ts)
-(`VITE_DATA_SOURCE=ble` vs mock). See
+(`VITE_DATA_SOURCE=ble` vs the built-in local stream). See
 [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql).
 
 ```
@@ -775,10 +771,9 @@ with a certificate on the box/broker.
 
 ### Phone / email alert delivery
 
-SMS delivery is implemented: see [Running with SMS alerts](#running-with-sms-alerts).
-Default `console` mode needs no API keys. Real Twilio send is optional (`SMS_MODE=live`).
-
-Email delivery is still out of scope.
+Email delivery is implemented: see [Running with email alerts](#running-with-email-alerts).
+Default `console` mode needs no credentials. Real send is `EMAIL_MODE=live`
+with a Gmail App Password.
 
 ---
 
