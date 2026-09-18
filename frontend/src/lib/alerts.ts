@@ -13,7 +13,7 @@ export interface AlertConfig {
   minC: number;
   maxMessage: string;
   minMessage: string;
-  /** Phone number in E.164 format (e.g. +15555550123). Used as the SMS destination. */
+  /** Email address used as the Gmail SMTP destination. */
   destination: string;
 }
 
@@ -23,5 +23,5 @@ export const DEFAULT_ALERT_CONFIG: AlertConfig = {
   minC: 15,
   maxMessage: 'Temperature high: sensor above the configured maximum.',
   minMessage: 'Temperature low: sensor below the configured minimum.',
-  destination: '+15555550123',
+  destination: '',
 };

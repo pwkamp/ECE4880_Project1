@@ -15,8 +15,7 @@ const MAX_EVENTS = 40;
 /**
  * Runs the SCRUM-621..633 alert state machine against the live frame stream.
  *
- * `frame` is the latest frame from `useThermometer()` - i.e. the same mock data
- * flow the rest of the console renders. There is no separate sensor
+ * `frame` is the latest frame from `useThermometer()`. There is no separate sensor
  * integration: as each frame arrives the engine advances one step and any
  * transition events are prepended to the returned list.
  *

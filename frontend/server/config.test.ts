@@ -6,26 +6,32 @@ it('defaults to console mode when nothing is set', () => {
   expect(c.mode).toBe('console');
   expect(c.port).toBe(8787);
   expect(c.apiToken).toBeNull();
-  expect(c.twilio).toBeNull();
+  expect(c.smtp).toBeNull();
 });
 
-it('rejects an unknown SMS_MODE', () => {
-  expect(() => loadConfig({ SMS_MODE: 'carrier-pigeon' } as NodeJS.ProcessEnv)).toThrow(/SMS_MODE/);
+it('rejects an unknown EMAIL_MODE', () => {
+  expect(() => loadConfig({ EMAIL_MODE: 'carrier-pigeon' } as NodeJS.ProcessEnv)).toThrow(/EMAIL_MODE/);
 });
 
-it('throws when test mode is missing Twilio vars', () => {
-  expect(() => loadConfig({ SMS_MODE: 'test' } as NodeJS.ProcessEnv)).toThrow(/TWILIO_ACCOUNT_SID/);
+it('throws when live mode is missing SMTP vars', () => {
+  expect(() => loadConfig({ SMS_MODE: 'live' } as NodeJS.ProcessEnv)).toThrow(/SMTP_USER/);
 });
 
-it('accepts a complete live config', () => {
+it('accepts a complete live Gmail config', () => {
   const c = loadConfig({
-    SMS_MODE: 'live',
-    TWILIO_ACCOUNT_SID: 'AC1',
-    TWILIO_AUTH_TOKEN: 'tok',
-    TWILIO_FROM_NUMBER: '+15005550006',
+    EMAIL_MODE: 'live',
+    SMTP_USER: 'alerts@gmail.com',
+    SMTP_PASS: 'app-password',
   } as NodeJS.ProcessEnv);
   expect(c.mode).toBe('live');
-  expect(c.twilio).toEqual({ accountSid: 'AC1', authToken: 'tok', fromNumber: '+15005550006' });
+  expect(c.smtp).toEqual({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    user: 'alerts@gmail.com',
+    pass: 'app-password',
+    fromEmail: 'alerts@gmail.com',
+  });
 });
 
 it('reads PORT and ALERT_API_TOKEN overrides', () => {

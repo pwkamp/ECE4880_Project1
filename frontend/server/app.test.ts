@@ -8,7 +8,7 @@ const consoleConfig: Config = {
   mode: 'console',
   port: 8787,
   apiToken: null,
-  twilio: null,
+  smtp: null,
   mysqlUrl: null,
 };
 const okSender: SmsSender = { async send() { return { status: 'logged' }; } };
@@ -20,7 +20,7 @@ const validEvent = {
   ruleId: 'sensor-1',
   source: 'SENSOR_1',
   transition: 'HIGH',
-  destination: '+15005550006',
+  destination: 'you@example.com',
   message: 'Temperature high.',
   celsius: 40,
 };

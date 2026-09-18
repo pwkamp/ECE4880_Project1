@@ -59,7 +59,7 @@ export default function App() {
           <p className="subtitle">
             {supportsBle(thermometerSource)
               ? 'Computer console — Python BLE connector'
-              : 'Computer console — mock data source'}
+              : 'Computer console'}
           </p>
         </div>
         <div className="unit-toggle" role="group" aria-label="Temperature unit">
