@@ -1,7 +1,7 @@
 """OS-specific production defaults for the BLE connector service.
 
 The same Python package runs on Windows and Linux. Pairing backends and
-scan policy are chosen from ``sys.platform`` — never from a config flag
+scan policy are chosen from ``sys.platform`` - never from a config flag
 the operator has to remember.
 """
 

@@ -137,7 +137,7 @@ class HistorySynchronizer:
                 except Exception as exc:
                     # get_history_chunk succeeding but validate_chunk rejecting
                     # the payload must not leave `chunk` bound to the invalid
-                    # object from this attempt — otherwise, if this was the
+                    # object from this attempt - otherwise, if this was the
                     # last retry, the loop below would treat rejected data as
                     # good instead of taking the `chunk is None` failure path.
                     chunk = None

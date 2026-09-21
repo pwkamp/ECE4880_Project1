@@ -45,7 +45,7 @@ setup and acceptance checklist is in
 
 Python 3.10 or newer. The same `main.py` detects the OS (`sys.platform`) and
 selects WinRT PIN pairing on Windows 10/11 or BlueZ (D-Bus agent) on Linux.
-Linux **does not auto-scan on startup** — use the web console Scan/Connect
+Linux **does not auto-scan on startup** - use the web console Scan/Connect
 buttons. Your user must be in the `bluetooth` group (`groups` should list it
 after a full log-out). From this directory:
 

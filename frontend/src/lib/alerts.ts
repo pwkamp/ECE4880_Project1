@@ -13,8 +13,8 @@ export interface AlertConfig {
   minC: number;
   maxMessage: string;
   minMessage: string;
-  /** Email address used as the Gmail SMTP destination. */
-  destination: string;
+  /** Confirmed email addresses that receive alerts. */
+  destinations: string[];
 }
 
 export const DEFAULT_ALERT_CONFIG: AlertConfig = {
@@ -23,5 +23,5 @@ export const DEFAULT_ALERT_CONFIG: AlertConfig = {
   minC: 15,
   maxMessage: 'Temperature high: sensor above the configured maximum.',
   minMessage: 'Temperature low: sensor below the configured minimum.',
-  destination: '',
+  destinations: [],
 };

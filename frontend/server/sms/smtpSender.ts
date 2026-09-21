@@ -15,8 +15,9 @@ export function createSmtpEmailSender(config: SmtpConfig): SmsSender {
       const info = await transport.sendMail({
         from: config.fromEmail,
         to: msg.to,
-        subject: 'Thermometer alert',
+        subject: msg.subject ?? 'Thermometer alert',
         text: msg.body,
+        html: msg.html,
       });
       return { status: 'sent', providerId: info.messageId };
     },

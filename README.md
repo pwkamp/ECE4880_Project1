@@ -49,7 +49,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints — default <http://localhost:5173>. The chart is
+Open the URL Vite prints - default <http://localhost:5173>. The chart is
 pre-seeded with 300 s of history, so it's full immediately. Hot-reloads on
 save; `Ctrl+C` stops it.
 
@@ -147,13 +147,13 @@ you can still demo with only Python + an ESP32.
 
 ### Prerequisites
 
-- **Node.js 20+** and npm — web console.
-- **Python 3.10+** — BLE connector. 3.12/3.14 are fine.
+- **Node.js 20+** and npm - web console.
+- **Python 3.10+** - BLE connector. 3.12/3.14 are fine.
 - **An ESP32** flashed with this repo’s `firmware/` (fake sensors are the
   default and are enough). The box must be powered and advertising.
 - **Bluetooth adapter** on the PC. The Python connector **detects the OS at
   startup** (`pc_client/platform_runtime.py` via `sys.platform`) and picks the
-  pairing stack — you do not choose Windows vs Linux in config.
+  pairing stack - you do not choose Windows vs Linux in config.
   - **Windows 10/11:** WinRT PIN pairing (`pc_client/windows_pairing.py`).
     Auto-discover stays on (original design).
   - **Linux:** BlueZ pairing via D-Bus (`pc_client/linux_pairing.py`). The
@@ -304,9 +304,9 @@ npm run dev
 
 Open <http://localhost:5173>. You should see:
 
-- Subtitle **Computer console — Python BLE connector**
+- Subtitle **Computer console - Python BLE connector**
 - A **Device connection** panel (scan, passkey, connect, disconnect, reconnect)
-- **Demo controls** hidden — those only exist without a BLE data source
+- **Demo controls** hidden - those only exist without a BLE data source
 
 Vite proxies (see `vite.config.ts`):
 
@@ -332,7 +332,7 @@ the **same machine** that will run Python.
 3. The advertised name is `Thermometer-` plus a MAC suffix
    (`Thermometer-A1B2C3`). Scan will not list a device named something else.
 4. Power the box and wait several seconds so it is advertising **before** you
-   click Scan. If it is off, Scan returns `{ "devices": [] }` — that is a
+   click Scan. If it is off, Scan returns `{ "devices": [] }` - that is a
    radio result, not a crashed connector.
 
 That same PIN is what you type in the console **Pairing passkey** field.
@@ -470,7 +470,7 @@ Replace the address and passkey. Connect returns **202** with an
 | `401` on connect | Passkey missing/wrong; must match `firmware/device_config.cmake` |
 | `409` | Connector is busy (already connected / conflicting scan) |
 | Chart empty but status `ready` | Displays off, both probes disconnected, or `/current` has nulls |
-| Chart empty, `persistence_configured: false`, and `/current` also empty | No BLE snapshot yet — not a MySQL problem |
+| Chart empty, `persistence_configured: false`, and `/current` also empty | No BLE snapshot yet - not a MySQL problem |
 | `MYSQL_URL` set but `/api/samples/latest` is 503 | Wrong password, MySQL down, or schema not applied |
 | Samples configured but row always null | Writer adapter still no-op, or history never synced |
 | Machine/Bluetooth hard-locks | Two `main.py` processes. On Linux do **not** set `THERMOMETER_LINUX_AUTO_SCAN=1`. Stop with `Ctrl+C`. |
@@ -515,19 +515,19 @@ can authenticate.
   resetting history).
 - `unplugged sensor` message when a sensor is disconnected.
 - `no data available` for both sensors when the third box's switch is off.
-- Live numbers resume automatically the moment data returns — no refresh.
+- Live numbers resume automatically the moment data returns - no refresh.
 
 **Virtual sensor control**
-- A toggle per sensor turns its display on/off from the computer — the software
+- A toggle per sensor turns its display on/off from the computer - the software
   equivalent of the physical button on the box. Takes effect in well under 1 s.
 
 **Chart recorder (last 300 s)**
 - New point on the right, scrolls right-to-left, oldest falls off the left.
-- Y-axis is **fixed** at 10–50 °C (50–122 °F) and never auto-scales.
+- Y-axis is **fixed** at 10-50 °C (50-122 °F) and never auto-scales.
 - X-axis is labelled "seconds ago from current time", 300 → 0.
 - History seeds on startup (well within the spec's 10 s).
 
-**Missing vs. off-scale data** — deliberately distinct:
+**Missing vs. off-scale data** - deliberately distinct:
 - **Missing** (switch off / unplugged / display off): a hatched band in the
   sensor's colour, labelled "no data". The chart keeps scrolling through it.
 - **Off-scale** (a real reading above 50 °C or below 10 °C): a solid triangle
@@ -560,7 +560,7 @@ automatically once a BLE data source is connected.
 Everything the UI knows about the hardware goes through **one interface**,
 `ThermometerSource`, defined in
 [`src/datasource/types.ts`](src/datasource/types.ts). The UI, hooks, and
-business logic depend only on that interface — never on the mock.
+business logic depend only on that interface - never on the mock.
 
 ```
                     ┌───────────────────────────────┐
@@ -581,14 +581,14 @@ The active source is chosen in [`src/datasource/index.ts`](src/datasource/index.
 ```
 src/
   datasource/
-    types.ts                  the hardware contract — READ THIS FIRST
+    types.ts                  the hardware contract - READ THIS FIRST
     mockThermometerSource.ts   the simulator
     pythonBleSource.ts         FastAPI BLE + MySQL sample reader
     bleClient.ts / bleMap.ts   HTTP client and frame mapping
     index.ts                   exports the active source (the swap point)
   hooks/useThermometer.ts      subscribes, keeps the rolling 300 s window
   lib/
-    temperature.ts             C/F conversion, the fixed 10–50 scale
+    temperature.ts             C/F conversion, the fixed 10-50 scale
     readout.ts                 what the big number shows
     alerts.ts                  pure threshold evaluation, once-per-crossing
   components/                  RealtimeReadout, ChartRecorder, SensorControls,
@@ -613,7 +613,7 @@ interface ThermometerFrame {
 }
 ```
 
-`celsius` must be `null` — not `0`, not a stale value — whenever the box cannot
+`celsius` must be `null` - not `0`, not a stale value - whenever the box cannot
 produce a fresh reading: switch off, sensor unplugged, or sensor display turned
 off. Send raw Celsius; the app handles unit conversion and clamping.
 
@@ -633,7 +633,7 @@ Interface methods:
 ## Connecting to the real hardware
 
 This is the plan for wiring the console to the actual third box, the sensor
-probes, and the phone. **None of it changes the UI** — it is all one new file
+probes, and the phone. **None of it changes the UI** - it is all one new file
 plus firmware work.
 
 ### 1. Physical piece → what it maps to
@@ -678,8 +678,8 @@ nearly a pass-through:
 }
 ```
 
-If the box's native format differs, the translation lives in one place — the
-adapter's message handler — and nothing else needs to know.
+If the box's native format differs, the translation lives in one place - the
+adapter's message handler - and nothing else needs to know.
 
 ### 4. Implement `RealThermometerSource`
 
@@ -754,7 +754,7 @@ optional `ThermometerSimControls`.
   the adapter needs a **staleness watchdog**: if no frame arrives for ~3 s,
   synthesize frames with `switchState: 'off'` so the console shows
   "no data available" and the chart gaps. When frames resume, real data flows
-  again — this is what satisfies the spec's "recover within 10 s" requirement.
+  again - this is what satisfies the spec's "recover within 10 s" requirement.
   (If the box has a *soft* switch that keeps the radio alive, it can just report
   `switchState: 'off'` directly and the watchdog is a backup.)
 - **Clock skew.** The chart's X-axis uses frame timestamps. If the box clock is
@@ -765,7 +765,7 @@ optional `ThermometerSimControls`.
 
 The console is a static site. On demo day, from `frontend/` run `npm run dev` (or serve
 `npm run build` output) on the lab computer, with the box on the **same LAN**.
-Note: a browser page served over **https** cannot open an insecure `ws://` — so
+Note: a browser page served over **https** cannot open an insecure `ws://` - so
 either serve the console over plain `http` on the LAN, or terminate `wss://`
 with a certificate on the box/broker.
 
@@ -785,7 +785,7 @@ with a Gmail App Password.
 2. **Missing-data bands are per-sensor and full plot height**, tinted in that
    sensor's colour, so a one-sensor outage doesn't look like a total outage.
 3. **Alerts + missing data:** a sensor that goes offline while exceeding a
-   threshold and returns still-exceeded does **not** re-alert — missing data is
+   threshold and returns still-exceeded does **not** re-alert - missing data is
    not treated as returning to the safe band.
 4. **Thresholds are stored in Celsius** and converted for display; editing in
    °F round-trips through Celsius (minor display rounding).
@@ -1058,7 +1058,7 @@ The database teammate can supply a synchronous no-argument factory returning an
 object with that interface. A reference implementation against this project's
 schema ships at [pc_client/mysql_adapter.py](backend/pc_client/mysql_adapter.py)
 (SCRUM-341/368/369). It requires a MySQL server already running somewhere
-reachable — it's a client only, it does not start one itself:
+reachable - it's a client only, it does not start one itself:
 
 ```powershell
 $env:THERMOMETER_DATABASE_ADAPTER_FACTORY = "pc_client.mysql_adapter:create_adapter"

@@ -4,6 +4,7 @@ import { AlertSettings } from './components/AlertSettings';
 import { ChartRecorder } from './components/ChartRecorder';
 import { DebugPanel } from './components/DebugPanel';
 import { DevicePanel } from './components/DevicePanel';
+import { OffScaleBanner } from './components/OffScaleBanner';
 import { RealtimeReadout } from './components/RealtimeReadout';
 import { SensorControls } from './components/SensorControls';
 import { thermometerSource, SENSOR_IDS, supportsBle } from './datasource';
@@ -16,6 +17,7 @@ import {
   type AlertRule,
 } from './lib/alertEngine';
 import { DEFAULT_ALERT_CONFIG, type AlertConfig } from './lib/alerts';
+import { useTheme } from './hooks/useTheme';
 import type { Unit } from './lib/temperature';
 
 /** Sent when a sensor comes back inside the configured band (SCRUM-624). */
@@ -24,10 +26,11 @@ const CLEAR_MESSAGE = 'Temperature back within the configured range.';
 export default function App() {
   const { frame, history } = useThermometer();
   const [unit, setUnit] = useState<Unit>('C');
+  const [theme, setTheme] = useTheme();
   const [alertConfig, setAlertConfig] = useState<AlertConfig>(DEFAULT_ALERT_CONFIG);
 
   // Adapt the single UI config into the alert engine's rule/recipient model.
-  // One rule per physical sensor; the destination becomes the sole recipient.
+  // One rule per physical sensor; each saved email is its own recipient.
   const rules = useMemo<AlertRule[]>(() => {
     const shared = {
       minC: alertConfig.minC,
@@ -44,8 +47,13 @@ export default function App() {
   }, [alertConfig]);
 
   const recipients = useMemo<AlertRecipient[]>(
-    () => [{ id: 'primary', destination: alertConfig.destination, enabled: true }],
-    [alertConfig.destination],
+    () =>
+      alertConfig.destinations.map((destination) => ({
+        id: destination,
+        destination,
+        enabled: true,
+      })),
+    [alertConfig.destinations],
   );
 
   const alerts = useAlertEngine(frame, rules, recipients);
@@ -58,11 +66,28 @@ export default function App() {
           <h1>Networked Thermometer</h1>
           <p className="subtitle">
             {supportsBle(thermometerSource)
-              ? 'Computer console — Python BLE connector'
+              ? 'Computer console - Python BLE connector'
               : 'Computer console'}
           </p>
         </div>
-        <div className="unit-toggle" role="group" aria-label="Temperature unit">
+        <div className="header-controls">
+          <div className="unit-toggle" role="group" aria-label="Color theme">
+            <button
+              type="button"
+              className={theme === 'light' ? 'active' : ''}
+              onClick={() => setTheme('light')}
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              className={theme === 'dark' ? 'active' : ''}
+              onClick={() => setTheme('dark')}
+            >
+              Dark
+            </button>
+          </div>
+          <div className="unit-toggle" role="group" aria-label="Temperature unit">
           {(['C', 'F'] as Unit[]).map((u) => (
             <button
               key={u}
@@ -73,6 +98,7 @@ export default function App() {
               °{u}
             </button>
           ))}
+          </div>
         </div>
       </header>
 
@@ -83,8 +109,9 @@ export default function App() {
       </section>
 
       <section className="chart-section">
-        <h2>Temperature history &mdash; 300 s buffer + reconnect recovery</h2>
-        <ChartRecorder history={history} nowMs={frame.timestamp} unit={unit} />
+        <h2>Temperature history; 300 s buffer + reconnect recovery</h2>
+        <OffScaleBanner frame={frame} />
+        <ChartRecorder history={history} nowMs={frame.timestamp} unit={unit} theme={theme} />
       </section>
 
       <div className="panels">

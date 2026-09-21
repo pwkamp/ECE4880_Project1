@@ -232,7 +232,7 @@ class MySQLDatabaseAdapter:
         # (see schema.sql), so they can't be matched to a recovered HISTORY
         # sample via the natural key. Instead: a PROVISIONAL row is stale iff
         # a HISTORY sample from this batch landed within half a sample
-        # period of its observed_at_utc — that HISTORY row (already written
+        # period of its observed_at_utc - that HISTORY row (already written
         # by upsert_history, which the persistence worker always runs first)
         # is strictly better data for the same real-world second, so the
         # placeholder is deleted rather than merged/updated in place.

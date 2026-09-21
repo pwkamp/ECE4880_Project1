@@ -1,6 +1,8 @@
 export interface SmsMessage {
   to: string;
   body: string;
+  subject?: string;
+  html?: string;
 }
 
 export interface SmsResult {

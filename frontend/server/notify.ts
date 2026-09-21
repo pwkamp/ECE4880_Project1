@@ -40,8 +40,54 @@ const SOURCE_LABEL: Record<AlertEventInput['source'], string> = {
   AVERAGE: 'Sensor average',
 };
 
-function composeBody(event: AlertEventInput): string {
-  return `${event.message} (${SOURCE_LABEL[event.source]} ${event.celsius.toFixed(1)}°C)`;
+export interface ComposedEmail {
+  subject: string;
+  text: string;
+  html: string;
+}
+
+/** Subject + plain text + HTML for a HIGH/LOW threshold crossing. */
+export function composeAlertEmail(event: AlertEventInput): ComposedEmail {
+  const sensor = SOURCE_LABEL[event.source];
+  const reading = `${event.celsius.toFixed(1)}°C`;
+  const kind = event.transition === 'HIGH' ? 'HIGH' : 'LOW';
+  const when = new Date(event.timestamp).toUTCString();
+  const subject = `${kind} temperature alert - ${sensor} at ${reading}`;
+  const text = [
+    'Networked Thermometer alert',
+    '',
+    `Status:  ${kind}`,
+    `Sensor:  ${sensor}`,
+    `Reading: ${reading}`,
+    `Time:    ${when}`,
+    '',
+    event.message,
+    '',
+    'This message was sent by the networked thermometer computer console.',
+  ].join('\n');
+  const accent = event.transition === 'HIGH' ? '#c62828' : '#1565c0';
+  const html = `<div style="font-family:Segoe UI,Helvetica,Arial,sans-serif;max-width:520px;color:#1a1a1a;line-height:1.45">
+  <h1 style="font-size:18px;margin:0 0 4px">Networked Thermometer</h1>
+  <p style="margin:0 0 16px;font-size:14px;color:#5a5a5a">Threshold alert from the computer console</p>
+  <p style="margin:0 0 16px;font-size:16px"><strong style="color:${accent}">${kind}</strong> on ${sensor}</p>
+  <table style="border-collapse:collapse;width:100%;font-size:14px">
+    <tr><td style="padding:6px 0;color:#5a5a5a;width:96px">Sensor</td><td>${escapeHtml(sensor)}</td></tr>
+    <tr><td style="padding:6px 0;color:#5a5a5a">Reading</td><td><strong>${escapeHtml(reading)}</strong></td></tr>
+    <tr><td style="padding:6px 0;color:#5a5a5a">Status</td><td>${kind}</td></tr>
+    <tr><td style="padding:6px 0;color:#5a5a5a">Time (UTC)</td><td>${escapeHtml(when)}</td></tr>
+  </table>
+  <p style="margin:16px 0 0">${escapeHtml(event.message)}</p>
+  <p style="margin:20px 0 0;font-size:12px;color:#5a5a5a">Sent automatically when a sensor crossed the configured min/max threshold.</p>
+</div>`;
+  return { subject, text, html };
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 export async function handleNotify(rawBody: unknown, deps: NotifyDeps): Promise<NotifyOutcome> {
@@ -63,7 +109,13 @@ export async function handleNotify(rawBody: unknown, deps: NotifyDeps): Promise<
   }
 
   try {
-    const result = await deps.sender.send({ to: destination, body: composeBody(event) });
+    const email = composeAlertEmail(event);
+    const result = await deps.sender.send({
+      to: destination,
+      body: email.text,
+      subject: email.subject,
+      html: email.html,
+    });
     deps.seen.add(event.id);
     return { code: 200, payload: { status: result.status, providerId: result.providerId } };
   } catch (err) {
