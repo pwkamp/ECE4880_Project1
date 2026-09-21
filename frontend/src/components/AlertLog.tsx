@@ -22,7 +22,7 @@ function line(a: AlertEvent, unit: Unit): string {
       : a.transition === 'LOW'
         ? 'below min'
         : 'back in range';
-  return `${t} — ${SOURCE_LABEL[a.source]} ${what} (${formatTemp(a.celsius, unit)})`;
+  return `${t} - ${SOURCE_LABEL[a.source]} ${what} (${formatTemp(a.celsius, unit)})`;
 }
 
 function deliveryLabel(state: DeliveryState | undefined): string | null {
@@ -30,7 +30,7 @@ function deliveryLabel(state: DeliveryState | undefined): string | null {
   if (state === 'pending') return 'sending…';
   if (state.ok) return state.status === 'logged' ? 'logged (console)' : 'sent';
   if (state.status === 'unreachable') return 'service unreachable';
-  return state.reason ? `failed — ${state.reason}` : 'failed';
+  return state.reason ? `failed - ${state.reason}` : 'failed';
 }
 
 /** The visible log of threshold alerts and email delivery status. */

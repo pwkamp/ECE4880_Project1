@@ -36,7 +36,7 @@ export function SensorControls({ frame, source = thermometerSource }: Props) {
     <section className="panel">
       <h2>Sensor display</h2>
       <p className="panel-hint">
-        Virtual button &mdash; same effect as pressing the button on the box.
+        Virtual button
       </p>
       {error ? <p className="device-error" role="alert">{error}</p> : null}
       <div className="control-rows">
@@ -44,7 +44,7 @@ export function SensorControls({ frame, source = thermometerSource }: Props) {
           const enabled = frame.readings[id].enabled;
           return (
             <label className="toggle-row" key={id}>
-              <span>Sensor {id}</span>
+              <span className={`sensor-name sensor-${id}`}>Sensor {id}</span>
               <input
                 type="checkbox"
                 checked={enabled}

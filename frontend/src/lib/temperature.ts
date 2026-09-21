@@ -31,6 +31,11 @@ export function formatTemp(celsius: number, unit: Unit, digits = 1): string {
   return `${toUnit(celsius, unit).toFixed(digits)} °${unit}`;
 }
 
+/** True when a live Celsius reading is outside the 10-50 °C chart window. */
+export function isOffScale(celsius: number | null): boolean {
+  return celsius != null && (celsius > SCALE_C.max || celsius < SCALE_C.min);
+}
+
 export function unitSymbol(unit: Unit): string {
   return `°${unit}`;
 }

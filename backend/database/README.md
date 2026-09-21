@@ -141,7 +141,7 @@ a MySQL server against this schema:
   `HISTORY` sample via the natural key. The reference adapter
   (`backend/pc_client/mysql_adapter.py::reconcile_provisional_intervals`)
   instead deletes a `PROVISIONAL` row when a `HISTORY` sample from the same
-  batch lands within half a sample period of its `observed_at_utc` — that
+  batch lands within half a sample period of its `observed_at_utc` - that
   `HISTORY` row (already written by `upsert_history`, which the persistence
   worker always runs first) is strictly better data for the same real-world
   second. Verified live: a real recovered sample correctly removes the
@@ -188,11 +188,11 @@ insert, tolerant of re-synced overlap) and `reconcile_provisional_intervals`
 (deletes superseded `PROVISIONAL` placeholders, see "Open items" above) are
 both implemented and verified live. `publish_connection_state` and
 `publish_display_result` remain documented no-ops (see "Scope questions"
-above — no destination tables exist yet). Credentials are never hardcoded:
+above - no destination tables exist yet). Credentials are never hardcoded:
 connection settings come from `THERMOMETER_DB_HOST` / `_PORT` / `_USER` /
 `_PASSWORD` / `_NAME` environment variables.
 
-**Requires a running MySQL server** — this is a client only, it does not
+**Requires a running MySQL server** - this is a client only, it does not
 start or embed one. Install MySQL locally (or point the env vars above at a
 shared instance), then apply `schema.sql` once before running anything else
 in this section.

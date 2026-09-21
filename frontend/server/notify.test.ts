@@ -33,8 +33,11 @@ it('sends email for a valid HIGH event', async () => {
   expect(out.payload).toMatchObject({ status: 'sent', providerId: 'SM123' });
   expect(calls).toHaveLength(1);
   expect(calls[0].to).toBe('you@example.com');
+  expect(calls[0].subject).toBe('HIGH temperature alert - Sensor 1 at 34.2°C');
   expect(calls[0].body).toContain('Sensor 1');
   expect(calls[0].body).toContain('34.2');
+  expect(calls[0].html).toContain('Sensor 1');
+  expect(calls[0].html).toContain('34.2');
 });
 
 it('sends email for a valid LOW event', async () => {

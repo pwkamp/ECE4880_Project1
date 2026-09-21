@@ -12,22 +12,37 @@ import {
   Y_PLOT_MIN,
 } from '../lib/chartScroll';
 import { cToF, type Unit } from '../lib/temperature';
+import type { Theme } from '../hooks/useTheme';
 
 interface Props {
   history: ThermometerFrame[];
   /** Timestamp of the newest frame; the right edge of the chart. */
   nowMs: number;
   unit: Unit;
+  theme?: Theme;
 }
 
 const VIEWPORT_H = 340;
 const M = { top: 16, right: 16, bottom: 36, left: 12 };
 const Y_LABEL_W = 44;
 
-const COLOR: Record<SensorId, string> = { 1: '#1f5c8b', 2: '#b3541e' };
-const GRID = '#e4e4e4';
-const AXIS_TEXT = '#555';
-const MISSING_FILL = 'rgba(110,110,110,0.13)';
+const COLOR: Record<SensorId, string> = { 1: '#c62828', 2: '#2e7d32' };
+
+function chartPalette() {
+  const root = getComputedStyle(document.documentElement);
+  const token = (name: string, fallback: string) =>
+    root.getPropertyValue(name).trim() || fallback;
+  return {
+    grid: token('--chart-grid', '#e4e4e4'),
+    axis: token('--chart-axis', '#555'),
+    border: token('--chart-border', '#bdbdbd'),
+    missing: token('--chart-missing', 'rgba(110,110,110,0.13)'),
+    missingLabel: token('--ink-soft', '#5a5a5a'),
+    offScale: token('--ink', '#333'),
+  };
+}
+
+let drawPalette = chartPalette();
 
 interface Sample {
   x: number;
@@ -37,15 +52,15 @@ interface Sample {
 /**
  * A fixed-scale chart recorder.
  *
- *  - Drawable Y is 0–60 C; the default view is the spec window 10–50 C.
+ *  - Drawable Y is 0-60 C; the default view is the spec window 10-50 C.
  *  - X axis is "seconds ago", 320 on the left to 0 on the right.
  *  - New points enter at the right; the trace scrolls left; old points fall off.
  *  - Missing data (switch off / unplugged / display off) is drawn as a
- *    hatched band in the sensor's colour. Off-scale readings (outside 0–60 C)
+ *    hatched band in the sensor's colour. Off-scale readings (outside 0-60 C)
  *    are drawn as a solid triangle clipped to the rail. The two are distinct.
  *  - The chart keeps scrolling during an outage.
  */
-export function ChartRecorder({ history, nowMs, unit }: Props) {
+export function ChartRecorder({ history, nowMs, unit, theme = 'light' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
@@ -97,6 +112,8 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     canvas.height = canvasCssH * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, canvasCssW, canvasCssH);
+    const pal = chartPalette();
+    drawPalette = pal;
 
     const plot = {
       left: M.left,
@@ -114,8 +131,8 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
       "11px ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif";
     ctx.textBaseline = 'middle';
 
-    ctx.strokeStyle = GRID;
-    ctx.fillStyle = AXIS_TEXT;
+    ctx.strokeStyle = pal.grid;
+    ctx.fillStyle = pal.axis;
     ctx.lineWidth = 1;
     for (let c = Y_PLOT_MIN; c <= Y_PLOT_MAX; c += 10) {
       const y = yForC(c);
@@ -128,17 +145,17 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     ctx.textAlign = 'center';
     for (let s = 0; s <= WINDOW_S; s += 60) {
       const x = xFor(s);
-      ctx.strokeStyle = GRID;
+      ctx.strokeStyle = pal.grid;
       ctx.beginPath();
       ctx.moveTo(x, plot.top);
       ctx.lineTo(x, plot.bottom);
       ctx.stroke();
-      ctx.fillStyle = AXIS_TEXT;
+      ctx.fillStyle = pal.axis;
       ctx.fillText(String(s), x, plot.bottom + 14);
     }
     ctx.fillText(String(WINDOW_S), xFor(WINDOW_S), plot.bottom + 14);
 
-    ctx.strokeStyle = '#bdbdbd';
+    ctx.strokeStyle = pal.border;
     ctx.strokeRect(plot.left, plot.top, plotW, plotH);
 
     ([1, 2] as SensorId[]).forEach((sensorId) => {
@@ -152,7 +169,7 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     });
 
     drawLegend(ctx, plot.right, yForC(50));
-  }, [history, nowMs, unit, canvasCssW, canvasCssH, plotW, plotH]);
+  }, [history, nowMs, unit, theme, canvasCssW, canvasCssH, plotW, plotH]);
 
   const yTicks: Array<{ c: number; y: number; label: string }> = [];
   for (let c = Y_PLOT_MIN; c <= Y_PLOT_MAX; c += 10) {
@@ -167,7 +184,11 @@ export function ChartRecorder({ history, nowMs, unit }: Props) {
     <>
       <p className="chart-hint">
         Drag or scroll to look back in time or up and down the temperature scale.
-        Newest readings stay on the right; the default view is 10–50 °C.
+        Newest readings stay on the right; the default view is 10-50 °C.
+        <span className="chart-legend">
+          <span className="chart-legend-item sensor-1">Sensor 1</span>
+          <span className="chart-legend-item sensor-2">Sensor 2</span>
+        </span>
       </p>
       <div className="chart-frame">
         <div
@@ -272,7 +293,7 @@ function paintBand(
   ctx.save();
   ctx.beginPath();
   ctx.rect(x0, top, w, h);
-  ctx.fillStyle = MISSING_FILL;
+  ctx.fillStyle = drawPalette.missing;
   ctx.fill();
   ctx.clip();
   ctx.strokeStyle = COLOR[sensorId];
@@ -287,7 +308,7 @@ function paintBand(
   }
   ctx.restore();
   if (w > 52) {
-    ctx.fillStyle = '#5a5a5a';
+    ctx.fillStyle = drawPalette.missingLabel;
     ctx.textAlign = 'center';
     ctx.fillText('no data', (x0 + x1) / 2, top + 10 + (sensorId === 1 ? 0 : 12));
   }
@@ -347,7 +368,7 @@ function drawLegend(
     ['Sensor 1', (x, y) => swatch(ctx, x, y, COLOR[1])],
     ['Sensor 2', (x, y) => swatch(ctx, x, y, COLOR[2])],
     ['off-scale', (x, y) => {
-      ctx.fillStyle = '#333';
+      ctx.fillStyle = drawPalette.offScale;
       ctx.beginPath();
       ctx.moveTo(x + 6, y - 4);
       ctx.lineTo(x + 2, y + 3);
@@ -356,9 +377,9 @@ function drawLegend(
       ctx.fill();
     }],
     ['missing', (x, y) => {
-      ctx.fillStyle = MISSING_FILL;
+      ctx.fillStyle = drawPalette.missing;
       ctx.fillRect(x, y - 5, 12, 10);
-      ctx.strokeStyle = 'rgba(70,70,70,0.5)';
+      ctx.strokeStyle = drawPalette.axis;
       ctx.beginPath();
       ctx.moveTo(x, y + 5);
       ctx.lineTo(x + 12, y - 5);
@@ -371,7 +392,7 @@ function drawLegend(
     const w = ctx.measureText(label).width + 18;
     const x = right - w;
     draw(x, y);
-    ctx.fillStyle = AXIS_TEXT;
+    ctx.fillStyle = drawPalette.axis;
     ctx.fillText(label, x + 16, y);
     y += 15;
   }

@@ -1684,7 +1684,7 @@ class ThermometerBleService:
 
         Another shutdown/reconnect path may already be awaiting the same
         task, and a task can finish with its own error just before
-        cancellation lands — either outcome must be consumed here, not
+        cancellation lands - either outcome must be consumed here, not
         leaked to the loop.
         """
         pending = [task for task in tasks if task is not None and not task.done()]

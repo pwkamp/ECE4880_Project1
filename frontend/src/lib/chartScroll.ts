@@ -6,11 +6,11 @@ export const WINDOW_S = 320;
 /** Horizontal scale: the full recovery window remains scrollable on a laptop. */
 export const PX_PER_SECOND = 8;
 
-/** Drawable Y range. The spec window (10–50 C) is the default view; 0 C and 60 C are a scroll away. */
+/** Drawable Y range. The spec window (10-50 C) is the default view; 0 C and 60 C are a scroll away. */
 export const Y_PLOT_MIN = 0;
 export const Y_PLOT_MAX = 60;
 
-/** Vertical scale: tall enough that a 340px viewport cannot show 0–60 C at once. */
+/** Vertical scale: tall enough that a 340px viewport cannot show 0-60 C at once. */
 export const PX_PER_DEGREE = 8;
 
 /** Plot inner width in CSS pixels. */

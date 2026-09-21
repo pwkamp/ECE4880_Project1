@@ -140,7 +140,7 @@ export function connectionHint(
 ): string {
   if (status.host_os === 'linux' || status.pairing_backend === 'bluez') {
     return (
-      'Linux detected (BlueZ). The box is not scanned in a loop — click Scan, ' +
+      'Linux detected (BlueZ). The box is not scanned in a loop - click Scan, ' +
       'then Connect with the six-digit firmware PIN. Power the ESP32 so it ' +
       'advertises as Thermometer-XXXXXX.'
     );

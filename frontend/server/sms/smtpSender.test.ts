@@ -24,7 +24,14 @@ it('sends mail through the SMTP transport', async () => {
     fromEmail: 'alerts@gmail.com',
   });
 
-  await expect(sender.send({ to: 'you@example.com', body: 'hot' })).resolves.toEqual({
+  await expect(
+    sender.send({
+      to: 'you@example.com',
+      body: 'hot',
+      subject: 'HIGH temperature alert - Sensor 1 at 34.2°C',
+      html: '<p>hot</p>',
+    }),
+  ).resolves.toEqual({
     status: 'sent',
     providerId: '<id@gmail.com>',
   });
@@ -32,8 +39,9 @@ it('sends mail through the SMTP transport', async () => {
     expect.objectContaining({
       from: 'alerts@gmail.com',
       to: 'you@example.com',
-      subject: 'Thermometer alert',
+      subject: 'HIGH temperature alert - Sensor 1 at 34.2°C',
       text: 'hot',
+      html: '<p>hot</p>',
     }),
   );
 });
