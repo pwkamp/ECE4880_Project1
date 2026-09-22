@@ -60,16 +60,39 @@ idf.py --no-ccache build
 idf.py size
 ```
 
-The fake/real sensor and display backends are independently selectable under
-**Thermometer Configuration** in `idf.py menuconfig`. Before integrating real
-hardware, build each of these combinations after changing the two selections:
+The physical/test temperature sensor backend remains selectable under
+**Thermometer Configuration** in `idf.py menuconfig`. Production builds default
+to the two physical DS18B20 probes; simulated readings require explicitly
+selecting **Deterministic simulated sensors**.
 
-| Sensor backend | Display backend | Expected purpose |
-|---|---|---|
-| Fake | LED | Complete default simulation |
-| Real | LED | Compile-check sensor integration stub |
-| Fake | Real | Compile-check display integration stub |
-| Real | Real | Compile-check both hardware integration stubs |
+The local hardware copied from the prototype firmware is wired as follows:
+
+| Function | ESP32 GPIO |
+|---|---:|
+| Sensor 1 DS18B20 data | 14 |
+| Sensor 2 DS18B20 data | 27 |
+| LCD RS | 16 |
+| LCD Enable | 17 |
+| LCD D4, D5, D6, D7 | 18, 19, 21, 23 |
+| Sensor 1 button | 34 |
+| Sensor 2 button | 35 |
+
+The buttons are active-low and use 40 ms software debounce. GPIO34 and GPIO35
+do not provide internal pull-ups, so each button input requires an external
+pull-up resistor and the switch must connect the input to ground when pressed.
+Each DS18B20 uses its own three-wire bus and requires an approximately 4.7 kOhm
+pull-up from data to 3.3 V. Parasitic-power wiring is not supported. With no
+valid presence pulse, or with a bad scratchpad CRC, that sensor is reported as
+disconnected and cannot be switched to the display's ON state.
+
+If a Windows/BlueZ bond becomes stale, the current firmware permits an
+explicitly reset host to replace the stored ESP32 peer bond, but only by
+completing authenticated pairing with the configured six-digit PIN. Use the
+backend launcher's `-ResetPairings`/`--reset-pairings` option; normal reconnects
+continue to reuse the existing bond.
+The LCD backlight is powered directly; the current hardware has no backlight
+control pin. The prototype's GPIO32/GPIO33 sensor LEDs are intentionally not
+used by this firmware.
 
 There is not yet a separate on-target Unity unit-test application. Hardware
 acceptance therefore requires flashing the default build, connecting through
@@ -78,17 +101,32 @@ synchronizing history, controlling both display states, and power-cycling the
 board to verify automatic reconnection. These checks require the actual ESP32
 and cannot be run by `master_test.py`.
 
-Real sensor and display files are integration stubs; fake sensors and the LED
-display simulator are the default working backends.
+The DS18B20 sensors, HD44780 LCD, and two physical buttons are the default
+production configuration. The deterministic backend remains available only
+for explicit simulation testing.
+
+## Flashing without holding BOOT
+
+No application-firmware change is needed or able to control entry into the
+original ESP32 ROM download mode. ESP-IDF already asks the serial adapter to
+toggle DTR/RTS so a development board with the standard auto-reset circuit can
+enter download mode and flash without pressing **BOOT**. Use the normal VS Code
+**Flash** button or `idf.py -p COM5 flash`.
+
+If flashing only connects while **BOOT** is held, the board or USB-to-serial
+adapter does not expose a working automatic EN/GPIO0 reset circuit. Use the
+correct USB-UART driver and a data-capable cable; otherwise the remedy is a
+board/adapter with automatic DTR/RTS wiring (or adding that hardware circuit),
+not a change to this firmware.
 
 ## Full cross-platform integration
 
 The firmware itself stays on the ESP32 and is built/flashed from the native
 Windows or Linux host. MySQL and the web application are containerized on both
 platforms; the BLE backend is native on Windows and containerized with host
-BlueZ access on Linux. Keep the default **Deterministic simulated sensors**
-selection, set the six-digit PIN in `device_config.cmake`, and flash before
-starting the backend:
+BlueZ access on Linux. Keep the default **Two DS18B20 sensors on
+GPIO14/GPIO27** selection, set the six-digit PIN in `device_config.cmake`, and
+flash before starting the backend:
 
 ```bash
 idf.py set-target esp32

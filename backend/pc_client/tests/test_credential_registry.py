@@ -54,8 +54,20 @@ class CredentialRegistryTests(unittest.TestCase):
             self.assertEqual(tuple(rows[0]), CSV_FIELDS)
             self.assertEqual(rows[0]["pairing_passkey"], "012345")
 
+            self.assertEqual(registry.list_all(), (stored,))
+
             self.assertTrue(registry.delete("aabbccddeeff"))
             self.assertIsNone(registry.lookup("AA:BB:CC:DD:EE:FF"))
+
+    def test_clear_removes_every_record(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            registry = CredentialRegistry(Path(directory) / "devices.csv")
+            for address in ("AA:BB:CC:DD:EE:01", "AA:BB:CC:DD:EE:02"):
+                registry.save_verified(address, "Thermometer", "123456")
+
+            self.assertEqual(registry.clear(), 2)
+            self.assertEqual(registry.list_all(), ())
+            self.assertEqual(registry.clear(), 0)
 
     def test_rejects_invalid_address_and_passkey(self) -> None:
         self.assertRaises(ValueError, normalize_mac_address, "not-a-mac")

@@ -4,10 +4,10 @@ import type { BleStatus } from './bleMap';
  * The contract between the computer app and the "third box".
  *
  * Everything the UI knows about the hardware goes through a
- * `ThermometerSource`. The app ships with `MockThermometerSource`; a real
- * implementation (`RealThermometerSource`) that talks to the physical box over
- * HTTP / WebSocket / serial can be dropped in later without touching any UI or
- * business-logic code. See src/datasource/index.ts for the swap point.
+ * `ThermometerSource`. Production uses `PythonBleSource` to read MySQL and
+ * control the physical box through the Python BLE service. The explicit
+ * `MockThermometerSource` remains available for UI-only tests. See
+ * src/datasource/index.ts for the swap point.
  *
  * ---------------------------------------------------------------------------
  * FOR THE HARDWARE / EMBEDDED TEAM

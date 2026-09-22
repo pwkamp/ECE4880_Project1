@@ -41,6 +41,7 @@ export function SensorControls({ frame, source = thermometerSource }: Props) {
       {error ? <p className="device-error" role="alert">{error}</p> : null}
       <div className="control-rows">
         {SENSOR_IDS.map((id) => {
+          const connected = frame.readings[id].connected;
           const enabled = frame.readings[id].enabled;
           return (
             <label className="toggle-row" key={id}>
@@ -48,11 +49,21 @@ export function SensorControls({ frame, source = thermometerSource }: Props) {
               <input
                 type="checkbox"
                 checked={enabled}
-                disabled={pending[id] || (ble !== null && !ble.getConnectionStatus().ready)}
+                disabled={
+                  !connected ||
+                  pending[id] ||
+                  (ble !== null && !ble.getConnectionStatus().ready)
+                }
                 onChange={(e) => void changeDisplay(id, e.target.checked)}
               />
               <span className="toggle-state">
-                {pending[id] ? 'Updating...' : enabled ? 'on' : 'off'}
+                {!connected
+                  ? 'unavailable'
+                  : pending[id]
+                    ? 'Updating...'
+                    : enabled
+                      ? 'on'
+                      : 'off'}
               </span>
             </label>
           );

@@ -1,34 +1,13 @@
 menu "Thermometer Configuration"
     choice THERMOMETER_SENSOR_BACKEND
         prompt "Temperature sensor backend"
-        default THERMOMETER_SENSOR_BACKEND_FAKE
+        default THERMOMETER_SENSOR_BACKEND_REAL
 
         config THERMOMETER_SENSOR_BACKEND_FAKE
             bool "Deterministic simulated sensors"
 
         config THERMOMETER_SENSOR_BACKEND_REAL
-            bool "Real sensor driver stub"
+            bool "Two DS18B20 sensors on GPIO14/GPIO27"
     endchoice
 
-    choice THERMOMETER_DISPLAY_BACKEND
-        prompt "Local display backend"
-        default THERMOMETER_DISPLAY_BACKEND_LED
-
-        config THERMOMETER_DISPLAY_BACKEND_LED
-            bool "On-board LED display simulator"
-
-        config THERMOMETER_DISPLAY_BACKEND_REAL
-            bool "Real character LCD stub"
-    endchoice
-
-    config THERMOMETER_LED_GPIO
-        int "LED display-simulator GPIO"
-        depends on THERMOMETER_DISPLAY_BACKEND_LED
-        range 0 48
-        default 2
-
-    config THERMOMETER_LED_ACTIVE_LOW
-        bool "LED display simulator is active-low"
-        depends on THERMOMETER_DISPLAY_BACKEND_LED
-        default n
 endmenu

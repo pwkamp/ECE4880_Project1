@@ -17,25 +17,25 @@ Status meanings:
 | Requirement | Jira | Status | Repository contribution |
 |---|---|---|---|
 | SYS-HLR-500 | SCRUM-414 | Acceptance pending | Current sensor/status data is exposed to the database adapter and diagnostic REST API. |
-| SYS-HLR-510 | SCRUM-415 | Simulated | Per-sensor remote display control uses prioritized REST-to-BLE requests and ESP32-confirmed state; the LED simulates the LCD. |
+| SYS-HLR-510 | SCRUM-415 | Acceptance pending | Per-sensor remote display control uses prioritized REST-to-BLE requests, ESP32-confirmed state, and the physical HD44780 LCD. |
 | SYS-HLR-520 | SCRUM-416 | Acceptance pending | Autonomous discovery, power-cycle reconnect, first-current publication, and a ten-second recovery deadline are implemented. |
 
-The internet-facing web UI, concrete MySQL implementation, alerts, and final
-hardware are separate workstreams, so this repository alone cannot close the
-system-level requirements.
+The web UI and concrete MySQL integration are implemented in this repository.
+Final physical wiring, timing, and full-system acceptance still require the
+assembled hardware.
 
 ## ESP32 firmware
 
 | Requirement(s) | Jira issue(s) | Status | Implementation / verification |
 |---|---|---|---|
 | SWE-EMB-MLR-300..304 | SCRUM-456..460 | Implemented | ESP-IDF C application, continuous two-sensor state, independent history, and disconnect/recovery model; firmware builds. |
-| SWE-EMB-MLR-305 | SCRUM-461 | Simulated | Independent logical display flags rendered through the LED simulator. |
-| SWE-EMB-MLR-310..313 | SCRUM-466..469 | Implemented / interface only | Celsius state, atomic snapshot, recovery, and remote display state are implemented; physical LCD presentation is an interface stub. |
-| SWE-EMB-LLR-300..311 | SCRUM-470..481 | Implemented / simulated | Ordered startup, per-sensor runtime records, independent fake acquisition, 1 Hz snapshots, fixed 300-record rings, state mapping, faults, and recovery. Real sensor drivers remain pending. |
-| SWE-EMB-LLR-312..313 | SCRUM-482..483 | Interface only | Local button API and shared toggle path exist; GPIO/debounce hardware is not selected. |
+| SWE-EMB-MLR-305 | SCRUM-461 | Acceptance pending | Independent logical display flags are rendered on the physical two-row HD44780 LCD. |
+| SWE-EMB-MLR-310..313 | SCRUM-466..469 | Implemented / acceptance pending | Celsius state, atomic snapshot, recovery, remote display state, and physical LCD presentation are implemented. |
+| SWE-EMB-LLR-300..311 | SCRUM-470..481 | Implemented / acceptance pending | Ordered startup, independent DS18B20 acquisition on GPIO14/GPIO27, presence/CRC validation, 1 Hz snapshots, fixed 300-record rings, state mapping, faults, and recovery. |
+| SWE-EMB-LLR-312..313 | SCRUM-482..483 | Implemented / acceptance pending | Active-low GPIO34/GPIO35 buttons use 40 ms debounce and the shared toggle path. |
 | SWE-EMB-LLR-314..316 | SCRUM-484..486 | Implemented | Overflow-safe average calculation/validity and cached snapshot rendering. |
-| SWE-EMB-LLR-317 | SCRUM-487 | Interface only | Immediate render scheduling contract exists; physical input timing is not yet verified. |
-| SWE-EMB-LLR-318..322 | SCRUM-488..492 | Interface only | Real LCD/backlight integration contract compiles; no display bus, geometry, or input hardware is selected. |
+| SWE-EMB-LLR-317 | SCRUM-487 | Implemented / acceptance pending | Button and BLE state changes schedule immediate serialized LCD rendering; physical timing remains to be measured. |
+| SWE-EMB-LLR-318..322 | SCRUM-488..492 | Implemented / acceptance pending | The 16x2 HD44780 parallel interface uses GPIO16/17/18/19/21/23; its directly powered backlight is not software-controllable. |
 | SWE-EMB-LLR-323..326 | SCRUM-493..496 | Implemented | Canonical Celsius values, mutex-protected snapshots, boot identity, and recovery without restart. |
 | SWE-EMB-LLR-327..328 | SCRUM-497..498 | Implemented | Local/remote commands share state mutation/rendering, and invalid commands do not change state. |
 

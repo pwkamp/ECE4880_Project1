@@ -84,6 +84,10 @@ class SharedConfigTests(unittest.TestCase):
                 "use_cached_gatt_services",
             },
         )
+        # Windows must refresh the GATT table after firmware changes. Reusing
+        # cached WinRT characteristic handles can make an otherwise connected
+        # ESP32 fail its first authenticated write with "Unreachable".
+        self.assertIs(raw["client"]["use_cached_gatt_services"], False)
 
     def test_json_drives_python_enums_and_layouts(self) -> None:
         raw = load_and_validate(SHARED_CONFIG)
