@@ -56,6 +56,17 @@ def production_service_kwargs(
 
     host = detect_ble_host(platform, env)
     settings: ServiceConfig = CONFIG.service
+    if host.family == "windows":
+        # WinRT's GATT connection/service discovery owns a 20 second timeout.
+        # Do not let the service's general recovery objective cancel it at 10
+        # seconds and immediately overlap the next Windows GATT session.
+        settings = replace(
+            CONFIG.service,
+            recovery_deadline_seconds=max(
+                CONFIG.service.recovery_deadline_seconds,
+                CONFIG.client.connect_timeout_seconds + 5.0,
+            ),
+        )
     if host.family == "linux":
         settings = replace(
             CONFIG.service,

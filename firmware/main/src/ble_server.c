@@ -212,8 +212,24 @@ static int handle_gap_event(struct ble_gap_event *event, void *argument)
         return 0;
 
     case BLE_GAP_EVENT_REPEAT_PAIRING:
-        ESP_LOGW(TAG, "re-pairing rejected; authenticated bond reset required");
-        return BLE_GAP_REPEAT_PAIRING_IGNORE;
+        /*
+         * Recovery path for an explicitly removed PC-side bond. The peer must
+         * still prove knowledge of the configured six-digit passkey below.
+         * Without this, a lost/corrupt Windows or BlueZ bond permanently locks
+         * out the owner because RESET_BOND itself requires a working secure
+         * GATT session.
+         */
+        if (ble_gap_conn_find(event->repeat_pairing.conn_handle, &description) !=
+            0) {
+            ESP_LOGE(TAG, "could not inspect repeat-pairing peer");
+            return BLE_GAP_REPEAT_PAIRING_IGNORE;
+        }
+        if (ble_store_util_delete_peer(&description.peer_id_addr) != 0) {
+            ESP_LOGE(TAG, "could not replace stale peer bond");
+            return BLE_GAP_REPEAT_PAIRING_IGNORE;
+        }
+        ESP_LOGW(TAG, "stale peer bond removed; retrying authenticated pairing");
+        return BLE_GAP_REPEAT_PAIRING_RETRY;
 
     case BLE_GAP_EVENT_PASSKEY_ACTION: {
         struct ble_sm_io passkey = {0};

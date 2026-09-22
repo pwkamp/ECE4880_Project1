@@ -1,4 +1,7 @@
-param([switch]$KeepDatabase)
+param(
+    [switch]$KeepDatabase,
+    [switch]$ResetPairings
+)
 
 # Not "Stop": docker compose/mysql write normal progress and warnings to
 # stderr (image pulls, container start/stop, "using a password on the
@@ -179,6 +182,18 @@ $env:THERMOMETER_DB_PASSWORD = $Config["MYSQL_PASSWORD"]
 $env:THERMOMETER_DB_NAME = $Config["MYSQL_DATABASE"]
 $env:THERMOMETER_CREDENTIAL_REGISTRY_PATH = Join-Path $RuntimeDir "paired_devices.csv"
 $env:THERMOMETER_CORS_ORIGINS = $Config["WINDOWS_CORS_ORIGINS"]
+
+if ($ResetPairings) {
+    Write-Host "Removing all thermometer bonds enrolled by this project..."
+    Push-Location $BackendDir
+    try {
+        & $VenvPython -m pc_client.pairing_reset --all
+        if ($LASTEXITCODE -ne 0) { Fail "thermometer pairing reset failed" }
+    }
+    finally {
+        Pop-Location
+    }
+}
 
 Write-Host "Starting the native WinRT BLE backend on http://127.0.0.1:$($Config['BACKEND_PORT'])"
 Push-Location $BackendDir

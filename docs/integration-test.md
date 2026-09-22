@@ -4,7 +4,7 @@ This procedure verifies the complete project data path without a dedicated
 Bluetooth dongle:
 
 ```text
-ESP32 simulated sensors -> built-in host Bluetooth -> Python backend -> MySQL
+ESP32 DS18B20 sensors -> built-in host Bluetooth -> Python backend -> MySQL
     -> frontend Node reader -> React readouts and graph
 ```
 
@@ -35,11 +35,14 @@ On the first launch, the platform backend script creates `backend/.env` from
 `backend/.env.example`. This one gitignored file controls both platform paths.
 Local ports 3306, 5173, and 8000 are published only on loopback.
 
-## 2. Build and flash the simulated firmware
+## 2. Wire, build, and flash the production firmware
 
-From `firmware/`, copy `device_config.cmake.example` to the gitignored
-`device_config.cmake`, then replace `000000` with a unique six-digit PIN. The
-default Kconfig selection already uses the deterministic simulated sensors.
+Connect sensor 1's DS18B20 data line to GPIO14 and sensor 2's data line to
+GPIO27. Each probe must use three-wire power and its own approximately 4.7 kOhm
+pull-up from data to 3.3 V; parasitic power is not supported. From `firmware/`,
+copy `device_config.cmake.example` to the gitignored `device_config.cmake`, then
+replace `000000` with a unique six-digit PIN. The default Kconfig selection is
+the physical DS18B20 backend.
 
 Windows example:
 
@@ -76,6 +79,11 @@ For a code-update restart that retains existing samples, use
 `backend/run.ps1 -KeepDatabase` on Windows or `backend/run.sh --keep-db` on
 Linux after stopping the backend process. Without that option, the database
 is intentionally reset.
+
+To recover all thermometer pairings known to this project while retaining the
+database, add `-ResetPairings` on Windows or `--reset-pairings` on Linux. This
+does not remove unrelated Bluetooth devices. The next Connect asks for the
+six-digit firmware PIN again.
 
 ### Windows
 
@@ -136,6 +144,11 @@ Compose network.
 4. Wait for `CONNECTED` and `ready: true`.
 5. Enable both sensor displays.
 
+With either probe unplugged, its display control must remain OFF, its LCD row
+must show `DISCONNECTED`, and MySQL must store a `DISCONNECTED` status with no
+temperature. Connecting a valid probe makes it available on the following
+successful one-second acquisition cycle.
+
 An empty scan means the board is not advertising, Bluetooth is disabled, or
 another process owns the scan. It is not a database or frontend error.
 
@@ -161,10 +174,12 @@ Acceptance criteria:
   `boot_id`/`sample_seq` identity and `LIVE` source.
 - `/api/samples/latest` matches the newest MySQL row.
 - Both web readouts and graph series update from those database rows.
-- Sensor 1 remains approximately 17-23 degrees C and sensor 2 approximately
-  20.3-24.7 degrees C.
-- Simulated disconnect windows produce graph gaps and `DISCONNECTED` status,
-  not repeated stale values.
+- With both probes attached, both statuses are `VALID` and the database and UI
+  show the same physical temperatures. Warming one probe changes only its
+  corresponding series.
+- Unplugging either probe produces graph gaps and `DISCONNECTED` status rather
+  than a zero or repeated stale temperature; its display command is rejected
+  until a valid DS18B20 is detected again.
 - After a BLE reconnection, the backend automatically fetches the ESP32 history
   buffer and writes its original timestamps to MySQL. The graph replaces
   recoverable provisional gaps from the refreshed database window without a

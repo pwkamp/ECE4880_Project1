@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n web,api -c blue,green \"vite\" \"npm:dev:server\"",
+    "dev": "concurrently -k -n api,web -c green,blue \"npm:dev:server\" \"npm:dev:web\"",
     "dev:server": "tsx watch server/main.ts",
+    "dev:web": "node scripts/wait-for-api.mjs && vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",

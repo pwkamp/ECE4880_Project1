@@ -31,6 +31,24 @@ To restart the backend without deleting recorded samples, stop its running
 terminal and use `backend/run.ps1 -KeepDatabase` on Windows or
 `bash backend/run.sh --keep-db` on Linux. The default remains a clean reset.
 
+If an old or damaged OS bond prevents GATT service discovery, stop the backend
+and explicitly clear every thermometer enrolled by this project before
+starting it again:
+
+```powershell
+.\backend\run.ps1 -KeepDatabase -ResetPairings
+```
+
+```bash
+bash backend/run.sh --keep-db --reset-pairings
+```
+
+This does not touch unrelated Bluetooth devices. It removes each enrolled
+thermometer from WinRT/BlueZ and from `.runtime/paired_devices.csv`, so the web
+console will request the six-digit PIN again. Firmware accepts this explicit
+recovery as a fresh authenticated pairing; flash the current firmware before
+using the reset option with builds that rejected all repeat pairing.
+
 On Linux, the backend container connects to host BlueZ through
 `/run/dbus/system_bus_socket`; it is not privileged and does not receive the
 host HCI device directly. On Windows, `run.ps1` prepares `backend/.venv` and
