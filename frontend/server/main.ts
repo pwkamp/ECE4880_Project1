@@ -2,12 +2,12 @@ import { createApp } from './app.ts';
 import { loadConfig } from './config.ts';
 import { loadServerEnv } from './loadEnv.ts';
 import { createMysqlSampleStore } from './samples.ts';
-import { createSmsSender } from './sms/index.ts';
+import { createEmailSender } from './email/index.ts';
 
 async function main() {
   loadServerEnv();
   const config = loadConfig(process.env);
-  const sender = createSmsSender(config);
+  const sender = createEmailSender(config);
 
   let samples = null;
   if (config.mysqlUrl) {

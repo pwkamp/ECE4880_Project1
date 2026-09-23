@@ -129,16 +129,6 @@ class CredentialRegistry:
                 self._records = updated
             return removed
 
-    def clear(self) -> int:
-        """Remove all project credentials and return the number removed."""
-
-        with self._lock:
-            removed = len(self._records)
-            if removed:
-                self._write_all({})
-                self._records = {}
-            return removed
-
     def _read_all(self) -> dict[str, DeviceCredential]:
         if not self.path.exists():
             return {}

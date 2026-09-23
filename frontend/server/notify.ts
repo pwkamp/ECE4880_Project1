@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { SmsSender } from './sms/types.ts';
+import type { EmailSender } from './email/types.ts';
 
 export const AlertEventSchema = z.object({
   id: z.string().min(1),
@@ -16,7 +16,7 @@ export const AlertEventSchema = z.object({
 export type AlertEventInput = z.infer<typeof AlertEventSchema>;
 
 export interface NotifyDeps {
-  sender: SmsSender;
+  sender: EmailSender;
   /** Event ids already delivered. The caller owns and size-caps this. */
   seen: Set<string>;
 }

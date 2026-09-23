@@ -1,10 +1,10 @@
 import { expect, it, vi } from 'vitest';
-import { createSmsSender } from './index.ts';
+import { createEmailSender } from './index.ts';
 
 it('returns a console sender in console mode', async () => {
   const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
   try {
-    const sender = createSmsSender({ mode: 'console', port: 8787, apiToken: null, smtp: null, mysqlUrl: null });
+    const sender = createEmailSender({ mode: 'console', port: 8787, apiToken: null, smtp: null, mysqlUrl: null });
     await expect(sender.send({ to: 'you@example.com', body: 'x' })).resolves.toEqual({ status: 'logged' });
   } finally {
     spy.mockRestore();
@@ -12,7 +12,7 @@ it('returns a console sender in console mode', async () => {
 });
 
 it('returns an SMTP-backed sender when live config is present', () => {
-  const sender = createSmsSender({
+  const sender = createEmailSender({
     mode: 'live',
     port: 8787,
     apiToken: null,

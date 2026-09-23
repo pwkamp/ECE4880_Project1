@@ -89,7 +89,7 @@ directly.
                                       |
   Browser  --same origin-->  Vite (:5173)  --proxy /api/v1-->  Python :8000
            React console                  --proxy /api----->  Node :8787
-                                                            (SMS + MySQL reader)
+                                                            (email + MySQL reader)
                                       ^
                                       | GET /api/samples
                                       |
@@ -99,7 +99,7 @@ directly.
 | Process | Command | Bind | Role |
 | --- | --- | --- | --- |
 | Web console | `cd frontend && npm run dev` (Vite half) | `http://localhost:5173` | UI: readouts, chart, scan/connect panel, alerts |
-| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | SMS delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
+| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | Email delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
 | BLE connector | `backend/.venv/bin/python main.py` | `127.0.0.1:8000` | Scan, pair, connect, poll the box at 1 Hz, **write** samples through a DB adapter |
 | MySQL | `mysqld` / local MySQL | `127.0.0.1:3306` | Stores 1 Hz rows the console charts from |
 | ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of physical DS18B20 temperatures and connection status |
@@ -635,153 +635,6 @@ Interface methods:
 
 ---
 
-## Connecting to the real hardware
-
-This is the plan for wiring the console to the actual third box, the sensor
-probes, and the phone. **None of it changes the UI** - it is all one new file
-plus firmware work.
-
-### 1. Physical piece → what it maps to
-
-| Real thing | Interface element | What has to be built |
-| --- | --- | --- |
-| Third-box microcontroller | the transport (below) | firmware that emits a JSON frame ~1 Hz |
-| Power switch | `frame.switchState` | firmware reports `'off'`, **or** the console infers "off" from loss of signal (see step 4) |
-| Sensor probe 1 / 2 | `readings[n].celsius` | ADC / 1-Wire read, converted to °C, sent raw |
-| Probe unplugged | `readings[n].connected = false`, `celsius = null` | firmware detects an open circuit / out-of-range read on that channel |
-| Physical display button | `readings[n].enabled` | firmware toggles a per-sensor flag and reports it |
-| Console's on/off toggle | `setSensorEnabled(id, bool)` | firmware accepts a command message and applies it to the same flag |
-| The phone | the alert log → real SMS/email | a small backend + a provider account (see below) |
-
-### 2. Choose a transport (box ↔ computer)
-
-Pick based on what the box's microcontroller can do:
-
-| Transport | Good when | `RealThermometerSource` uses |
-| --- | --- | --- |
-| **WebSocket** (box runs a WS server, e.g. on an ESP32) | box has Wi-Fi; want true 1 Hz push and a return channel for the virtual button | `new WebSocket('ws://<box-ip>:81')` |
-| **HTTP polling** | simplest firmware; box exposes `GET /reading` and `POST /command` | `fetch` on a 1 s interval |
-| **MQTT over WebSocket** | box is battery-powered / behind NAT; a broker sits in between | an MQTT-WS client, subscribe to `box/frame`, publish to `box/command` |
-| **USB serial** (box plugged into the computer) | no networking on the box | the Web Serial API (`navigator.serial`, Chrome only), or a tiny local bridge that re-exposes serial as a WebSocket |
-
-WebSocket is the recommended target: it matches the 1 Hz streaming model and
-gives a built-in path for `setSensorEnabled` commands.
-
-### 3. Define the on-the-wire JSON
-
-Have the firmware emit exactly the `ThermometerFrame` shape so the adapter is
-nearly a pass-through:
-
-```json
-{
-  "timestamp": 1717000000000,
-  "switchState": "on",
-  "readings": {
-    "1": { "sensorId": 1, "celsius": 22.4, "connected": true,  "enabled": true },
-    "2": { "sensorId": 2, "celsius": null, "connected": false, "enabled": true }
-  }
-}
-```
-
-If the box's native format differs, the translation lives in one place - the
-adapter's message handler - and nothing else needs to know.
-
-### 4. Implement `RealThermometerSource`
-
-One new file, `src/datasource/realThermometerSource.ts`, implementing
-`ThermometerSource`. Skeleton:
-
-```ts
-import type { ThermometerFrame, ThermometerSource, SensorId } from './types';
-
-export class RealThermometerSource implements ThermometerSource {
-  private ws: WebSocket | null = null;
-  private last: ThermometerFrame = OFFLINE_FRAME;          // switchState: 'off'
-  private history: ThermometerFrame[] = [];
-  private listeners = new Set<(f: ThermometerFrame) => void>();
-  private staleTimer: ReturnType<typeof setTimeout> | null = null;
-
-  constructor(private url: string) {}
-
-  start() {
-    this.ws = new WebSocket(this.url);
-    this.ws.onmessage = (e) => {
-      const frame = JSON.parse(e.data) as ThermometerFrame; // validate here
-      this.ingest(frame);
-    };
-    this.ws.onclose = () => {
-      this.scheduleReconnect();       // exponential backoff
-      this.markOffline();             // synthesize switchState:'off' frames
-    };
-  }
-
-  stop() { this.ws?.close(); this.ws = null; }
-
-  private ingest(frame: ThermometerFrame) {
-    this.last = frame;
-    this.history.push(frame);
-    this.trimHistory(frame.timestamp);           // keep ~360 s
-    this.resetStaleWatchdog();                    // 3 s → markOffline()
-    for (const l of this.listeners) l(frame);
-  }
-
-  getFrame() { return this.last; }
-  getSwitchState() { return this.last.switchState; }
-  getHistory(seconds: number) {
-    const cutoff = Date.now() - seconds * 1000;
-    return this.history.filter((f) => f.timestamp >= cutoff);
-  }
-  subscribe(fn: (f: ThermometerFrame) => void) {
-    this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
-  }
-  setSensorEnabled(sensorId: SensorId, enabled: boolean) {
-    this.ws?.send(JSON.stringify({ type: 'setEnabled', sensorId, enabled }));
-    // Optionally update this.last optimistically so the UI reacts < 1 s.
-  }
-}
-```
-
-Then change the one line in `src/datasource/index.ts`:
-
-```ts
-export const thermometerSource: ThermometerSource =
-  new RealThermometerSource('ws://third-box.local:81');
-```
-
-Nothing in `src/components`, `src/hooks`, or `src/lib` changes. The demo-control
-panel hides itself because `RealThermometerSource` does not implement the
-optional `ThermometerSimControls`.
-
-### 5. Two things the adapter must handle that the mock fakes for free
-
-- **"Switch off" as a disconnect.** A truly powered-off box sends nothing, so
-  the adapter needs a **staleness watchdog**: if no frame arrives for ~3 s,
-  synthesize frames with `switchState: 'off'` so the console shows
-  "no data available" and the chart gaps. When frames resume, real data flows
-  again - this is what satisfies the spec's "recover within 10 s" requirement.
-  (If the box has a *soft* switch that keeps the radio alive, it can just report
-  `switchState: 'off'` directly and the watchdog is a backup.)
-- **Clock skew.** The chart's X-axis uses frame timestamps. If the box clock is
-  unreliable, have the adapter stamp `timestamp = Date.now()` on arrival
-  instead of trusting the box.
-
-### 6. Where the app and the box run
-
-The console is a static site. On demo day, from `frontend/` run `npm run dev` (or serve
-`npm run build` output) on the lab computer, with the box on the **same LAN**.
-Note: a browser page served over **https** cannot open an insecure `ws://` - so
-either serve the console over plain `http` on the LAN, or terminate `wss://`
-with a certificate on the box/broker.
-
-### Phone / email alert delivery
-
-Email delivery is implemented: see [Running with email alerts](#running-with-email-alerts).
-Default `console` mode needs no credentials. Real send is `EMAIL_MODE=live`
-with a Gmail App Password.
-
----
-
 ## Assumptions / judgement calls (worth confirming with the instructor)
 
 1. **"Display off" (virtual button off)** is shown as its own readout message
@@ -950,23 +803,12 @@ changed by this project.
 
 ## Build and flash
 
-Use an ESP-IDF 6.x terminal. On the first build, create the local device
-configuration from its committed example:
+See [firmware/README.md](firmware/README.md) for the full build/flash
+walkthrough (ESP-IDF 6.x, `device_config.cmake` setup, and known build-cache
+gotchas). The original ESP32 is the only active firmware target; defaults for
+other chips are not part of the active project. The app binary is named
+`thermometer_gatt_server.bin`.
 
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Edit device_config.cmake with this ESP32's unique six-digit passkey.
-idf.py set-target esp32
-idf.py build
-idf.py -p COM5 flash monitor
-```
-
-Replace `COM5` as needed. The original ESP32 is the only active firmware
-target; defaults for other chips are not part of the active project. The app
-binary is named `thermometer_gatt_server.bin`.
 Changing a provisioned passkey does not authorize replacement of the existing
 ESP32 bond. Use the authenticated reset API before changing it. If the owner
 credential is lost, use the explicit backend launcher reset with the current
@@ -1250,14 +1092,8 @@ supplies the configured six-digit PIN.
 
 ### Python unit tests
 
-From a fresh checkout, create the backend environment and install the
-development dependency set from the repository root:
-
-```powershell
-python -m venv backend\.venv
-backend\.venv\Scripts\python.exe -m pip install -r backend\pc_client\requirements-dev.txt
-backend\.venv\Scripts\python.exe master_test.py
-```
+See [backend/README.md](backend/README.md#tests) for the environment setup
+and run command (`master_test.py` from the repository root).
 
 The tests cover byte layout, request IDs, response validation, current/history
 decoding, incomplete-record rejection, requester-only ordering, display control,
@@ -1273,19 +1109,8 @@ when the entire discovered suite passes.
 
 The firmware validation presently consists of protocol-generation checks, a
 clean ESP-IDF build, and hardware acceptance; there is no separate on-target
-Unity test application yet. In an initialized ESP-IDF 6.x terminal:
-
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Set a unique six-digit passkey if this is a new local configuration.
-idf.py set-target esp32
-idf.py fullclean
-idf.py build
-idf.py size
-```
+Unity test application yet. See [firmware/README.md](firmware/README.md#firmware-tests)
+for the build/size commands.
 
 The build validates the shared JSON, creates
 `firmware/build/generated/thermometer_config.h`, compiles the selected

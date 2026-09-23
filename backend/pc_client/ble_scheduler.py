@@ -37,10 +37,6 @@ class BleRequestScheduler:
         self._sequence = itertools.count()
         self._worker: asyncio.Task[None] | None = None
 
-    @property
-    def pending_count(self) -> int:
-        return self._queue.qsize()
-
     def start(self) -> None:
         if self._worker is None or self._worker.done():
             self._worker = asyncio.create_task(
