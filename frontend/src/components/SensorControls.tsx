@@ -47,6 +47,7 @@ export function SensorControls({ frame, source = thermometerSource }: Props) {
               <span className={`sensor-name sensor-${id}`}>Sensor {id}</span>
               <input
                 type="checkbox"
+                aria-label={`Sensor ${id} display`}
                 checked={enabled}
                 disabled={pending[id] || (ble !== null && !ble.getConnectionStatus().ready)}
                 onChange={(e) => void changeDisplay(id, e.target.checked)}

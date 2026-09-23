@@ -3,6 +3,7 @@ import { expect, it } from 'vitest';
 import { createApp } from './app.ts';
 import type { Config } from './config.ts';
 import type { SmsSender } from './sms/types.ts';
+import type { AlertConfigStore, PersistedAlertConfig } from './alertConfig.ts';
 
 const consoleConfig: Config = {
   mode: 'console',
@@ -54,6 +55,41 @@ it('GET /api/samples reports the DB reader as unconfigured by default', async ()
   const history = await request(app).get('/api/samples?seconds=300');
   expect(latest.body).toEqual({ configured: false, row: null });
   expect(history.body).toEqual({ configured: false, rows: [] });
+});
+
+it('persists and reloads validated email-only alert configuration', async () => {
+  let saved: PersistedAlertConfig | null = null;
+  const store: AlertConfigStore = {
+    async load() { return saved; },
+    async save(config) { saved = config; },
+  };
+  const app = createApp({ config: consoleConfig, sender: okSender, alertConfig: store });
+  const config: PersistedAlertConfig = {
+    enabled: true,
+    minC: 10,
+    maxC: 30,
+    minMessage: 'too cold',
+    maxMessage: 'too hot',
+    destinations: ['one@example.com', 'two@example.com'],
+  };
+  const update = await request(app).put('/api/alert-config').send(config);
+  expect(update.status).toBe(200);
+  const reload = await request(app).get('/api/alert-config');
+  expect(reload.body.config).toEqual(config);
+});
+
+it('rejects invalid alert thresholds and non-email destinations', async () => {
+  const store: AlertConfigStore = { async load() { return null; }, async save() {} };
+  const app = createApp({ config: consoleConfig, sender: okSender, alertConfig: store });
+  const invalid = await request(app).put('/api/alert-config').send({
+    enabled: true,
+    minC: 30,
+    maxC: 10,
+    minMessage: 'low',
+    maxMessage: 'high',
+    destinations: ['not-an-email'],
+  });
+  expect(invalid.status).toBe(400);
 });
 
 it('enforces the bearer token when one is configured', async () => {

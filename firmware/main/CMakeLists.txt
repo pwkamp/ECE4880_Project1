@@ -33,8 +33,10 @@ if(CONFIG_THERMOMETER_SENSOR_BACKEND_REAL)
 endif()
 
 set(DISPLAY_BACKEND_SOURCE "src/led_display.c")
+set(DISPLAY_PRIVATE_REQUIRES "")
 if(CONFIG_THERMOMETER_DISPLAY_BACKEND_REAL)
     set(DISPLAY_BACKEND_SOURCE "src/real_display.c")
+    list(APPEND DISPLAY_PRIVATE_REQUIRES hd44780)
 endif()
 
 idf_component_register(
@@ -49,6 +51,7 @@ idf_component_register(
         "${SENSOR_BACKEND_SOURCE}"
         "${DISPLAY_BACKEND_SOURCE}"
     PRIV_REQUIRES bt nvs_flash esp_driver_gpio esp_pm esp_system esp_timer mbedtls
+                  ${DISPLAY_PRIVATE_REQUIRES}
     INCLUDE_DIRS "include" "${CMAKE_BINARY_DIR}/generated"
 )
 

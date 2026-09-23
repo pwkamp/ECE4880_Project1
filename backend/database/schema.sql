@@ -20,22 +20,11 @@ CREATE TABLE temperature_samples(
     INDEX entry_index (observed_at_utc)            -- SWE-DB-LLR-552;
 );
 
-CREATE TABLE users( -- SWE-DB-LLR-554
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,           -- sized for bcrypt/Argon2id/scrypt PHC strings, never plaintext
-    role ENUM('USER','ADMIN') NOT NULL,            -- ADMIN: third-box control + alert configuration; USER: read-only
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uq_username (username)
-);
-
 CREATE TABLE alert_recipients( -- SWE-DB-LLR-555
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    type ENUM('EMAIL','SMS') NOT NULL,
+    type ENUM('EMAIL') NOT NULL DEFAULT 'EMAIL',
     address VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)                               -- no unique constraint: multiple recipients per type must be allowed
@@ -48,6 +37,7 @@ CREATE TABLE alert_rules( -- SWE-DB-LLR-556
     high_temp_message VARCHAR(255) NOT NULL,
     low_temp_message VARCHAR(255) NOT NULL,
     monitored_series ENUM('SENSOR1','SENSOR2','AVERAGE') NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)

@@ -1,0 +1,49 @@
+{
+  "software": {
+    "order": 10,
+    "title": "Software, simulation, and container checks",
+    "pause": false,
+    "uart_required": false,
+    "instructions": [
+      "No ESP32 or physical sensors are required for this section.",
+      "Docker must be running for integration-profile MySQL checks.",
+      "The runner may start local backend/frontend/database services, but it will not use the physical BLE device."
+    ]
+  },
+  "ble_no_uart": {
+    "order": 20,
+    "title": "Battery-powered BLE and physical-sensor checks (UART disconnected)",
+    "pause": true,
+    "uart_required": false,
+    "instructions": [
+      "Disconnect the ESP32 micro-USB/UART cable from the PC. It can back-power the board and invalidate later power-off observations.",
+      "Power the enclosure from its battery or intended non-PC supply and switch it ON.",
+      "Connect both physical temperature sensors and confirm the built-in PC Bluetooth radio is ON.",
+      "Close ESP-IDF Monitor and connect the thermometer from the real web UI when prompted."
+    ]
+  },
+  "power_cycle_no_uart": {
+    "order": 30,
+    "title": "Power-switch, restart, and radio-loss checks (all UART/USB power removed)",
+    "pause": true,
+    "uart_required": false,
+    "instructions": [
+      "Physically disconnect every micro-USB/UART cable from the ESP32 before continuing; closing the serial monitor is not enough.",
+      "Power the enclosure only from its battery or the intended switched supply so OFF truly removes ESP32 power.",
+      "Keep the PC Bluetooth radio ON unless a test explicitly asks you to disable only that radio.",
+      "Do not reconnect USB/UART during this section. These tests measure real restart and advertising behavior."
+    ]
+  },
+  "uart_live": {
+    "order": 40,
+    "title": "UART-correlated live display checks (no restart or power-off)",
+    "pause": true,
+    "uart_required": true,
+    "instructions": [
+      "Connect the ESP32 micro-USB/UART cable to the PC and leave the enclosure switched ON for the entire section.",
+      "Do not run any power-cycle or restart step in this section; USB power prevents a valid OFF condition.",
+      "Close ESP-IDF Monitor because the verification runner needs exclusive access to the serial port.",
+      "Confirm the web UI is open, BLE is connected, and both sensors are available before continuing."
+    ]
+  }
+}

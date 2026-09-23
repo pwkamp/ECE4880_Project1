@@ -1,0 +1,7 @@
+# SYS-03 - Startup, Power-On, and History Recovery
+
+Disconnect every ESP32 micro-USB/UART cable first and power the box only through its battery or intended switched supply. Case A tests power-on recovery: leave all computer services running with the third box OFF, switch the box ON when prompted, and measure until current and graph data are usable. The limit is 10 seconds. UART cannot be used in this case because it would keep the ESP32 powered.
+
+Case B tests history recovery and must not power-cycle the box. Keep the ESP32 powered long enough to hold at least 300 records per sensor. When prompted, disable and re-enable only the PC Bluetooth radio (Windows Quick Settings or Linux `rfkill`); do not use the web/backend Disconnect command. The runner verifies that the backend observes the unplanned link loss, reconnects without a Connect click, starts a new automatic history operation, and reports COMPLETE with both expected and retrieved counts at least 300. It also counts only non-MISSING browser/database records and asks the operator to confirm the graph is backfilled. Automatic reconnect is measured separately from the requirement that all history be available no more than 10 seconds after the connection is re-established.
+
+Save the connection timeline, history status/counts, database-backed samples, and browser evidence. A powered-off box cannot accumulate disconnected history and is invalid for Case B.

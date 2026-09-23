@@ -1,0 +1,2633 @@
+[
+  {
+    "id": "HW-01",
+    "setup_group": "ble_no_uart",
+    "title": "Physical Configuration and Design Inspection",
+    "subsystem": "hardware",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "third_box_complete",
+      "sensor_1",
+      "sensor_2",
+      "lcd_real",
+      "battery",
+      "physical_power_switch",
+      "measurement_tool",
+      "component_datasheets"
+    ],
+    "instrumentation": [
+      "manual_measurement_form",
+      "photo_capture",
+      "datasheet_reference_capture",
+      "runner_environment_capture"
+    ],
+    "description": "Measures cable lengths and inspects construction, parts, power, labels, LCD capacity/readability, and supported design range.",
+    "rationale": "Calibrated measurements, named component datasheets, powered smoke data, and dated photographs directly establish the physical attributes that software cannot infer; every inspection criterion remains operator-attributable.",
+    "limitations": [
+      "Physical dimensions, construction and datasheet capabilities require an operator and photographs."
+    ],
+    "human_intervention": "Physical dimensions, construction and datasheet capabilities require an operator and photographs.",
+    "requirements": [
+      "HWE-LLR-200",
+      "HWE-LLR-201",
+      "HWE-LLR-202",
+      "HWE-LLR-203",
+      "HWE-LLR-204",
+      "HWE-LLR-205",
+      "HWE-LLR-206",
+      "HWE-LLR-207",
+      "HWE-LLR-208",
+      "HWE-LLR-209",
+      "HWE-LLR-210",
+      "HWE-LLR-211",
+      "HWE-LLR-212",
+      "HWE-LLR-213",
+      "HWE-LLR-214",
+      "HWE-LLR-215",
+      "HWE-LLR-216",
+      "HWE-LLR-217",
+      "HWE-LLR-218",
+      "HWE-LLR-219",
+      "HWE-LLR-220",
+      "HWE-LLR-221",
+      "HWE-LLR-222",
+      "HWE-LLR-223",
+      "HWE-LLR-224",
+      "HWE-LLR-225",
+      "HWE-MLR-200",
+      "HWE-MLR-201",
+      "HWE-MLR-202",
+      "HWE-MLR-203",
+      "HWE-MLR-204",
+      "HWE-MLR-205",
+      "HWE-MLR-206",
+      "HWE-MLR-207",
+      "HWE-MLR-208",
+      "HWE-MLR-209",
+      "HWE-MLR-210",
+      "HWE-MLR-211",
+      "HWE-MLR-212",
+      "HWE-MLR-213",
+      "HWE-MLR-214",
+      "HWE-MLR-215",
+      "HWE-MLR-216",
+      "PRJ-REQ-005",
+      "SYS-HLR-100",
+      "SYS-HLR-200",
+      "SYS-HLR-300",
+      "SYS-HLR-410"
+    ],
+    "jira_keys": [
+      "SCRUM-403",
+      "SCRUM-405",
+      "SCRUM-408",
+      "SCRUM-412",
+      "SCRUM-421",
+      "SCRUM-422",
+      "SCRUM-423",
+      "SCRUM-424",
+      "SCRUM-425",
+      "SCRUM-426",
+      "SCRUM-427",
+      "SCRUM-428",
+      "SCRUM-429",
+      "SCRUM-430",
+      "SCRUM-431",
+      "SCRUM-432",
+      "SCRUM-433",
+      "SCRUM-434",
+      "SCRUM-435",
+      "SCRUM-436",
+      "SCRUM-437",
+      "SCRUM-438",
+      "SCRUM-439",
+      "SCRUM-440",
+      "SCRUM-441",
+      "SCRUM-442",
+      "SCRUM-443",
+      "SCRUM-444",
+      "SCRUM-445",
+      "SCRUM-446",
+      "SCRUM-447",
+      "SCRUM-448",
+      "SCRUM-449",
+      "SCRUM-450",
+      "SCRUM-451",
+      "SCRUM-452",
+      "SCRUM-453",
+      "SCRUM-454",
+      "SCRUM-455",
+      "SCRUM-634",
+      "SCRUM-635",
+      "SCRUM-636",
+      "SCRUM-637",
+      "SCRUM-638",
+      "SCRUM-639",
+      "SCRUM-640",
+      "SCRUM-641",
+      "SCRUM-653"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/HW-01.md"
+    },
+    "assisted_workflow": "inspection",
+    "requires_photo": true,
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for HW-01.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Measures cable lengths and inspects construction, parts, power, labels, LCD capacity/readability, and supported design range.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "HW-02",
+    "setup_group": "power_cycle_no_uart",
+    "title": "Mechanical Robustness",
+    "subsystem": "hardware",
+    "method": "semi-automated",
+    "profiles": [
+      "full"
+    ],
+    "fixtures": [
+      "third_box_complete",
+      "sensor_1",
+      "sensor_2",
+      "drop_test_surface",
+      "measurement_tool",
+      "camera",
+      "full_system"
+    ],
+    "instrumentation": [
+      "manual_test_form",
+      "photo_capture"
+    ],
+    "description": "Automatically captures pre/post full-system smoke evidence around guided drop, upside-down, connected-cable, handling, and immersion actions.",
+    "rationale": "Controlled physical stresses followed by the same automated connectivity and valid-data checks demonstrate both survival and retained function; photos establish that prohibited damage was not hidden by a passing software smoke check.",
+    "limitations": [
+      "No simulation or software-only evidence can satisfy physical robustness."
+    ],
+    "human_intervention": "No simulation or software-only evidence can satisfy physical robustness.",
+    "requirements": [
+      "HWE-LLR-201",
+      "HWE-LLR-202",
+      "HWE-LLR-203",
+      "HWE-LLR-204",
+      "HWE-LLR-205",
+      "HWE-LLR-223",
+      "HWE-MLR-201",
+      "HWE-MLR-202",
+      "HWE-MLR-203",
+      "HWE-MLR-215",
+      "SYS-HLR-200"
+    ],
+    "jira_keys": [
+      "SCRUM-405",
+      "SCRUM-422",
+      "SCRUM-423",
+      "SCRUM-424",
+      "SCRUM-435",
+      "SCRUM-436",
+      "SCRUM-437",
+      "SCRUM-438",
+      "SCRUM-439",
+      "SCRUM-636",
+      "SCRUM-639"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/HW-02.md"
+    },
+    "assisted_workflow": "mechanical",
+    "requires_photo": true,
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for HW-02.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Records baseline, drop/upside-down/connected-cable/handling/immersion tests, post-test inspection, and functional smoke test.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "HW-03",
+    "setup_group": "power_cycle_no_uart",
+    "title": "Power Switch and Hot-Plug",
+    "subsystem": "hardware",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "third_box_complete",
+      "sensor_1",
+      "sensor_2",
+      "computer_backend",
+      "ble_real",
+      "physical_power_switch"
+    ],
+    "instrumentation": [
+      "backend_log_capture",
+      "current_data_capture",
+      "manual_switch_event_marker"
+    ],
+    "description": "Guides sensor hot-plug and power cycling while capturing independent operation, no-reset behavior, loss of current data, and recovery.",
+    "rationale": "Timestamped observations before, during, and after each physical interruption distinguish channel isolation from whole-device resets and measure the recovery behavior at the externally visible interfaces.",
+    "limitations": [
+      "An operator must physically disconnect sensors and operate the switch."
+    ],
+    "human_intervention": "An operator must physically disconnect sensors and operate the switch.",
+    "requirements": [
+      "HWE-LLR-206",
+      "HWE-LLR-208",
+      "HWE-MLR-204",
+      "HWE-MLR-205",
+      "HWE-MLR-211",
+      "HWE-MLR-215",
+      "SYS-HLR-210",
+      "SYS-HLR-220"
+    ],
+    "jira_keys": [
+      "SCRUM-406",
+      "SCRUM-407",
+      "SCRUM-425",
+      "SCRUM-426",
+      "SCRUM-432",
+      "SCRUM-440",
+      "SCRUM-442",
+      "SCRUM-636"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/HW-03.md"
+    },
+    "assisted_workflow": "power_hotplug",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for HW-03.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Guides sensor hot-plug and power cycling while capturing independent operation, no-reset behavior, loss of current data, and recovery.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "HW-04",
+    "setup_group": "ble_no_uart",
+    "title": "Temperature Accuracy and Thermal Response",
+    "subsystem": "hardware",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "third_box_complete",
+      "sensor_1",
+      "sensor_2",
+      "reference_room_thermometer",
+      "ice_water_bath",
+      "soldering_iron",
+      "timer"
+    ],
+    "instrumentation": [
+      "temperature_stream_capture",
+      "runner_monotonic_clock",
+      "measurement_csv_writer"
+    ],
+    "description": "Captures room, ice-water, hand-heating, and soldering-iron response measurements for both sensors.",
+    "rationale": "Reference-temperature plateaus test accuracy while two controlled thermal transitions test direction and response rate; machine-collected samples reduce timing and transcription error but safe placement still requires an operator.",
+    "limitations": [
+      "Physical accuracy and thermal response require calibrated references and operator handling."
+    ],
+    "human_intervention": "Physical accuracy and thermal response require calibrated references and operator handling.",
+    "requirements": [
+      "HWE-LLR-201",
+      "HWE-LLR-208",
+      "HWE-LLR-209",
+      "HWE-LLR-213",
+      "HWE-LLR-218",
+      "HWE-LLR-219",
+      "HWE-LLR-220",
+      "HWE-LLR-224",
+      "HWE-LLR-225",
+      "HWE-MLR-200",
+      "HWE-MLR-201",
+      "HWE-MLR-210",
+      "HWE-MLR-211",
+      "HWE-MLR-212",
+      "HWE-MLR-216",
+      "SYS-HLR-300",
+      "SYS-HLR-310",
+      "SYS-HLR-320",
+      "SYS-HLR-321",
+      "SYS-HLR-322"
+    ],
+    "jira_keys": [
+      "SCRUM-408",
+      "SCRUM-409",
+      "SCRUM-410",
+      "SCRUM-419",
+      "SCRUM-420",
+      "SCRUM-421",
+      "SCRUM-422",
+      "SCRUM-431",
+      "SCRUM-432",
+      "SCRUM-433",
+      "SCRUM-435",
+      "SCRUM-442",
+      "SCRUM-443",
+      "SCRUM-447",
+      "SCRUM-452",
+      "SCRUM-453",
+      "SCRUM-454",
+      "SCRUM-637",
+      "SCRUM-640",
+      "SCRUM-641"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/HW-04.md"
+    },
+    "assisted_workflow": "thermal",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for HW-04.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Captures room, ice-water, hand-heating, and soldering-iron response measurements for both sensors.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "FW-01",
+    "title": "Firmware Build, Startup, and Configuration",
+    "subsystem": "firmware",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "esp_idf",
+      "protocol_config",
+      "repository_checkout"
+    ],
+    "instrumentation": [
+      "build_log_capture",
+      "generated_config_capture",
+      "git_revision_capture",
+      "firmware_metadata_capture"
+    ],
+    "description": "Builds or statically validates real and simulated firmware configuration, protocol generation, app_main initialization, Celsius, and boot identity.",
+    "rationale": "An official ESP-IDF build of each supported configuration plus focused source assertions proves compile-time integration and required startup wiring; it does not claim that stubbed hardware drivers work physically.",
+    "limitations": [
+      "A successful build does not prove operation on physical ESP32/LCD/sensors."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-EMB-LLR-300",
+      "SWE-EMB-LLR-323",
+      "SWE-EMB-MLR-300",
+      "SYS-HLR-300"
+    ],
+    "jira_keys": [
+      "SCRUM-408",
+      "SCRUM-456",
+      "SCRUM-470",
+      "SCRUM-493"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FW-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FW-02",
+    "title": "Sensor Acquisition, State Machine, and Recovery",
+    "subsystem": "firmware",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "deterministic_sensor_simulator",
+      "firmware_logic_harness"
+    ],
+    "instrumentation": [
+      "state_transition_capture",
+      "sample_sequence_capture",
+      "assertion_report"
+    ],
+    "description": "Exercises both-valid, individual/both failure, preservation of pre-disconnection ON/OFF state, independent acquisition, and no-restart logic.",
+    "rationale": "Deterministic state-transition checks cover every sensor-validity combination, while SYS-02 supplies physical confirmation; source checks specifically prevent disconnect/recovery paths from overwriting the retained display state.",
+    "limitations": [
+      "Host logic/static evidence does not prove real DS18B20 electrical behavior."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-EMB-LLR-300",
+      "SWE-EMB-LLR-301",
+      "SWE-EMB-LLR-302",
+      "SWE-EMB-LLR-303",
+      "SWE-EMB-LLR-304",
+      "SWE-EMB-LLR-305",
+      "SWE-EMB-LLR-306",
+      "SWE-EMB-LLR-308",
+      "SWE-EMB-LLR-309",
+      "SWE-EMB-LLR-310",
+      "SWE-EMB-LLR-311",
+      "SWE-EMB-LLR-312",
+      "SWE-EMB-LLR-313",
+      "SWE-EMB-LLR-314",
+      "SWE-EMB-LLR-315",
+      "SWE-EMB-LLR-316",
+      "SWE-EMB-LLR-318",
+      "SWE-EMB-LLR-319",
+      "SWE-EMB-LLR-324",
+      "SWE-EMB-LLR-326",
+      "SWE-EMB-LLR-328",
+      "SWE-EMB-MLR-301",
+      "SWE-EMB-MLR-302",
+      "SWE-EMB-MLR-303",
+      "SWE-EMB-MLR-304",
+      "SWE-EMB-MLR-305",
+      "SWE-EMB-MLR-306",
+      "SWE-EMB-MLR-307",
+      "SWE-EMB-MLR-308",
+      "SWE-EMB-MLR-311",
+      "SWE-EMB-MLR-312",
+      "SWE-EMB-MLR-313",
+      "SYS-HLR-420"
+    ],
+    "jira_keys": [
+      "SCRUM-413",
+      "SCRUM-457",
+      "SCRUM-458",
+      "SCRUM-459",
+      "SCRUM-460",
+      "SCRUM-461",
+      "SCRUM-462",
+      "SCRUM-463",
+      "SCRUM-464",
+      "SCRUM-467",
+      "SCRUM-468",
+      "SCRUM-469",
+      "SCRUM-470",
+      "SCRUM-471",
+      "SCRUM-472",
+      "SCRUM-473",
+      "SCRUM-474",
+      "SCRUM-475",
+      "SCRUM-476",
+      "SCRUM-478",
+      "SCRUM-479",
+      "SCRUM-480",
+      "SCRUM-481",
+      "SCRUM-482",
+      "SCRUM-483",
+      "SCRUM-484",
+      "SCRUM-485",
+      "SCRUM-486",
+      "SCRUM-488",
+      "SCRUM-489",
+      "SCRUM-494",
+      "SCRUM-496",
+      "SCRUM-498"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FW-02"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FW-03",
+    "title": "History, Average, and Atomic Snapshot",
+    "subsystem": "firmware",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "firmware_logic_harness",
+      "deterministic_sensor_simulator"
+    ],
+    "instrumentation": [
+      "history_buffer_dump",
+      "sequence_capture",
+      "snapshot_capture"
+    ],
+    "description": "Verifies 1 Hz logical sampling, 300-record wrap/order, record fields, averages, synchronization, and boot identity.",
+    "rationale": "Boundary-focused history model tests expose off-by-one, wraparound, ordering, identity, and average errors that long manual observation would miss, with HIL recovery tests validating the same contract over BLE.",
+    "limitations": [
+      "Host tests do not measure real BLE transfer timing."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-EMB-LLR-300",
+      "SWE-EMB-LLR-304",
+      "SWE-EMB-LLR-305",
+      "SWE-EMB-LLR-306",
+      "SWE-EMB-LLR-307",
+      "SWE-EMB-LLR-314",
+      "SWE-EMB-LLR-315",
+      "SWE-EMB-LLR-324",
+      "SWE-EMB-LLR-325",
+      "SWE-EMB-MLR-306",
+      "SWE-EMB-MLR-311",
+      "SYS-HLR-600"
+    ],
+    "jira_keys": [
+      "SCRUM-417",
+      "SCRUM-462",
+      "SCRUM-467",
+      "SCRUM-470",
+      "SCRUM-474",
+      "SCRUM-475",
+      "SCRUM-476",
+      "SCRUM-477",
+      "SCRUM-484",
+      "SCRUM-485",
+      "SCRUM-494",
+      "SCRUM-495"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FW-03"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FW-04",
+    "setup_group": "uart_live",
+    "title": "LCD, Buttons, and Backlight",
+    "subsystem": "firmware",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "esp32_real",
+      "lcd_real",
+      "sensor_button_1",
+      "sensor_button_2",
+      "selected_backlight_input",
+      "sensor_1",
+      "sensor_2"
+    ],
+    "instrumentation": [
+      "esp32_serial_capture",
+      "button_event_timestamp",
+      "lcd_render_timestamp",
+      "manual_visual_confirmation"
+    ],
+    "description": "Exercises both buttons, ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and backlight levels including the 20 ms software contribution.",
+    "rationale": "Guided manipulation of both physical controls and visual inspection cover behavior unavailable to unit tests; timestamp evidence is required for timing so human reaction time is never treated as firmware latency.",
+    "limitations": [
+      "Operator visual confirmation and physical timestamp markers are mandatory."
+    ],
+    "human_intervention": "Operator visual confirmation and physical timestamp markers are mandatory.",
+    "requirements": [
+      "HWE-LLR-202",
+      "HWE-LLR-207",
+      "HWE-LLR-208",
+      "HWE-LLR-210",
+      "HWE-LLR-211",
+      "HWE-LLR-212",
+      "HWE-LLR-213",
+      "HWE-LLR-219",
+      "HWE-LLR-222",
+      "HWE-MLR-207",
+      "HWE-MLR-208",
+      "HWE-MLR-211",
+      "HWE-MLR-213",
+      "HWE-MLR-214",
+      "SWE-EMB-LLR-300",
+      "SWE-EMB-LLR-309",
+      "SWE-EMB-LLR-311",
+      "SWE-EMB-LLR-312",
+      "SWE-EMB-LLR-313",
+      "SWE-EMB-LLR-314",
+      "SWE-EMB-LLR-315",
+      "SWE-EMB-LLR-316",
+      "SWE-EMB-LLR-317",
+      "SWE-EMB-LLR-318",
+      "SWE-EMB-LLR-319",
+      "SWE-EMB-LLR-320",
+      "SWE-EMB-LLR-321",
+      "SWE-EMB-LLR-322",
+      "SWE-EMB-LLR-327",
+      "SWE-EMB-MLR-305",
+      "SWE-EMB-MLR-306",
+      "SWE-EMB-MLR-307",
+      "SWE-EMB-MLR-308",
+      "SWE-EMB-MLR-309",
+      "SWE-EMB-MLR-310",
+      "SWE-EMB-MLR-313",
+      "SYS-HLR-400",
+      "SYS-HLR-410",
+      "SYS-HLR-420"
+    ],
+    "jira_keys": [
+      "SCRUM-411",
+      "SCRUM-412",
+      "SCRUM-413",
+      "SCRUM-428",
+      "SCRUM-429",
+      "SCRUM-432",
+      "SCRUM-436",
+      "SCRUM-441",
+      "SCRUM-442",
+      "SCRUM-444",
+      "SCRUM-445",
+      "SCRUM-446",
+      "SCRUM-447",
+      "SCRUM-453",
+      "SCRUM-461",
+      "SCRUM-462",
+      "SCRUM-463",
+      "SCRUM-464",
+      "SCRUM-465",
+      "SCRUM-466",
+      "SCRUM-469",
+      "SCRUM-470",
+      "SCRUM-479",
+      "SCRUM-481",
+      "SCRUM-482",
+      "SCRUM-483",
+      "SCRUM-484",
+      "SCRUM-485",
+      "SCRUM-486",
+      "SCRUM-487",
+      "SCRUM-488",
+      "SCRUM-489",
+      "SCRUM-490",
+      "SCRUM-491",
+      "SCRUM-492",
+      "SCRUM-497",
+      "SCRUM-634",
+      "SCRUM-635",
+      "SCRUM-638"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/FW-04.md"
+    },
+    "assisted_workflow": "buttons",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for FW-04.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Exercises both buttons, ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and backlight levels including the 20 ms software contribution.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "FW-05",
+    "setup_group": "ble_no_uart",
+    "title": "Shared Local/Remote Display State",
+    "subsystem": "firmware",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "esp32_real",
+      "lcd_real",
+      "sensor_buttons",
+      "ble_test_client"
+    ],
+    "instrumentation": [
+      "ble_transaction_capture",
+      "state_snapshot_capture"
+    ],
+    "description": "Confirms local and remote commands update one authoritative display state and malformed commands do not change it.",
+    "rationale": "Alternating local and remote actions against the same observed state detects split-brain or optimistic UI behavior, and invalid commands confirm the shared state cannot be changed outside the defined interface.",
+    "limitations": [
+      "Physical buttons and LCD require operator observation."
+    ],
+    "human_intervention": "Physical buttons and LCD require operator observation.",
+    "requirements": [
+      "SWE-EMB-MLR-313",
+      "SYS-HLR-400"
+    ],
+    "jira_keys": [
+      "SCRUM-411",
+      "SCRUM-469"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/FW-05.md"
+    },
+    "assisted_workflow": "shared_display",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for FW-05.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Confirms local and remote commands update one authoritative display state and malformed commands do not change it.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "BLE-01",
+    "title": "GATT and Protocol Contract",
+    "subsystem": "ble",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "protocol_definition",
+      "computer_protocol_client"
+    ],
+    "instrumentation": [
+      "gatt_transaction_log",
+      "protocol_decoder"
+    ],
+    "description": "Checks UUIDs, layouts, request IDs, GET_CURRENT, statuses/version rejection, authentication framing, and requester-only behavior.",
+    "rationale": "Byte-exact protocol tests are the most direct evidence for interoperability because they compare encoded and decoded frames, UUIDs, routing identifiers, and rejection behavior without radio timing variability.",
+    "limitations": [
+      "Fake/client contract evidence does not prove radio interoperability."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "INT-LLR-400",
+      "INT-LLR-402",
+      "INT-LLR-403",
+      "INT-LLR-404",
+      "INT-LLR-412",
+      "INT-MLR-400",
+      "INT-MLR-401",
+      "INT-MLR-402",
+      "INT-MLR-403",
+      "INT-MLR-407"
+    ],
+    "jira_keys": [
+      "SCRUM-499",
+      "SCRUM-500",
+      "SCRUM-501",
+      "SCRUM-502",
+      "SCRUM-506",
+      "SCRUM-507",
+      "SCRUM-509",
+      "SCRUM-510",
+      "SCRUM-511",
+      "SCRUM-519"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "BLE-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "BLE-02",
+    "setup_group": "ble_no_uart",
+    "title": "Authenticated Display Control",
+    "subsystem": "ble",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "esp32_real",
+      "ble_authorized_client",
+      "ble_unauthorized_client",
+      "lcd_real"
+    ],
+    "instrumentation": [
+      "ble_transaction_capture",
+      "auth_event_capture"
+    ],
+    "description": "Confirms authenticated SET_DISPLAY and rejection of unauthorized/malformed state-changing requests.",
+    "rationale": "An authorized end-to-end state change plus attempted unbonded and malformed writes proves both availability and access enforcement; inability to provide an independent unbonded client is reported BLOCKED, never assumed secure.",
+    "limitations": [
+      "Requires real bonded and untrusted BLE clients."
+    ],
+    "human_intervention": "Requires real bonded and untrusted BLE clients.",
+    "requirements": [
+      "INT-LLR-405",
+      "INT-LLR-406",
+      "INT-LLR-413",
+      "INT-LLR-414",
+      "INT-LLR-416",
+      "INT-MLR-406",
+      "SYS-HLR-510"
+    ],
+    "jira_keys": [
+      "SCRUM-415",
+      "SCRUM-505",
+      "SCRUM-512",
+      "SCRUM-513",
+      "SCRUM-520",
+      "SCRUM-521",
+      "SCRUM-646"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/BLE-02.md"
+    },
+    "assisted_workflow": "ble_control",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for BLE-02.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Confirms authenticated SET_DISPLAY and rejection of unauthorized/malformed state-changing requests.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "BLE-03",
+    "setup_group": "ble_no_uart",
+    "title": "History Transfer and MTU Adaptation",
+    "subsystem": "ble",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "history_populated_device",
+      "ble_client",
+      "configurable_mtu_simulator"
+    ],
+    "instrumentation": [
+      "history_transfer_trace",
+      "mtu_capture",
+      "record_reconstruction_check"
+    ],
+    "description": "Validates metadata-first chunks, boundaries, retries, complete reconstruction, small MTU behavior, and negotiated real MTU.",
+    "rationale": "Protocol boundary automation proves chunk correctness and retry safety, while the real-device run requires the backend-reported expected/retrieved counts and non-missing database records so filler rows cannot create a false pass.",
+    "limitations": [
+      "Simulated MTU checks are partial until a negotiated hardware MTU is captured."
+    ],
+    "human_intervention": "Simulated MTU checks are partial until a negotiated hardware MTU is captured.",
+    "requirements": [
+      "INT-LLR-401",
+      "INT-LLR-407",
+      "INT-LLR-408",
+      "INT-LLR-409",
+      "INT-LLR-410",
+      "INT-LLR-411",
+      "INT-MLR-404",
+      "SYS-HLR-600"
+    ],
+    "jira_keys": [
+      "SCRUM-417",
+      "SCRUM-503",
+      "SCRUM-508",
+      "SCRUM-514",
+      "SCRUM-515",
+      "SCRUM-516",
+      "SCRUM-517",
+      "SCRUM-518"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/BLE-03.md"
+    },
+    "assisted_workflow": "history",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for BLE-03.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Validates metadata-first chunks, boundaries, retries, complete reconstruction, small MTU behavior, and negotiated real MTU.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "BLE-04",
+    "setup_group": "power_cycle_no_uart",
+    "title": "BLE Link-Loss Recovery",
+    "subsystem": "ble",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "esp32_real",
+      "computer_backend",
+      "ble_real"
+    ],
+    "instrumentation": [
+      "connection_state_timeline",
+      "backend_log_capture"
+    ],
+    "description": "Forces physical link loss and verifies automatic rediscovery/reconnection without web restart.",
+    "rationale": "Powering the box off and on while all computer services remain running matches the stated recovery condition and measures user-visible recovery without a manual Connect action or application restart.",
+    "limitations": [
+      "Operator must create a real radio/power interruption."
+    ],
+    "human_intervention": "Operator must create a real radio/power interruption.",
+    "requirements": [
+      "INT-LLR-415",
+      "INT-MLR-405"
+    ],
+    "jira_keys": [
+      "SCRUM-504",
+      "SCRUM-522"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/BLE-04.md"
+    },
+    "assisted_workflow": "reconnect",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for BLE-04.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Forces physical link loss and verifies automatic rediscovery/reconnection without web restart.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "BE-01",
+    "setup_group": "ble_no_uart",
+    "title": "Worker Isolation, 1-Hz Polling, and Persistence",
+    "subsystem": "backend",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "python",
+      "backend_worker",
+      "computer_backend",
+      "full_system",
+      "sensor_1",
+      "sensor_2"
+    ],
+    "instrumentation": [
+      "runner_monotonic_clock",
+      "fake_ble_request_log",
+      "database_capture",
+      "backend_log_capture"
+    ],
+    "description": "Runs the backend worker unit precheck, then guides Sensor 1 and Sensor 2 disconnect/reconnect actions while measuring persisted 1 Hz fault, independent-channel, and recovery states.",
+    "rationale": "Unit checks establish worker isolation and scheduling deterministically; guided real-sensor faults then prove the deployed worker persists fault/recovery states at the required cadence without stopping the unaffected channel.",
+    "limitations": [
+      "The physical phase is operator-triggered; the 300-second scheduler tolerance remains established by the automated precheck."
+    ],
+    "human_intervention": "The operator disconnects and reconnects each sensor when prompted; the runner records and evaluates backend/database state.",
+    "requirements": [
+      "SWE-CONN-LLR-500",
+      "SWE-CONN-LLR-501",
+      "SWE-CONN-LLR-502",
+      "SWE-CONN-LLR-503",
+      "SWE-CONN-LLR-504",
+      "SWE-CONN-LLR-505",
+      "SWE-CONN-LLR-506",
+      "SWE-CONN-LLR-507",
+      "SWE-CONN-LLR-508",
+      "SWE-CONN-LLR-509",
+      "SWE-CONN-LLR-510",
+      "SWE-CONN-LLR-511",
+      "SWE-CONN-LLR-512",
+      "SWE-CONN-LLR-513",
+      "SWE-CONN-LLR-514",
+      "SWE-CONN-LLR-515",
+      "SWE-CONN-LLR-516",
+      "SWE-CONN-MLR-500",
+      "SWE-CONN-MLR-501",
+      "SWE-CONN-MLR-502",
+      "SWE-CONN-MLR-503",
+      "SWE-CONN-MLR-504",
+      "SWE-CONN-MLR-505",
+      "SWE-CONN-MLR-506",
+      "SWE-CONN-MLR-507",
+      "SYS-HLR-500"
+    ],
+    "jira_keys": [
+      "SCRUM-414",
+      "SCRUM-523",
+      "SCRUM-524",
+      "SCRUM-525",
+      "SCRUM-526",
+      "SCRUM-527",
+      "SCRUM-528",
+      "SCRUM-529",
+      "SCRUM-535",
+      "SCRUM-536",
+      "SCRUM-537",
+      "SCRUM-538",
+      "SCRUM-539",
+      "SCRUM-540",
+      "SCRUM-541",
+      "SCRUM-542",
+      "SCRUM-543",
+      "SCRUM-544",
+      "SCRUM-545",
+      "SCRUM-546",
+      "SCRUM-547",
+      "SCRUM-548",
+      "SCRUM-549",
+      "SCRUM-642",
+      "SCRUM-644",
+      "SCRUM-645"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/BE-01.md"
+    },
+    "assisted_workflow": "sensor_disconnect",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Connect the real third box and both sensors; the runner verifies backend readiness.",
+        "prompt": "Ready?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "BE-02",
+    "title": "History Synchronization",
+    "subsystem": "backend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "python",
+      "fake_ble_device_with_300_samples",
+      "backend_worker"
+    ],
+    "instrumentation": [
+      "fake_ble_transaction_log",
+      "history_sync_timeline",
+      "database_capture",
+      "runner_monotonic_clock"
+    ],
+    "description": "Runs deterministic 300-record metadata/chunk/retry/reconstruction/upsert/no-duplicate and time-budget tests.",
+    "rationale": "A controlled 300-record fixture makes completeness, order, deduplication, retry, and time-budget assertions reproducible and independent of radio noise, while BLE-03 and SYS-03 provide physical transport confirmation.",
+    "limitations": [
+      "The 10-second requirement remains incomplete until SYS-03 measures real hardware."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-CONN-LLR-501",
+      "SWE-CONN-LLR-505",
+      "SWE-CONN-LLR-506",
+      "SWE-CONN-LLR-507",
+      "SWE-CONN-LLR-508",
+      "SWE-CONN-LLR-509",
+      "SWE-CONN-LLR-515",
+      "SWE-CONN-MLR-503",
+      "SWE-CONN-MLR-507",
+      "SYS-HLR-600"
+    ],
+    "jira_keys": [
+      "SCRUM-417",
+      "SCRUM-526",
+      "SCRUM-536",
+      "SCRUM-540",
+      "SCRUM-541",
+      "SCRUM-542",
+      "SCRUM-543",
+      "SCRUM-544",
+      "SCRUM-642",
+      "SCRUM-644"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "BE-02"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "BE-03",
+    "title": "Power-On Recovery",
+    "subsystem": "backend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "python",
+      "controllable_fake_ble_device",
+      "backend_worker"
+    ],
+    "instrumentation": [
+      "runner_monotonic_clock",
+      "connection_state_timeline",
+      "database_capture"
+    ],
+    "description": "Measures fake-device appearance through discovery, connection, current poll, and publication against 10 seconds.",
+    "rationale": "A deterministic BLE fixture isolates backend discovery/recovery latency and verifies every internal stage; the physical power-cycle test separately confirms the same budget with real advertising and radio setup.",
+    "limitations": [
+      "Real Windows/BlueZ advertising and power-on latency require SYS-03."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-CONN-LLR-503",
+      "SWE-CONN-LLR-504",
+      "SWE-CONN-LLR-505",
+      "SWE-CONN-LLR-509",
+      "SWE-CONN-LLR-516",
+      "SWE-CONN-MLR-503",
+      "SWE-CONN-MLR-506",
+      "SWE-CONN-MLR-508",
+      "SYS-HLR-520"
+    ],
+    "jira_keys": [
+      "SCRUM-416",
+      "SCRUM-526",
+      "SCRUM-529",
+      "SCRUM-538",
+      "SCRUM-539",
+      "SCRUM-540",
+      "SCRUM-544",
+      "SCRUM-643",
+      "SCRUM-645"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "BE-03"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "BE-04",
+    "title": "Direct Backend Control Command Lifecycle",
+    "subsystem": "backend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "repository_checkout"
+    ],
+    "instrumentation": [
+      "database_state_capture",
+      "command_timeline_capture",
+      "fake_ble_command_capture",
+      "runner_monotonic_clock"
+    ],
+    "description": "Verifies validated commands use the direct backend/BLE path, are serialized, return terminal results, and do not create a MySQL command queue.",
+    "rationale": "API and adapter tests observe command serialization and completion directly, while schema inspection proves no legacy database queue can silently become an alternate command path.",
+    "limitations": [
+      "Physical under-one-second response is covered by SYS-04."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-CONN-LLR-502",
+      "SWE-CONN-LLR-510",
+      "SWE-CONN-LLR-511",
+      "SWE-CONN-LLR-512",
+      "SWE-CONN-MLR-503"
+    ],
+    "jira_keys": [
+      "SCRUM-526",
+      "SCRUM-537",
+      "SCRUM-545",
+      "SCRUM-546",
+      "SCRUM-547"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "BE-04"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "DB-01",
+    "title": "Schema, Types, Email Configuration, UTC, and Secrets",
+    "subsystem": "database",
+    "method": "automated",
+    "profiles": [
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "docker",
+      "mysql_qualification",
+      "repository_checkout"
+    ],
+    "instrumentation": [
+      "information_schema_capture",
+      "database_query_capture",
+      "repository_secret_scanner"
+    ],
+    "description": "Inspects isolated MySQL schema types, email-only alert models, deliberate absence of user/command tables, UTC, and external credentials.",
+    "rationale": "Executing the production initialization schema in an isolated MySQL instance verifies actual server types, constraints, timezone behavior, and intentional exclusions rather than relying on text-only SQL review.",
+    "limitations": [
+      "Static schema parsing alone is explicitly insufficient; unavailable isolated MySQL blocks this test."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-DB-LLR-550",
+      "SWE-DB-LLR-554",
+      "SWE-DB-LLR-555",
+      "SWE-DB-LLR-556",
+      "SWE-DB-LLR-559",
+      "SWE-DB-LLR-561"
+    ],
+    "jira_keys": [
+      "SCRUM-550",
+      "SCRUM-554",
+      "SCRUM-555",
+      "SCRUM-556",
+      "SCRUM-559",
+      "SCRUM-561"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "DB-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "DB-02",
+    "title": "Samples, Uniqueness, Indexes, and Retention",
+    "subsystem": "database",
+    "method": "automated",
+    "profiles": [
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "docker",
+      "mysql_qualification",
+      "large_synthetic_sample_dataset"
+    ],
+    "instrumentation": [
+      "database_capture",
+      "explain_capture",
+      "retention_timeline"
+    ],
+    "description": "Seeds an isolated database and verifies identity uniqueness, indexed latest/history plans, 300-second minimum retention, and >600-second eligibility.",
+    "rationale": "Seeded edge cases and query-plan inspection directly test deduplication, chronological retrieval, retention boundaries, and index use with the same engine used by the application.",
+    "limitations": [
+      "Does not run against the development database."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-DB-LLR-551",
+      "SWE-DB-LLR-552",
+      "SWE-DB-LLR-553",
+      "SWE-DB-MLR-550",
+      "SWE-DB-MLR-551",
+      "SWE-DB-MLR-554"
+    ],
+    "jira_keys": [
+      "SCRUM-530",
+      "SCRUM-531",
+      "SCRUM-534",
+      "SCRUM-551",
+      "SCRUM-552",
+      "SCRUM-553"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "DB-02"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "DB-03",
+    "title": "History-Only Database and Direct Command Boundary",
+    "subsystem": "database",
+    "method": "automated",
+    "profiles": [
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "docker",
+      "mysql_qualification"
+    ],
+    "instrumentation": [
+      "information_schema_capture",
+      "database_capture"
+    ],
+    "description": "Validates that MySQL stores history/email configuration but no command queue/state, while commands use the direct backend API.",
+    "rationale": "Combining schema inspection with live API command tests proves the approved architecture at both persistence and execution boundaries: history is database-backed and control is backend/BLE-direct.",
+    "limitations": [
+      "Direct command execution is verified separately by BE-04 and SYS-04."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-DB-LLR-557",
+      "SWE-DB-LLR-558",
+      "SWE-DB-LLR-560",
+      "SWE-DB-MLR-552",
+      "SWE-DB-MLR-553"
+    ],
+    "jira_keys": [
+      "SCRUM-532",
+      "SCRUM-533",
+      "SCRUM-557",
+      "SCRUM-558",
+      "SCRUM-560"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "DB-03"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-01",
+    "title": "Latest and History API Contract",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "frontend_test_suite"
+    ],
+    "instrumentation": [
+      "http_capture",
+      "database_capture"
+    ],
+    "description": "Verifies latest/history response fields, bounds, ordering, statuses, missing markers, average, availability, and display state.",
+    "rationale": "HTTP contract tests exercise the exact JSON consumed by the browser across valid and unavailable cases, preventing database representation details or missing values from leaking into ambiguous UI behavior.",
+    "limitations": [
+      "Unit/Supertest coverage is partial if the production endpoint omits Jira-required fields."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-600",
+      "SWE-WEB-LLR-601",
+      "SWE-WEB-LLR-605",
+      "SWE-WEB-MLR-601"
+    ],
+    "jira_keys": [
+      "SCRUM-563",
+      "SCRUM-574",
+      "SCRUM-575",
+      "SCRUM-579"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-02",
+    "title": "Live Readout and Stale-Data Behavior",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "frontend_test_suite"
+    ],
+    "instrumentation": [
+      "browser_assertion_capture",
+      "scenario_http_capture"
+    ],
+    "description": "Exercises valid/change/disconnected/box-off scenarios, 1-second refresh, stale-number removal, exact unavailable text, and prominent values.",
+    "rationale": "Rendered-DOM assertions against controlled API scenarios verify what a user actually sees, including stale-value removal and required wording, rather than merely testing state-transform helper functions.",
+    "limitations": [
+      "DOM unit evidence is partial; the full profile also requires operator/browser evidence through SYS tests."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-604",
+      "SWE-WEB-LLR-606",
+      "SWE-WEB-LLR-614",
+      "SWE-WEB-LLR-617",
+      "SWE-WEB-LLR-618",
+      "SWE-WEB-LLR-619",
+      "SWE-WEB-LLR-630",
+      "SWE-WEB-MLR-613",
+      "SYS-HLR-500"
+    ],
+    "jira_keys": [
+      "SCRUM-414",
+      "SCRUM-578",
+      "SCRUM-580",
+      "SCRUM-588",
+      "SCRUM-591",
+      "SCRUM-592",
+      "SCRUM-593",
+      "SCRUM-647",
+      "SCRUM-649"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-02"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-03",
+    "title": "Chart Recorder Compliance",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "frontend_test_suite",
+      "scenario_dataset_300"
+    ],
+    "instrumentation": [
+      "chart_dataset_capture",
+      "browser_assertion_capture"
+    ],
+    "description": "Checks all series combinations, unit conversion, fixed limits, 300-to-0 axis, order/scroll/pruning, gaps/off-scale distinction, and same-sample average.",
+    "rationale": "Deterministic timestamped series make chart direction, pruning, gaps, limits, unit conversion, and average provenance machine-checkable; HIL screenshots and database recovery tests confirm integration with real samples.",
+    "limitations": [
+      "Canvas pixels and cross-browser presentation require the optional Playwright/HIL evidence when available."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-600",
+      "SWE-WEB-LLR-601",
+      "SWE-WEB-LLR-604",
+      "SWE-WEB-LLR-606",
+      "SWE-WEB-LLR-608",
+      "SWE-WEB-LLR-611",
+      "SWE-WEB-LLR-613",
+      "SWE-WEB-LLR-614",
+      "SWE-WEB-LLR-615",
+      "SWE-WEB-LLR-616",
+      "SWE-WEB-LLR-617",
+      "SWE-WEB-LLR-620",
+      "SWE-WEB-LLR-621",
+      "SWE-WEB-LLR-624",
+      "SWE-WEB-LLR-625",
+      "SWE-WEB-LLR-626",
+      "SWE-WEB-LLR-627",
+      "SWE-WEB-LLR-628",
+      "SWE-WEB-LLR-630",
+      "SWE-WEB-LLR-631",
+      "SWE-WEB-LLR-632",
+      "SWE-WEB-LLR-633",
+      "SWE-WEB-MLR-604",
+      "SWE-WEB-MLR-605",
+      "SWE-WEB-MLR-606",
+      "SWE-WEB-MLR-608",
+      "SWE-WEB-MLR-609",
+      "SWE-WEB-MLR-610",
+      "SWE-WEB-MLR-611",
+      "SWE-WEB-MLR-614",
+      "SYS-HLR-600"
+    ],
+    "jira_keys": [
+      "SCRUM-417",
+      "SCRUM-566",
+      "SCRUM-567",
+      "SCRUM-568",
+      "SCRUM-570",
+      "SCRUM-571",
+      "SCRUM-572",
+      "SCRUM-573",
+      "SCRUM-574",
+      "SCRUM-575",
+      "SCRUM-578",
+      "SCRUM-580",
+      "SCRUM-582",
+      "SCRUM-585",
+      "SCRUM-587",
+      "SCRUM-588",
+      "SCRUM-589",
+      "SCRUM-590",
+      "SCRUM-591",
+      "SCRUM-594",
+      "SCRUM-595",
+      "SCRUM-598",
+      "SCRUM-599",
+      "SCRUM-600",
+      "SCRUM-601",
+      "SCRUM-602",
+      "SCRUM-648",
+      "SCRUM-649",
+      "SCRUM-650",
+      "SCRUM-651",
+      "SCRUM-652"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-03"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-04",
+    "title": "Responsive Layout",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "frontend_test_suite"
+    ],
+    "instrumentation": [
+      "viewport_overflow_check",
+      "browser_assertion_capture"
+    ],
+    "description": "Checks required controls and horizontal overflow expectations for desktop, laptop, and two mobile viewport definitions.",
+    "rationale": "Playwright loads and interacts with the actual built React GUI at four specified viewport sizes and captures full-page screenshots, so DOM assertions and visual evidence jointly demonstrate responsive usability.",
+    "limitations": [
+      "JSDOM cannot prove rendered geometry; absent Playwright browser evidence causes this check to report BLOCKED."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-606"
+    ],
+    "jira_keys": [
+      "SCRUM-580"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-04"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-05",
+    "title": "Trusted-Local Access Boundary and Validation",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "repository_checkout"
+    ],
+    "instrumentation": [
+      "http_capture",
+      "database_capture",
+      "cookie_capture_redacted"
+    ],
+    "description": "Checks deliberate absence of application accounts/credentials, loopback-scoped deployment, CORS restrictions, and server-side command/email validation.",
+    "rationale": "Configuration, CORS preflight, schema, and hostile-input tests establish the approved trusted-local boundary and prove validation occurs server-side despite user-account authentication being intentionally out of scope.",
+    "limitations": [
+      "Network/firewall policy beyond loopback binding remains a deployment responsibility."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-SEC-LLR-750",
+      "SWE-SEC-LLR-751",
+      "SWE-SEC-LLR-752",
+      "SWE-SEC-LLR-753",
+      "SWE-SEC-LLR-754",
+      "SWE-SEC-MLR-750",
+      "SWE-WEB-LLR-602",
+      "SWE-WEB-LLR-603",
+      "SWE-WEB-LLR-607",
+      "SWE-WEB-LLR-608",
+      "SWE-WEB-LLR-609",
+      "SWE-WEB-LLR-610",
+      "SWE-WEB-LLR-611",
+      "SWE-WEB-LLR-612",
+      "SWE-WEB-LLR-622",
+      "SWE-WEB-MLR-602",
+      "SWE-WEB-MLR-605",
+      "SWE-WEB-MLR-607"
+    ],
+    "jira_keys": [
+      "SCRUM-564",
+      "SCRUM-567",
+      "SCRUM-569",
+      "SCRUM-576",
+      "SCRUM-577",
+      "SCRUM-581",
+      "SCRUM-582",
+      "SCRUM-583",
+      "SCRUM-584",
+      "SCRUM-585",
+      "SCRUM-586",
+      "SCRUM-596",
+      "SCRUM-609",
+      "SCRUM-625",
+      "SCRUM-626",
+      "SCRUM-627",
+      "SCRUM-628",
+      "SCRUM-629"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-05"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-06",
+    "title": "Email Alert Configuration and Delivery",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "repository_checkout"
+    ],
+    "instrumentation": [
+      "database_capture",
+      "browser_assertion_capture"
+    ],
+    "description": "Checks email-only recipients/rules, email validation, configurable thresholds/messages, Gmail-compatible SMTP delivery, and persistence schema.",
+    "rationale": "UI/API tests verify editable persistent email rules and validation, adapter tests verify Gmail-compatible SMTP behavior, and SYS-05 reserves a real-inbox confirmation for evidence that mocks cannot supply.",
+    "limitations": [
+      "A real Gmail inbox confirmation remains part of SYS-05 because automated tests use a capture provider.",
+      "Jira SWE-WEB-LLR-610/611 remain BLOCKED: the current UI supports recipient add/remove and a persisted shared rule, but not per-recipient edit/enable controls or per-recipient thresholds."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-606",
+      "SWE-WEB-LLR-608",
+      "SWE-WEB-LLR-609",
+      "SWE-WEB-LLR-610",
+      "SWE-WEB-LLR-611",
+      "SWE-WEB-LLR-612",
+      "SWE-WEB-LLR-617",
+      "SWE-WEB-LLR-630",
+      "SWE-WEB-MLR-603",
+      "SYS-HLR-700"
+    ],
+    "jira_keys": [
+      "SCRUM-418",
+      "SCRUM-565",
+      "SCRUM-580",
+      "SCRUM-582",
+      "SCRUM-583",
+      "SCRUM-584",
+      "SCRUM-585",
+      "SCRUM-586",
+      "SCRUM-591",
+      "SCRUM-649"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-06"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "FE-07",
+    "title": "Remote Display Control UI",
+    "subsystem": "frontend",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "frontend_test_suite"
+    ],
+    "instrumentation": [
+      "database_capture",
+      "command_timeline",
+      "browser_assertion_capture"
+    ],
+    "description": "Tests independent controls, pending/completed/failed states, authoritative returned state, and no optimistic success.",
+    "rationale": "Simulated delayed, successful, and failed backend responses exercise the race conditions that caused prior control desynchronization and prove the UI only presents device-confirmed state as final.",
+    "limitations": [
+      "UI behavior alone does not prove the physical <1 second response; SYS-04 is mandatory."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-WEB-LLR-602",
+      "SWE-WEB-LLR-603",
+      "SWE-WEB-LLR-606",
+      "SWE-WEB-LLR-608",
+      "SWE-WEB-LLR-609",
+      "SWE-WEB-LLR-613",
+      "SWE-WEB-LLR-622",
+      "SWE-WEB-LLR-623",
+      "SWE-WEB-LLR-629",
+      "SWE-WEB-LLR-630",
+      "SWE-WEB-MLR-600",
+      "SWE-WEB-MLR-602",
+      "SWE-WEB-MLR-607",
+      "SWE-WEB-MLR-612",
+      "SYS-HLR-510"
+    ],
+    "jira_keys": [
+      "SCRUM-415",
+      "SCRUM-562",
+      "SCRUM-564",
+      "SCRUM-569",
+      "SCRUM-576",
+      "SCRUM-577",
+      "SCRUM-580",
+      "SCRUM-582",
+      "SCRUM-583",
+      "SCRUM-587",
+      "SCRUM-596",
+      "SCRUM-597",
+      "SCRUM-630",
+      "SCRUM-631",
+      "SCRUM-649"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "FE-07"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "ALR-01",
+    "title": "Alert Rule Matrix",
+    "subsystem": "alerting",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "alert_engine",
+      "fake_notification_provider",
+      "deterministic_samples"
+    ],
+    "instrumentation": [
+      "alert_evaluation_log",
+      "provider_capture"
+    ],
+    "description": "Table-drives HIGH/LOW/normal/missing/disconnected/invalid, both sensors/average, multiple recipients, and independent thresholds.",
+    "rationale": "A table-driven rule matrix exhaustively covers source, recipient, threshold, and invalid-data combinations with deterministic inputs, making omitted alert branches visible and repeatable.",
+    "limitations": [
+      "Does not prove delivery by a real third-party provider."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-ALR-LLR-700",
+      "SWE-ALR-LLR-701",
+      "SWE-ALR-LLR-702",
+      "SWE-ALR-LLR-703",
+      "SWE-ALR-LLR-704",
+      "SWE-ALR-LLR-705",
+      "SWE-ALR-LLR-706",
+      "SWE-ALR-LLR-707",
+      "SWE-ALR-LLR-709",
+      "SWE-ALR-LLR-710",
+      "SWE-ALR-LLR-711",
+      "SWE-ALR-LLR-712",
+      "SWE-ALR-LLR-713",
+      "SWE-ALR-LLR-714",
+      "SWE-ALR-LLR-715",
+      "SWE-ALR-MLR-700",
+      "SWE-ALR-MLR-701",
+      "SWE-ALR-MLR-702",
+      "SWE-ALR-MLR-704",
+      "SWE-ALR-MLR-706",
+      "SYS-HLR-700"
+    ],
+    "jira_keys": [
+      "SCRUM-418",
+      "SCRUM-603",
+      "SCRUM-604",
+      "SCRUM-605",
+      "SCRUM-607",
+      "SCRUM-610",
+      "SCRUM-611",
+      "SCRUM-612",
+      "SCRUM-613",
+      "SCRUM-614",
+      "SCRUM-615",
+      "SCRUM-616",
+      "SCRUM-617",
+      "SCRUM-619",
+      "SCRUM-620",
+      "SCRUM-621",
+      "SCRUM-622",
+      "SCRUM-623",
+      "SCRUM-624",
+      "SCRUM-632",
+      "SCRUM-633"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "ALR-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "ALR-02",
+    "title": "Alert Episode State Machine",
+    "subsystem": "alerting",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "alert_engine"
+    ],
+    "instrumentation": [
+      "alert_state_transition_log",
+      "provider_capture"
+    ],
+    "description": "Checks edge-triggered HIGH/LOW episodes, suppression while out of range, NORMAL reset, and re-alert.",
+    "rationale": "Explicit state-sequence tests are necessary to prove alerts occur on transitions rather than every poll; unresolved Jira semantics remain visibly blocked instead of being guessed by the harness.",
+    "limitations": [
+      "Jira marks this policy TBD; results remain BLOCKED until that requirement is approved."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-ALR-LLR-711",
+      "SWE-ALR-LLR-712",
+      "SWE-ALR-LLR-713",
+      "SWE-ALR-MLR-705"
+    ],
+    "jira_keys": [
+      "SCRUM-608",
+      "SCRUM-621",
+      "SCRUM-622",
+      "SCRUM-623"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "ALR-02"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "ALR-03",
+    "title": "Notification Provider Adapters and Failure Isolation",
+    "subsystem": "alerting",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "node",
+      "fake_notification_provider"
+    ],
+    "instrumentation": [
+      "provider_call_capture",
+      "error_log_capture",
+      "polling_continuity_capture"
+    ],
+    "description": "Checks email destinations/messages, external SMTP credentials, and failure isolation from subsequent polling.",
+    "rationale": "Provider-boundary tests inspect destination and content, reject embedded credentials, and inject delivery failures to prove notification problems cannot terminate acquisition or later evaluation.",
+    "limitations": [
+      "Fake providers do not prove delivery to a real email inbox; SYS-05 provides controlled end-to-end evidence."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "SWE-ALR-LLR-700",
+      "SWE-ALR-LLR-706",
+      "SWE-ALR-LLR-707",
+      "SWE-ALR-LLR-708",
+      "SWE-ALR-MLR-700",
+      "SWE-ALR-MLR-703",
+      "SYS-HLR-700"
+    ],
+    "jira_keys": [
+      "SCRUM-418",
+      "SCRUM-603",
+      "SCRUM-606",
+      "SCRUM-610",
+      "SCRUM-616",
+      "SCRUM-617",
+      "SCRUM-618"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "ALR-03"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  },
+  {
+    "id": "SYS-01",
+    "setup_group": "ble_no_uart",
+    "title": "Complete Data Path",
+    "subsystem": "system",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "full_system",
+      "third_box_complete",
+      "esp32_real",
+      "sensor_1",
+      "sensor_2",
+      "ble_real",
+      "browser"
+    ],
+    "instrumentation": [
+      "backend_log_capture",
+      "database_capture",
+      "http_capture",
+      "browser_screenshot",
+      "runner_monotonic_clock"
+    ],
+    "description": "Verifies both physical sensor values/status through ESP32, BLE, backend, MySQL, server, and browser.",
+    "rationale": "A synchronized capture compares the same two physical readings and statuses at every deployed hop; operator LCD/browser confirmation completes the portions that backend and database APIs cannot observe.",
+    "limitations": [
+      "Requires operator comparison of physical LCD/sensors and browser values."
+    ],
+    "human_intervention": "Requires operator comparison of physical LCD/sensors and browser values.",
+    "requirements": [
+      "PRJ-REQ-002",
+      "PRJ-REQ-003",
+      "SYS-HLR-100",
+      "SYS-HLR-110",
+      "SYS-HLR-500"
+    ],
+    "jira_keys": [
+      "SCRUM-400",
+      "SCRUM-401",
+      "SCRUM-403",
+      "SCRUM-404",
+      "SCRUM-414"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/SYS-01.md"
+    },
+    "assisted_workflow": "data_path",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for SYS-01.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Verifies both physical sensor values/status through ESP32, BLE, backend, MySQL, server, and browser.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "SYS-02",
+    "setup_group": "ble_no_uart",
+    "title": "Full-System Sensor Disconnect and Recovery",
+    "subsystem": "system",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "full_system",
+      "sensor_1",
+      "sensor_2"
+    ],
+    "instrumentation": [
+      "manual_disconnect_event_marker",
+      "connection_state_timeline",
+      "database_capture",
+      "browser_screenshot"
+    ],
+    "description": "Disconnects each real sensor in both ON and OFF display states and verifies other-sensor continuity, local/remote fault, graph gap, automatic recovery, and preservation of the pre-disconnection state.",
+    "rationale": "Testing both sensors in both retained states covers all four recovery branches and proves the behavior locally on the powered firmware while automatic database capture verifies channel independence and graph fault semantics.",
+    "limitations": [
+      "Requires physical cable manipulation."
+    ],
+    "human_intervention": "Requires physical cable manipulation.",
+    "requirements": [
+      "SWE-EMB-LLR-311",
+      "SYS-HLR-210",
+      "SYS-HLR-420"
+    ],
+    "jira_keys": [
+      "SCRUM-406",
+      "SCRUM-413"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/SYS-02.md"
+    },
+    "assisted_workflow": "sensor_disconnect",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for SYS-02.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Disconnects each real sensor and verifies other-sensor continuity, local/remote fault, graph gap, automatic recovery, and initial OFF.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "SYS-03",
+    "setup_group": "power_cycle_no_uart",
+    "title": "Startup, Power-On, and History Recovery",
+    "subsystem": "system",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "full_system",
+      "esp32_real",
+      "ble_real"
+    ],
+    "instrumentation": [
+      "runner_monotonic_clock",
+      "backend_log_capture",
+      "history_sync_capture",
+      "database_capture",
+      "browser_capture"
+    ],
+    "description": "Separately measures box-OFF power recovery and 300-second history recovery after a host-radio outage while the box remains powered.",
+    "rationale": "Two separate scenarios avoid conflating requirements: a box power cycle measures availability/reconnect timing, while disabling only the host Bluetooth radio creates an unplanned link loss without stopping ESP32 acquisition. The latter requires a new automatic history operation, 300 records per sensor in MySQL, graph backfill, and completion within 10 seconds after connection is re-established.",
+    "limitations": [
+      "Requires operator control of box power and the host Bluetooth radio, plus at least 300 seconds of powered physical-device history."
+    ],
+    "human_intervention": "The operator power-cycles the box for reconnect timing, then separately toggles only the host Bluetooth radio while keeping the box powered for history recovery.",
+    "requirements": [
+      "SWE-CONN-LLR-515",
+      "SWE-CONN-LLR-516",
+      "SYS-HLR-220",
+      "SYS-HLR-520",
+      "SYS-HLR-600"
+    ],
+    "jira_keys": [
+      "SCRUM-407",
+      "SCRUM-416",
+      "SCRUM-417",
+      "SCRUM-644",
+      "SCRUM-645"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/SYS-03.md"
+    },
+    "assisted_workflow": "startup_history",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for SYS-03.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Power-cycle the box for reconnect timing, then keep it powered while toggling only the host Bluetooth radio so automatic 300-record recovery can be timed from connection establishment.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "SYS-04",
+    "setup_group": "uart_live",
+    "title": "Remote Display Response Latency",
+    "subsystem": "system",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "full_system",
+      "lcd_real",
+      "browser",
+      "local_operator"
+    ],
+    "instrumentation": [
+      "runner_monotonic_clock",
+      "browser_command_timestamp",
+      "database_command_timeline",
+      "backend_command_timestamp",
+      "BLE_transaction_timestamp",
+      "ESP32_command_timestamp",
+      "LCD_render_timestamp",
+      "esp32_serial_capture"
+    ],
+    "description": "Measures 10 ON/OFF changes per sensor from user action to physical LCD render; every sample must be below 1000 ms.",
+    "rationale": "Playwright timestamps clicks on the live GUI and UART timestamps the firmware only after physical-render code executes, eliminating operator reaction time and providing 20 paired end-to-end samples across both controls.",
+    "limitations": [
+      "Backend acknowledgement alone never passes; physical LCD timestamps and operator setup are mandatory."
+    ],
+    "human_intervention": "Backend acknowledgement alone never passes; physical LCD timestamps and operator setup are mandatory.",
+    "requirements": [
+      "INT-LLR-416",
+      "SYS-HLR-510"
+    ],
+    "jira_keys": [
+      "SCRUM-415",
+      "SCRUM-646"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/SYS-04.md"
+    },
+    "assisted_workflow": "display_latency",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for SYS-04.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Measures 10 ON/OFF changes per sensor from user action to physical LCD render; every sample must be below 1000 ms.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "SYS-05",
+    "setup_group": "ble_no_uart",
+    "title": "End-to-End Notifications",
+    "subsystem": "system",
+    "method": "semi-automated",
+    "profiles": [
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "full_computer_stack",
+      "controlled_notification_provider",
+      "configured_alert_rule"
+    ],
+    "instrumentation": [
+      "database_capture",
+      "alert_state_capture",
+      "provider_capture",
+      "runner_monotonic_clock"
+    ],
+    "description": "Configures actual UI rules, triggers controlled crossings, and verifies storage, evaluation, episode transition, provider, destination, and message.",
+    "rationale": "A real provider/inbox is the only valid evidence for end-to-end delivery, while captured API and transition records establish the upstream chain; console-only operation therefore blocks rather than fails functionality.",
+    "limitations": [
+      "Controlled provider evidence is qualification evidence; optional real delivery is a separate smoke test."
+    ],
+    "human_intervention": "Controlled provider evidence is qualification evidence; optional real delivery is a separate smoke test.",
+    "requirements": [
+      "SYS-HLR-700"
+    ],
+    "jira_keys": [
+      "SCRUM-418"
+    ],
+    "entrypoint": {
+      "type": "manual",
+      "procedure": "verification/manual/SYS-05.md"
+    },
+    "assisted_workflow": "email",
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": [
+      {
+        "id": "setup",
+        "instruction": "Prepare every fixture and instrumentation item listed for SYS-05.",
+        "prompt": "Ready and evidence capture active?",
+        "expected": "yes"
+      },
+      {
+        "id": "procedure",
+        "instruction": "Configures actual UI rules, triggers controlled crossings, and verifies storage, evaluation, episode transition, provider, destination, and message.",
+        "prompt": "Acceptance criteria satisfied?",
+        "expected": "yes/no"
+      },
+      {
+        "id": "evidence",
+        "instruction": "Record measurement/evidence file paths in comments and retain them under this test's evidence directory.",
+        "prompt": "Evidence captured?",
+        "expected": "yes"
+      }
+    ]
+  },
+  {
+    "id": "DOC-01",
+    "title": "Requirement Coverage Integrity",
+    "subsystem": "documentation",
+    "method": "automated",
+    "profiles": [
+      "software",
+      "integration",
+      "hil",
+      "full"
+    ],
+    "fixtures": [
+      "requirements_catalog",
+      "generated_test_catalog"
+    ],
+    "instrumentation": [
+      "coverage_reporter"
+    ],
+    "description": "Fails on unmapped/unknown requirements, missing tests, invalid physical claims, or mishandled TBD/conflict requirements.",
+    "rationale": "Catalog invariants run on every software profile and prevent the qualification report from claiming completeness when requirements are missing, ambiguously mapped, or tested only by evidence incapable of proving them.",
+    "limitations": [
+      "Checks traceability integrity, not product behavior."
+    ],
+    "human_intervention": null,
+    "requirements": [
+      "PRJ-REQ-001",
+      "PRJ-REQ-003",
+      "PRJ-REQ-004"
+    ],
+    "jira_keys": [
+      "SCRUM-399",
+      "SCRUM-401",
+      "SCRUM-402"
+    ],
+    "entrypoint": {
+      "type": "python",
+      "command": [
+        "{python}",
+        "verification/checks/qualification_checks.py",
+        "DOC-01"
+      ]
+    },
+    "pass_policy": {
+      "all_required": true
+    },
+    "manual_steps": []
+  }
+]

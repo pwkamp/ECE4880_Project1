@@ -66,10 +66,10 @@ hardware, build each of these combinations after changing the two selections:
 
 | Sensor backend | Display backend | Expected purpose |
 |---|---|---|
-| Fake | LED | Complete default simulation |
-| Real | LED | Compile-check sensor integration stub |
-| Fake | Real | Compile-check display integration stub |
-| Real | Real | Compile-check both hardware integration stubs |
+| Fake | LED | Complete simulation profile |
+| Real | LED | Real-sensor testing without the LCD |
+| Fake | Real | LCD/button integration with simulated temperatures |
+| Real | Real | Production DS18B20, LCD, and button hardware |
 
 There is not yet a separate on-target Unity unit-test application. Hardware
 acceptance therefore requires flashing the default build, connecting through
@@ -78,17 +78,21 @@ synchronizing history, controlling both display states, and power-cycling the
 board to verify automatic reconnection. These checks require the actual ESP32
 and cannot be run by `master_test.py`.
 
-Real sensor and display files are integration stubs; fake sensors and the LED
-display simulator are the default working backends.
+Production builds default to the two real DS18B20 buses and the real HD44780
+LCD/button backend. The LCD uses RS/E/D4/D5/D6/D7 on GPIO16/17/18/19/21/23;
+the active-low sensor buttons use GPIO34/GPIO35 with external pull-ups. LCD or
+button initialization errors are logged but do not prevent sensor sampling or
+BLE startup. The fake sensors and LED simulator remain available through
+`menuconfig` for isolated development builds.
 
 ## Full cross-platform integration
 
 The firmware itself stays on the ESP32 and is built/flashed from the native
 Windows or Linux host. MySQL and the web application are containerized on both
 platforms; the BLE backend is native on Windows and containerized with host
-BlueZ access on Linux. Keep the default **Deterministic simulated sensors**
-selection, set the six-digit PIN in `device_config.cmake`, and flash before
-starting the backend:
+BlueZ access on Linux. Keep the production **Two DS18B20 sensors** and
+**HD44780 LCD and physical sensor buttons** selections, set the six-digit PIN
+in `device_config.cmake`, and flash before starting the backend:
 
 ```bash
 idf.py set-target esp32

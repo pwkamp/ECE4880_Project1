@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement.schema.json",
+  "type": "object",
+  "required": ["uid", "jira", "level", "status", "text", "parents"],
+  "properties": {
+    "uid": {"type": "string", "minLength": 1},
+    "jira": {"type": "string", "pattern": "^SCRUM-[0-9]+$"},
+    "level": {"enum": ["Project", "HLR", "MLR", "LLR"]},
+    "component": {"type": "string"},
+    "status": {"enum": ["active", "tbd", "conflict"]},
+    "parents": {"type": "array", "items": {"type": "string"}},
+    "text": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

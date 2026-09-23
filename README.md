@@ -2,6 +2,8 @@
 
 ESP32 firmware, Python BLE connector, MySQL schema, and the computer console.
 
+Requirements-driven qualification is documented in [verification/README.md](verification/README.md). Run all unattended software checks with `python verification/runner.py run software`; HIL and full profiles keep operator-dependent evidence separate.
+
 ## Computer console
 
 The web app lives in [`frontend/`](frontend/). The **computer** component of
@@ -89,7 +91,7 @@ directly.
                                       |
   Browser  --same origin-->  Vite (:5173)  --proxy /api/v1-->  Python :8000
            React console                  --proxy /api----->  Node :8787
-                                                            (SMS + MySQL reader)
+                                                            (email + MySQL reader)
                                       ^
                                       | GET /api/samples
                                       |
@@ -99,7 +101,7 @@ directly.
 | Process | Command | Bind | Role |
 | --- | --- | --- | --- |
 | Web console | `cd frontend && npm run dev` (Vite half) | `http://localhost:5173` | UI: readouts, chart, scan/connect panel, alerts |
-| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | SMS delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
+| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | Email delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
 | BLE connector | `backend/.venv/bin/python main.py` | `127.0.0.1:8000` | Scan, pair, connect, poll the box at 1 Hz, **write** samples through a DB adapter |
 | MySQL | `mysqld` / local MySQL | `127.0.0.1:3306` | Stores 1 Hz rows the console charts from |
 | ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of temperatures (fake-sensor firmware is fine for demo) |
@@ -646,7 +648,7 @@ plus firmware work.
 | Probe unplugged | `readings[n].connected = false`, `celsius = null` | firmware detects an open circuit / out-of-range read on that channel |
 | Physical display button | `readings[n].enabled` | firmware toggles a per-sensor flag and reports it |
 | Console's on/off toggle | `setSensorEnabled(id, bool)` | firmware accepts a command message and applies it to the same flag |
-| The phone | the alert log → real SMS/email | a small backend + a provider account (see below) |
+| Email inbox | the alert log → real email | the Node backend plus configured SMTP credentials (see below) |
 
 ### 2. Choose a transport (box ↔ computer)
 
