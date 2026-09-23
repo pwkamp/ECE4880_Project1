@@ -54,7 +54,7 @@ container. Windows sets `VITE_BLE_API_BASE` so the browser calls the native
 WinRT backend on loopback. Both paths proxy `/api` to the Node sample reader
 in the frontend container, which connects to MySQL over the private Compose
 network. Full ESP32 flashing, pairing, and data-flow checks are documented in
-[`docs/integration-test.md`](../docs/integration-test.md).
+the root [`README.md`](../README.md#connecting-the-console-to-ble-and-mysql).
 
 The browser reads temperatures and the rolling graph exclusively from MySQL
 through `/api/samples`. It polls backend status for connection and confirmed
