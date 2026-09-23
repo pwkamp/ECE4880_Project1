@@ -83,6 +83,7 @@ class MockBleClient:
         self.boot_id = random.getrandbits(32)
         self.sequence = 0
         self._temps = [20.0, 22.0]
+        self._display_enabled = {1: True, 2: True}
         self.disconnected_callback = None
 
     def set_disconnected_callback(self, callback) -> None:
@@ -118,13 +119,19 @@ class MockBleClient:
             max(15.0, min(30.0, t + random.uniform(-0.3, 0.3))) for t in self._temps
         ]
         sensors = tuple(
-            SensorSnapshot(i + 1, round(t, 2), VisibleState.ON, True)
+            SensorSnapshot(
+                i + 1,
+                round(t, 2),
+                VisibleState.ON if self._display_enabled[i + 1] else VisibleState.OFF,
+                self._display_enabled[i + 1],
+            )
             for i, t in enumerate(self._temps)
         )
         average = round(sum(self._temps) / len(self._temps), 2)
         return CurrentSnapshot(self.boot_id, self.sequence, sensors, average)
 
     async def set_display(self, sensor_id: int, enabled: bool) -> DisplayResult:
+        self._display_enabled[sensor_id] = enabled
         return DisplayResult(
             sensor_id, VisibleState.ON if enabled else VisibleState.OFF, enabled
         )
