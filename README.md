@@ -95,10 +95,10 @@ Gmail App Password in `frontend/server/.env` (`EMAIL_MODE=live`) - see
 
 ## Screenshots
 
-[SCREENSHOT-1: replace with new webapp screenshot]
+<img width="1335" height="1206" alt="f1" src="https://github.com/user-attachments/assets/78245066-283f-4e0b-9495-a5c336a65777" />
 *Live dashboard view - both sensor readouts and the 300-second chart recorder.*
 
-[SCREENSHOT-2: replace with new webapp screenshot]
+<img width="1321" height="585" alt="f2" src="https://github.com/user-attachments/assets/e33e4d10-cc82-4089-9470-84a997812809" />
 *Alert configuration panel - threshold, recipient, and message setup.*
 
 ## AI tool disclosure
@@ -107,7 +107,7 @@ Claude and Claude Code were used throughout this project's development,
 most heavily for test automation and for an early AI-generated requirements
 pass. That early requirements pass was reviewed by the team and partially
 rejected, not accepted as-is; all AI-assisted code and documentation changes
-were reviewed by a team member before merging.
+were reviewed by all team members before merging.
 
 The web console lives in [`frontend/`](frontend/). `cd frontend && npm run dev` is how you run it. BLE and MySQL
 are optional extra processes you start **in addition** to that, not instead of
