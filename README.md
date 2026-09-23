@@ -89,7 +89,7 @@ directly.
                                       |
   Browser  --same origin-->  Vite (:5173)  --proxy /api/v1-->  Python :8000
            React console                  --proxy /api----->  Node :8787
-                                                            (SMS + MySQL reader)
+                                                            (email + MySQL reader)
                                       ^
                                       | GET /api/samples
                                       |
@@ -99,7 +99,7 @@ directly.
 | Process | Command | Bind | Role |
 | --- | --- | --- | --- |
 | Web console | `cd frontend && npm run dev` (Vite half) | `http://localhost:5173` | UI: readouts, chart, scan/connect panel, alerts |
-| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | SMS delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
+| Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | Email delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
 | BLE connector | `backend/.venv/bin/python main.py` | `127.0.0.1:8000` | Scan, pair, connect, poll the box at 1 Hz, **write** samples through a DB adapter |
 | MySQL | `mysqld` / local MySQL | `127.0.0.1:3306` | Stores 1 Hz rows the console charts from |
 | ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of physical DS18B20 temperatures and connection status |
