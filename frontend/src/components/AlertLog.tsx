@@ -11,7 +11,6 @@ interface Props {
 const SOURCE_LABEL: Record<AlertSource, string> = {
   SENSOR_1: 'Sensor 1',
   SENSOR_2: 'Sensor 2',
-  AVERAGE: 'Sensor average',
 };
 
 function line(a: AlertEvent, unit: Unit): string {
