@@ -28,7 +28,7 @@ from .ble_service import (
 from .database_adapter import load_database_adapter
 from .linux_pairing import LinuxPairingError
 from .platform_runtime import detect_ble_host, production_service_kwargs
-from .protocol import CONFIG, CurrentSnapshot
+from .protocol import CONFIG, CurrentSnapshot, ProtocolError, Status
 from .windows_pairing import WindowsPairingError
 
 
@@ -361,6 +361,14 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
     @app.exception_handler(ValueError)
     async def invalid_value_handler(_request: Request, exc: ValueError) -> JSONResponse:
         return JSONResponse(status_code=422, content={"detail": str(exc)})
+
+    @app.exception_handler(ProtocolError)
+    async def protocol_error_handler(_request: Request, exc: ProtocolError) -> JSONResponse:
+        # NOT_AVAILABLE is the ESP32's real response when a command targets a
+        # sensor that isn't plugged in -- surface that plainly instead of a
+        # raw 500, same as every other known failure mode in this API.
+        detail = "sensor not available" if exc.status is Status.NOT_AVAILABLE else str(exc)
+        return JSONResponse(status_code=503, content={"detail": detail})
 
     @app.get("/healthz", response_model=HealthResponse)
     async def healthz(request: Request) -> dict[str, Any]:
