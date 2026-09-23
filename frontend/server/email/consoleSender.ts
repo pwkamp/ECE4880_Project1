@@ -1,7 +1,7 @@
-import type { SmsSender } from './types.ts';
+import type { EmailSender } from './types.ts';
 
 /** A sender that only prints the message. The default in local dev. */
-export function createConsoleSmsSender(): SmsSender {
+export function createConsoleEmailSender(): EmailSender {
   return {
     async send(msg) {
       console.log(`Email sent to ${msg.to}: ${JSON.stringify(msg.subject ?? msg.body)}`);

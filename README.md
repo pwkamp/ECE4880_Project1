@@ -950,23 +950,12 @@ changed by this project.
 
 ## Build and flash
 
-Use an ESP-IDF 6.x terminal. On the first build, create the local device
-configuration from its committed example:
+See [firmware/README.md](firmware/README.md) for the full build/flash
+walkthrough (ESP-IDF 6.x, `device_config.cmake` setup, and known build-cache
+gotchas). The original ESP32 is the only active firmware target; defaults for
+other chips are not part of the active project. The app binary is named
+`thermometer_gatt_server.bin`.
 
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Edit device_config.cmake with this ESP32's unique six-digit passkey.
-idf.py set-target esp32
-idf.py build
-idf.py -p COM5 flash monitor
-```
-
-Replace `COM5` as needed. The original ESP32 is the only active firmware
-target; defaults for other chips are not part of the active project. The app
-binary is named `thermometer_gatt_server.bin`.
 Changing a provisioned passkey does not authorize replacement of the existing
 ESP32 bond. Use the authenticated reset API before changing it. If the owner
 credential is lost, use the explicit backend launcher reset with the current
@@ -1250,14 +1239,8 @@ supplies the configured six-digit PIN.
 
 ### Python unit tests
 
-From a fresh checkout, create the backend environment and install the
-development dependency set from the repository root:
-
-```powershell
-python -m venv backend\.venv
-backend\.venv\Scripts\python.exe -m pip install -r backend\pc_client\requirements-dev.txt
-backend\.venv\Scripts\python.exe master_test.py
-```
+See [backend/README.md](backend/README.md#tests) for the environment setup
+and run command (`master_test.py` from the repository root).
 
 The tests cover byte layout, request IDs, response validation, current/history
 decoding, incomplete-record rejection, requester-only ordering, display control,
@@ -1273,19 +1256,8 @@ when the entire discovered suite passes.
 
 The firmware validation presently consists of protocol-generation checks, a
 clean ESP-IDF build, and hardware acceptance; there is no separate on-target
-Unity test application yet. In an initialized ESP-IDF 6.x terminal:
-
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Set a unique six-digit passkey if this is a new local configuration.
-idf.py set-target esp32
-idf.py fullclean
-idf.py build
-idf.py size
-```
+Unity test application yet. See [firmware/README.md](firmware/README.md#firmware-tests)
+for the build/size commands.
 
 The build validates the shared JSON, creates
 `firmware/build/generated/thermometer_config.h`, compiles the selected

@@ -1,18 +1,18 @@
-export interface SmsMessage {
+export interface EmailMessage {
   to: string;
   body: string;
   subject?: string;
   html?: string;
 }
 
-export interface SmsResult {
+export interface EmailResult {
   /** 'sent' via a real provider; 'logged' by the console sender. */
   status: 'sent' | 'logged';
   /** SMTP message id when status is 'sent'. */
   providerId?: string;
 }
 
-export interface SmsSender {
+export interface EmailSender {
   /** Resolves on success; rejects (throws) on provider failure. */
-  send(msg: SmsMessage): Promise<SmsResult>;
+  send(msg: EmailMessage): Promise<EmailResult>;
 }
