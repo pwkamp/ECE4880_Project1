@@ -3,17 +3,6 @@
 This matrix records the links verified during a read-only Jira review on
 2026-09-07. Jira issues, comments, fields, and statuses were not modified.
 
-<!-- TODO(docs-audit): This matrix predates the verification/ qualification
-framework and docs/qualification-report.pdf (both added after this 2026-09-07
-snapshot per git history). The ESP32/DS18B20/LCD hardware is now physically
-assembled (see verification/manual/HW-01..04.md, SYS-01..05.md), and a
-qualification report already exists, but this file's "Acceptance pending" /
-"Implemented / acceptance pending" rows and the "still require the assembled
-hardware" line below have not been reconciled against that report's per-
-requirement PASS/FAIL results. Judgment call: updating those statuses needs
-someone to read docs/qualification-report.pdf (out of scope for this pass)
-and confirm which requirements actually passed, rather than assuming pass. -->
-
 Status meanings:
 
 - **Implemented**: behavior exists in active code and has unit/build coverage.
@@ -35,13 +24,6 @@ Status meanings:
 | SYS-HLR-520 | SCRUM-416 | Acceptance pending | Autonomous discovery, power-cycle reconnect, first-current publication, and a ten-second recovery deadline are implemented. |
 
 The web UI and concrete MySQL integration are implemented in this repository.
-<!-- TODO(docs-audit): the sentence below ("still require the assembled
-hardware") was accurate at the 2026-09-07 review but the physical unit
-(ESP32, two DS18B20 probes, 16x2 LCD, battery box) is now built and the
-verification/ framework's manual hardware procedures (HW-01..04, SYS-01..05)
-plus docs/qualification-report.pdf exist as evidence acceptance work has
-since happened. Leaving the wording as-is rather than guessing whether every
-SYS-HLR row above actually passed. -->
 Final physical wiring, timing, and full-system acceptance still require the
 assembled hardware.
 
