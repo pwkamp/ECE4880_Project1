@@ -12,8 +12,10 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .outcomes import TEST_OUTCOMES
 
-ALLOWED_OUTCOMES = {"PASS", "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE"}
+
+ALLOWED_OUTCOMES = set(TEST_OUTCOMES)
 ALLOWED_METHODS = {"automated", "semi-automated", "manual"}
 PROFILES = ("software", "integration", "hil", "full")
 CATALOG_ROOT = Path(__file__).resolve().parents[1]

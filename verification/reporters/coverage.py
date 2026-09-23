@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from verification.core.evidence import safe_output_path
+from verification.core.outcomes import PASS_OVERRIDE, PASSING_OUTCOMES
 
 
 def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], results: list[dict[str, Any]]) -> dict[str, Any]:
@@ -20,8 +21,11 @@ def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], r
     for requirement in requirements:
         mapped = tests_by_requirement.get(requirement["uid"], [])
         states = [results_by_id[item["id"]]["outcome"] for item in mapped if item["id"] in results_by_id]
-        unresolved = requirement.get("status", "active").lower() in {"tbd", "conflict"}
-        if unresolved:
+        requirement_status = requirement.get("status", "active").lower()
+        unresolved = requirement_status in {"tbd", "conflict"}
+        if requirement_status == "not_applicable":
+            outcome, reason = "NOT_APPLICABLE", requirement.get("disposition_note", "requirement removed from project scope")
+        elif unresolved:
             outcome = "BLOCKED"
             reason = f"Jira requirement status is {requirement['status']}"
         elif not mapped:
@@ -30,8 +34,11 @@ def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], r
             outcome, reason = "FAIL", "one or more executed mandatory tests failed"
         elif len(states) < len(mapped) or any(state in {"BLOCKED", "SKIPPED"} for state in states):
             outcome, reason = "BLOCKED", "mandatory verification is unexecuted, skipped, or blocked"
-        elif states and all(state in {"PASS", "NOT_APPLICABLE"} for state in states):
-            outcome, reason = "PASS", "all mandatory mapped tests passed"
+        elif states and all(state in PASSING_OUTCOMES for state in states):
+            if any(state == PASS_OVERRIDE for state in states):
+                outcome, reason = PASS_OVERRIDE, "all mandatory mapped tests passed; one or more results were operator overrides"
+            else:
+                outcome, reason = "PASS", "all mandatory mapped tests passed"
         else:
             outcome, reason = "BLOCKED", "no conclusive evidence"
         rows.append({
@@ -46,7 +53,7 @@ def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], r
             "result": outcome,
             "reason": reason,
         })
-    counts = {state: sum(1 for row in rows if row["result"] == state) for state in ("PASS", "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE")}
+    counts = {state: sum(1 for row in rows if row["result"] == state) for state in ("PASS", PASS_OVERRIDE, "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE")}
     counts["UNMAPPED"] = sum(1 for row in rows if not row["tests"])
     return {"requirements": rows, "counts": counts, "total": len(rows)}
 

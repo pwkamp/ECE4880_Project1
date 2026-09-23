@@ -19,6 +19,12 @@
     {
       "name": "docs",
       "path": "docs"
+    },
+    {
+      "path": "verification"
+    },
+    {
+      "path": "artifacts"
     }
   ],
   "settings": {

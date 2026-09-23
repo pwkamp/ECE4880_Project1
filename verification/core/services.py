@@ -12,10 +12,15 @@ from pathlib import Path
 from typing import Any
 
 
-def _healthy(url: str) -> bool:
+def _healthy(url: str, expected_contract: int | None = None) -> bool:
     try:
         with urllib.request.urlopen(url, timeout=2) as response:
-            return response.status < 400
+            if response.status >= 400:
+                return False
+            if expected_contract is None:
+                return True
+            payload = json.loads(response.read().decode("utf-8"))
+            return payload.get("verification_contract") == expected_contract
     except Exception:
         return False
 
@@ -30,9 +35,14 @@ class ServiceManager:
         self.events: list[dict[str, Any]] = []
 
     def _start(self, name: str, command: list[str], cwd: Path, health_url: str, timeout: float = 300) -> None:
-        if _healthy(health_url):
+        if _healthy(health_url, expected_contract=2):
             self.events.append({"service": name, "action": "reused", "health_url": health_url})
             return
+        if _healthy(health_url):
+            raise RuntimeError(
+                f"{name} is healthy but belongs to an older verification contract; "
+                f"stop it and rerun so the current launcher can rebuild it"
+            )
         self.evidence_dir.mkdir(parents=True, exist_ok=True)
         log_path = self.evidence_dir / f"{name}-service.log"
         log = log_path.open("a", encoding="utf-8")
@@ -41,7 +51,7 @@ class ServiceManager:
         self.processes.append((name, process, log))
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            if _healthy(health_url):
+            if _healthy(health_url, expected_contract=2):
                 self.events.append({"service": name, "action": "started", "pid": process.pid, "health_url": health_url, "log": str(log_path)})
                 return
             code = process.poll()

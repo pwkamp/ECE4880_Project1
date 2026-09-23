@@ -1,27 +1,34 @@
-/**
- * UI-facing alert configuration.
- *
- * The threshold + message + destination fields the "Threshold alerts" panel
- * edits. `App.tsx` adapts one `AlertConfig` into the `AlertRule` /
- * `AlertRecipient` inputs of the alert engine (see `src/lib/alertEngine.ts`),
- * which owns the actual NORMAL/HIGH/LOW state machine.
- */
-export interface AlertConfig {
+/** UI-facing, MySQL-persisted email alert configuration. */
+
+export interface AlertRecipientConfig {
+  id: string;
+  destination: string;
   enabled: boolean;
   /** Thresholds are stored in Celsius regardless of the display unit. */
   maxC: number;
   minC: number;
   maxMessage: string;
   minMessage: string;
-  /** Confirmed email addresses that receive alerts. */
-  destinations: string[];
+}
+
+export interface AlertConfig {
+  enabled: boolean;
+  recipients: AlertRecipientConfig[];
 }
 
 export const DEFAULT_ALERT_CONFIG: AlertConfig = {
   enabled: true,
-  maxC: 30,
-  minC: 15,
-  maxMessage: 'Temperature high: sensor above the configured maximum.',
-  minMessage: 'Temperature low: sensor below the configured minimum.',
-  destinations: [],
+  recipients: [],
 };
+
+export function defaultRecipient(destination: string, id = destination): AlertRecipientConfig {
+  return {
+    id,
+    destination,
+    enabled: true,
+    maxC: 30,
+    minC: 15,
+    maxMessage: 'Temperature high: sensor above the configured maximum.',
+    minMessage: 'Temperature low: sensor below the configured minimum.',
+  };
+}

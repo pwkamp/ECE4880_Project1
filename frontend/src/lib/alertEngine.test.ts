@@ -154,6 +154,15 @@ test('SCRUM-621: two recipients on the same rule each get their own alert', () =
   expect(events.map((e) => e.recipientId).sort()).toEqual(['a', 'b']);
 });
 
+test('a recipient-scoped rule only alerts its configured recipient', () => {
+  const events = run(
+    [35],
+    [rule({ recipientId: 'a' })],
+    [recipient({ id: 'a' }), recipient({ id: 'b' })],
+  );
+  expect(events.map((event) => event.recipientId)).toEqual(['a']);
+});
+
 test('SCRUM-621: state key is (recipientId, ruleId, source)', () => {
   expect(ruleStateKey('alice', 'r1', AlertSource.SENSOR_1)).toBe('alice::r1::SENSOR_1');
 });

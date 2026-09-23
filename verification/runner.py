@@ -27,6 +27,7 @@ from verification.core.evidence import write_json
 from verification.core.execution import blocked_result, run_automated, run_manual
 from verification.core.preflight import CONFIRMED, blockers, confirmations_pending, run_preflight
 from verification.core.paths import existing_run, safe_test_id, within
+from verification.core.outcomes import PASS_OVERRIDE, PASSING_OUTCOMES, TEST_OUTCOMES, normalize_outcome
 from verification.core.services import ServiceManager
 from verification.reporters import coverage as coverage_reporter
 from verification.reporters import dashboard_data, junit, markdown
@@ -148,6 +149,93 @@ def _selected(tests: list[dict[str, Any]], profile: str) -> list[dict[str, Any]]
     return [test for test in tests if profile in test.get("profiles", [])]
 
 
+def _same_test_definition(previous: dict[str, Any] | None, current: dict[str, Any]) -> bool:
+    """Require an exact frozen-catalog match before carrying a result forward."""
+
+    return previous is not None and json.dumps(previous, sort_keys=True) == json.dumps(current, sort_keys=True)
+
+
+def _resume_results(
+    run_id: str,
+    source_run: Path,
+    selected: list[dict[str, Any]],
+    evidence_root: Path,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    """Copy reusable results/evidence and return tests that still need execution."""
+
+    results_path = source_run / "results.jsonl"
+    frozen_tests_path = source_run / "catalogs" / "tests.yaml"
+    if not results_path.is_file() or not frozen_tests_path.is_file():
+        raise ValueError(f"resume source {source_run.name} has no complete frozen test catalog/results")
+    source_results = {
+        item["test_id"]: item
+        for item in (json.loads(line) for line in results_path.read_text(encoding="utf-8").splitlines() if line)
+    }
+    source_tests = {item["id"]: item for item in load_catalog(frozen_tests_path)}
+    reused: list[dict[str, Any]] = []
+    pending: list[dict[str, Any]] = []
+    decisions: list[dict[str, str]] = []
+    reused_at = datetime.now(timezone.utc).isoformat()
+
+    for test in selected:
+        test_id = test["id"]
+        previous = source_results.get(test_id)
+        if previous is None:
+            pending.append(test)
+            decisions.append({"test_id": test_id, "action": "rerun", "reason": "new or absent from source run"})
+            continue
+        if previous.get("outcome") not in PASSING_OUTCOMES:
+            pending.append(test)
+            decisions.append({
+                "test_id": test_id,
+                "action": "rerun",
+                "reason": f"source outcome was {previous.get('outcome', 'unknown')}",
+            })
+            continue
+        if not _same_test_definition(source_tests.get(test_id), test):
+            pending.append(test)
+            decisions.append({"test_id": test_id, "action": "rerun", "reason": "test definition changed"})
+            continue
+
+        copied = json.loads(json.dumps(previous))
+        copied.update(
+            run_id=run_id,
+            title=test["title"],
+            subsystem=test["subsystem"],
+            method=test["method"],
+            setup_group=test.get("setup_group", "software"),
+            requirements=test.get("requirements", []),
+            jira_keys=test.get("jira_keys", []),
+            limitations=test.get("limitations", []),
+            human_intervention=test.get("human_intervention"),
+            reused=True,
+            execution_source="imported",
+            reused_from_run=source_run.name,
+            reused_at_utc=reused_at,
+            source_started_at_utc=previous.get("started_at_utc"),
+        )
+        source_evidence = source_run / "evidence" / test_id
+        destination_evidence = evidence_root / test_id
+        if source_evidence.is_dir():
+            shutil.copytree(source_evidence, destination_evidence, dirs_exist_ok=False)
+        copied["evidence"] = [
+            path for path in copied.get("evidence", [])
+            if (evidence_root.parent / path).is_file()
+        ]
+        reused.append(copied)
+        decisions.append({"test_id": test_id, "action": "reuse", "reason": f"unchanged {previous['outcome']} result"})
+
+    manifest = {
+        "source_run": source_run.name,
+        "created_at_utc": reused_at,
+        "reuse_policy": "reuse unchanged PASS, PASS_OVERRIDE, and NOT_APPLICABLE; rerun all other, missing, or changed tests",
+        "reused_test_ids": [item["test_id"] for item in reused],
+        "rerun_test_ids": [item["id"] for item in pending],
+        "decisions": decisions,
+    }
+    return reused, pending, manifest
+
+
 def _print_preflight(profile: str, tests: list[dict[str, Any]], fixtures: dict[str, Any], instrumentation: dict[str, Any]) -> None:
     print("ECE4880 Verification Preflight")
     print("=" * 30)
@@ -178,10 +266,21 @@ def preflight(profile: str) -> int:
     return 1 if any(blockers(test, fixture_status, instrumentation_status) for test in selected) else 0
 
 
-def run(profile: str, non_interactive: bool, defer_photos: bool = False, start_services: bool = True) -> int:
+def run(
+    profile: str,
+    non_interactive: bool,
+    defer_photos: bool = False,
+    start_services: bool = True,
+    resume_from: str | None = None,
+) -> int:
     requirements, tests, fixture_catalog = validate_catalogs(ROOT)
     setup_groups = load_catalog(ROOT / "setup_groups.yaml")
     selected = _selected(tests, profile)
+    source_run: Path | None = None
+    if resume_from:
+        source_run = existing_run(ARTIFACTS, resume_from)
+        if source_run is None or not source_run.is_dir():
+            raise CatalogError(f"resume source was not found: {resume_from}")
     now = datetime.now(timezone.utc)
     started_monotonic = time.perf_counter_ns()
     try:
@@ -198,17 +297,37 @@ def run(profile: str, non_interactive: bool, defer_photos: bool = False, start_s
     evidence_root = run_dir / "evidence"
     evidence_root.mkdir(parents=True, exist_ok=False)
 
+    results: list[dict[str, Any]] = []
+    pending = selected
+    resume_manifest: dict[str, Any] | None = None
+    if source_run is not None:
+        try:
+            results, pending, resume_manifest = _resume_results(run_id, source_run, selected, evidence_root)
+        except ValueError as exc:
+            shutil.rmtree(run_dir)
+            raise CatalogError(str(exc)) from exc
+        write_json(run_dir / "resume.json", resume_manifest)
+        print(f"\nResuming from {source_run.name}")
+        print(f"  Reused: {len(results)} unchanged conclusive results")
+        print(f"  Rerun:  {len(pending)} new, changed, failed, blocked, or skipped tests")
+        if pending:
+            print("  Tests:  " + ", ".join(test["id"] for test in pending))
+    (run_dir / "results.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in results),
+        encoding="utf-8",
+    )
+
     service_events: list[dict[str, Any]] = []
-    if profile in {"hil", "full"} and start_services:
+    if profile in {"hil", "full"} and start_services and any(_setup_group(test) != "software" for test in pending):
         print("\nStarting or reusing backend, MySQL, and frontend fixtures (existing database retained)...")
         try:
             service_events = ServiceManager(REPOSITORY, evidence_root / "_services").ensure()
         except RuntimeError as exc:
             print(f"Fixture startup failed: {exc}", file=sys.stderr)
 
-    fixture_status, instrumentation_status = run_preflight(selected, fixture_catalog, REPOSITORY)
-    _print_setup_plan(selected, setup_groups)
-    _print_preflight(profile, selected, fixture_status, instrumentation_status)
+    fixture_status, instrumentation_status = run_preflight(pending, fixture_catalog, REPOSITORY)
+    _print_setup_plan(pending, setup_groups)
+    _print_preflight(profile, pending, fixture_status, instrumentation_status)
 
     metadata = collect(REPOSITORY, ROOT, profile, run_id)
     write_json(run_dir / "run.json", metadata)
@@ -220,9 +339,8 @@ def run(profile: str, non_interactive: bool, defer_photos: bool = False, start_s
     for name in ("requirements.yaml", "tests.yaml", "fixtures.yaml", "setup_groups.yaml"):
         shutil.copy2(ROOT / name, catalog_dir / name)
 
-    results: list[dict[str, Any]] = []
     setup_records: list[dict[str, Any]] = []
-    ordered = _ordered_by_setup(selected, setup_groups)
+    ordered = _ordered_by_setup(pending, setup_groups)
     current_group_id: str | None = None
     current_group_ready = True
     for test in ordered:
@@ -259,12 +377,23 @@ def run(profile: str, non_interactive: bool, defer_photos: bool = False, start_s
         with (run_dir / "results.jsonl").open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(result, sort_keys=True) + "\n")
 
+    result_positions = {test["id"]: index for index, test in enumerate(_ordered_by_setup(selected, setup_groups))}
+    results.sort(key=lambda item: result_positions[item["test_id"]])
+    (run_dir / "results.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in results),
+        encoding="utf-8",
+    )
+
     coverage = coverage_reporter.calculate(requirements, tests, results)
     coverage_reporter.write(coverage, run_dir / "requirements-coverage.json", run_dir / "requirements-coverage.csv")
     junit.write(results, run_dir / "junit.xml")
     metadata["ended_at_utc"] = datetime.now(timezone.utc).isoformat()
     metadata["duration_ms"] = (time.perf_counter_ns() - started_monotonic) // 1_000_000
     metadata["outcome"] = _qualification_outcome(results, coverage)
+    if resume_manifest is not None:
+        metadata["resumed_from_run"] = resume_manifest["source_run"]
+        metadata["reused_test_ids"] = resume_manifest["reused_test_ids"]
+        metadata["executed_test_ids"] = resume_manifest["rerun_test_ids"]
     write_json(run_dir / "run.json", metadata)
     write_json(run_dir / "fixture-status.json", fixture_status)
     write_json(run_dir / "instrumentation-status.json", instrumentation_status)
@@ -310,6 +439,24 @@ def _rebuild_run_outputs(run_dir: Path, results: list[dict[str, Any]]) -> None:
     else:
         requirements, tests, _ = validate_catalogs(ROOT)
     coverage = coverage_reporter.calculate(requirements, tests, results)
+    requirement_adjudications = run_dir / "requirement-adjudications.json"
+    if requirement_adjudications.is_file():
+        decisions = json.loads(requirement_adjudications.read_text(encoding="utf-8")).get("adjudications", [])
+        rows_by_id = {row["uid"]: row for row in coverage["requirements"]}
+        for decision in decisions:
+            row = rows_by_id.get(str(decision.get("uid", "")))
+            outcome = normalize_outcome(str(decision.get("outcome", "")))
+            if row is None or outcome not in TEST_OUTCOMES:
+                continue
+            row["result"] = outcome
+            row["reason"] = str(decision.get("reason", "Run-specific requirement disposition"))
+            if outcome == "NOT_APPLICABLE":
+                row["requirement_status"] = "not_applicable"
+        coverage["counts"] = {
+            state: sum(1 for row in coverage["requirements"] if row["result"] == state)
+            for state in ("PASS", PASS_OVERRIDE, "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE")
+        }
+        coverage["counts"]["UNMAPPED"] = sum(1 for row in coverage["requirements"] if not row["tests"])
     coverage_reporter.write(coverage, run_dir / "requirements-coverage.json", run_dir / "requirements-coverage.csv")
     junit.write(results, run_dir / "junit.xml")
     metadata = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
@@ -320,14 +467,14 @@ def _rebuild_run_outputs(run_dir: Path, results: list[dict[str, Any]]) -> None:
 
 
 def adjudicate(run_id: str, test_id: str, outcome: str, reason: str, operator: str) -> tuple[bool, str]:
-    """Record a traceable operator decision for a non-automated test result."""
+    """Record a traceable post-run decision for any test result."""
 
     run_dir = existing_run(ARTIFACTS, run_id)
     if run_dir is None or not run_dir.is_dir():
         return False, f"verification run not found: {run_id}"
-    outcome = outcome.upper()
-    if outcome not in {"PASS", "FAIL", "BLOCKED"}:
-        return False, "manual outcome must be PASS, FAIL, or BLOCKED"
+    outcome = normalize_outcome(outcome)
+    if outcome not in TEST_OUTCOMES:
+        return False, f"outcome must be one of: {', '.join(TEST_OUTCOMES)}"
     if not reason.strip() or not operator.strip():
         return False, "operator and rationale are required"
     frozen_tests = run_dir / "catalogs" / "tests.yaml"
@@ -338,22 +485,25 @@ def adjudicate(run_id: str, test_id: str, outcome: str, reason: str, operator: s
     definition = next((item for item in tests if item["id"] == test_id), None)
     if definition is None:
         return False, f"test not found: {test_id}"
-    if definition["method"] == "automated":
-        return False, "automated results cannot be manually adjudicated"
     results_path = run_dir / "results.jsonl"
     results = [json.loads(line) for line in results_path.read_text(encoding="utf-8").splitlines() if line]
     result = next((item for item in results if item["test_id"] == test_id), None)
     if result is None:
         return False, f"test result not found: {test_id}"
     result.setdefault("original_outcome", result["outcome"])
+    if result.get("failure_reason"):
+        result.setdefault("original_failure_reason", result["failure_reason"])
     result["outcome"] = outcome
-    result["adjudication"] = {
+    decision = {
         "operator": operator.strip(),
         "reason": reason.strip(),
         "outcome": outcome,
+        "override": outcome == PASS_OVERRIDE,
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
     }
-    if outcome == "PASS":
+    result["adjudication"] = decision
+    result.setdefault("adjudication_history", []).append(decision)
+    if outcome in {"PASS", PASS_OVERRIDE, "NOT_APPLICABLE"}:
         result.pop("failure_reason", None)
     else:
         result["failure_reason"] = reason.strip()
@@ -479,6 +629,11 @@ def parser() -> argparse.ArgumentParser:
             command.add_argument("--non-interactive", action="store_true", help="record manual tests BLOCKED without prompting")
             command.add_argument("--defer-photos", action="store_true", help="run functional steps now and attach required photos later")
             command.add_argument("--no-start-services", action="store_true", help="do not automatically start missing backend/MySQL/frontend fixtures")
+            command.add_argument(
+                "--resume-from",
+                metavar="RUN_ID",
+                help="copy unchanged conclusive results/evidence from a prior run (use 'latest' for the most recent run)",
+            )
     commands.add_parser("status")
     dash = commands.add_parser("dashboard")
     dash.add_argument("--no-browser", action="store_true")
@@ -493,10 +648,10 @@ def parser() -> argparse.ArgumentParser:
     evidence_add.add_argument("test_id")
     evidence_add.add_argument("--photo", action="append", required=True)
     evidence_add.add_argument("--complete", action="store_true", help="complete a photo-only blocked result after attaching evidence")
-    adjudicate_parser = commands.add_parser("adjudicate", help="record PASS/FAIL/BLOCKED for a manual or semi-automated result")
+    adjudicate_parser = commands.add_parser("adjudicate", help="record a traceable post-run result decision")
     adjudicate_parser.add_argument("run_id")
     adjudicate_parser.add_argument("test_id")
-    adjudicate_parser.add_argument("outcome", choices=("PASS", "FAIL", "BLOCKED"))
+    adjudicate_parser.add_argument("outcome", choices=TEST_OUTCOMES)
     adjudicate_parser.add_argument("--reason", required=True)
     adjudicate_parser.add_argument("--operator", required=True)
     return result
@@ -506,7 +661,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
         if args.command == "run":
-            return run(args.profile, args.non_interactive, args.defer_photos, not args.no_start_services)
+            return run(
+                args.profile,
+                args.non_interactive,
+                args.defer_photos,
+                not args.no_start_services,
+                args.resume_from,
+            )
         if args.command == "preflight":
             return preflight(args.profile)
         if args.command == "status":

@@ -74,7 +74,14 @@ services:
       BACKEND_PROXY_TARGET: ${BACKEND_PROXY_TARGET:-http://backend:8000}
       FRONTEND_SERVER_PROXY_TARGET: ${FRONTEND_SERVER_PROXY_TARGET:-http://127.0.0.1:8787}
       MYSQL_URL: mysql://${MYSQL_USER:?set MYSQL_USER in backend/.env}:${MYSQL_PASSWORD:?set MYSQL_PASSWORD in backend/.env}@${MYSQL_HOST:-mysql}:${MYSQL_PORT:-3306}/${MYSQL_DATABASE:?set MYSQL_DATABASE in backend/.env}
-      EMAIL_MODE: console
+      EMAIL_MODE: ${EMAIL_MODE:-console}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      ALERT_API_TOKEN: ${ALERT_API_TOKEN:-}
       PORT: 8787
       TZ: UTC
     depends_on:

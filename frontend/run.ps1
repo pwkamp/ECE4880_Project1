@@ -42,6 +42,13 @@ foreach ($Name in @(
         Fail "$Name must be set in $EnvFile"
     }
 }
+if ($Config.ContainsKey("EMAIL_MODE") -and $Config["EMAIL_MODE"] -eq "live") {
+    foreach ($Name in @("SMTP_USER", "SMTP_PASS")) {
+        if (-not $Config.ContainsKey($Name) -or [string]::IsNullOrWhiteSpace($Config[$Name])) {
+            Fail "EMAIL_MODE=live requires $Name; run frontend/configure-smtp.ps1 first"
+        }
+    }
+}
 
 $BackendHealthUrl = "http://127.0.0.1:$($Config['BACKEND_PORT'])/healthz"
 try {

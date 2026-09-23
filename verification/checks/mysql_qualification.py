@@ -80,7 +80,7 @@ def execute_script(name: str, sql: str, *, database: str | None = None) -> None:
 def db01() -> None:
     with isolated_mysql() as name:
         tables = {row[0] for row in query(name, "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='thermometer'")}
-        required = {"temperature_samples", "alert_recipients", "alert_rules", "alert_rule_recipients"}
+        required = {"temperature_samples", "alert_settings", "alert_recipients", "alert_rules", "alert_rule_recipients"}
         missing = required - tables
         if missing:
             raise AssertionError(f"missing tables: {sorted(missing)}")

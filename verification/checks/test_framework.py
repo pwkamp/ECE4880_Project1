@@ -11,12 +11,14 @@ from verification.core.evidence import redact, safe_output_path
 from verification.core.paths import existing_run
 from verification.core.instrumentation import TimestampedLog, measure, write_database_capture
 from verification.core.execution import _manual_measurements
+from verification.core.assisted import _button_display
 from verification.core.services import ServiceManager
+from verification.core.uart_capture import UartEvent
 from verification.reporters.coverage import calculate
 from verification.reporters.dashboard_data import publish
 from verification.fixtures.fake_ble_device import FakeBleDevice
 from verification.fixtures.fake_notification_provider import CaptureEmailProvider, FailingNotificationProvider
-from verification.runner import _ordered_by_setup, _prepare_setup_section, _qualification_outcome
+from verification.runner import _ordered_by_setup, _prepare_setup_section, _qualification_outcome, _resume_results, adjudicate
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +30,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(_qualification_outcome([{"outcome": "PASS"}], coverage), "PASS")
         self.assertEqual(_qualification_outcome([{"outcome": "PASS"}, {"outcome": "BLOCKED"}], coverage), "BLOCKED")
         self.assertEqual(_qualification_outcome([{"outcome": "BLOCKED"}, {"outcome": "FAIL"}], coverage), "FAIL")
+        self.assertEqual(_qualification_outcome([{"outcome": "PASS_OVERRIDE"}], coverage), "PASS")
 
     def test_jira_snapshot_and_consolidated_matrix_are_complete(self) -> None:
         requirements, tests, _ = validate_catalogs(ROOT)
@@ -52,7 +55,7 @@ class CatalogTests(unittest.TestCase):
     def test_tbd_and_conflict_requirements_remain_explicit(self) -> None:
         requirements, _, _ = validate_catalogs(ROOT)
         unresolved = {item["status"] for item in requirements if item["status"] != "active"}
-        self.assertEqual(unresolved, {"tbd", "conflict"})
+        self.assertEqual(unresolved, {"tbd", "conflict", "not_applicable"})
 
     def test_system_hlrs_are_not_claimed_by_simulation_alone(self) -> None:
         requirements, tests, _ = validate_catalogs(ROOT)
@@ -99,6 +102,83 @@ class CatalogTests(unittest.TestCase):
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_fw04_detects_button_and_render_markers_without_operator_press_confirmation(self) -> None:
+        class FakeUart:
+            def __init__(self) -> None:
+                self.events: list[UartEvent] = []
+                self.closed = False
+
+            def wait_for(self, fragments: tuple[str, ...], after_wall_ns: int, timeout: float = 2.0) -> UartEvent:
+                if fragments[0] == "VERIFY LOCAL_DISPLAY_RENDER":
+                    line = " ".join(fragments)
+                    observed = after_wall_ns + 5_000_000
+                else:
+                    line = f"local_controls: {fragments[0]} GPIO34 pressed"
+                    observed = after_wall_ns + 1_000_000
+                event = UartEvent(observed, observed, line)
+                self.events.append(event)
+                return event
+
+            def close(self) -> None:
+                self.closed = True
+
+        fake_uart = FakeUart()
+        records: list[dict[str, object]] = []
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "verification.core.assisted.UartCapture.from_environment", return_value=fake_uart
+        ), patch(
+            "verification.core.assisted._display_states", return_value={1: False, 2: True}
+        ), patch(
+            "verification.core.assisted._wait_display",
+            side_effect=[(True, 10.0, True), (True, 11.0, False)],
+        ), patch(
+            "verification.core.assisted.choice", return_value="All cases pass"
+        ) as operator_choice:
+            metrics, failures = _button_display(records, False, Path(directory))
+
+        self.assertEqual(failures, [])
+        self.assertEqual(metrics["sensor_1_button_to_render_ms"], 5.0)
+        self.assertEqual(metrics["sensor_2_button_to_render_ms"], 5.0)
+        self.assertEqual(operator_choice.call_count, 1, "only the final LCD visual check should prompt")
+        self.assertTrue(fake_uart.closed)
+
+    def test_resume_copies_only_unchanged_conclusive_results_and_their_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "artifacts" / "verification" / "source-run"
+            destination = root / "artifacts" / "verification" / "new-run" / "evidence"
+            (source / "catalogs").mkdir(parents=True)
+            (source / "evidence" / "T-PASS").mkdir(parents=True)
+            (source / "evidence" / "T-PASS" / "command.log").write_text("proof", encoding="utf-8")
+
+            def definition(test_id: str, rationale: str = "unchanged") -> dict[str, object]:
+                return {
+                    "id": test_id, "title": test_id, "subsystem": "test", "method": "automated",
+                    "rationale": rationale, "requirements": ["REQ-1"], "jira_keys": ["SCRUM-1"],
+                    "limitations": [], "human_intervention": None,
+                }
+
+            frozen = [definition("T-PASS"), definition("T-FAIL"), definition("T-CHANGED", "old")]
+            (source / "catalogs" / "tests.yaml").write_text(json.dumps(frozen), encoding="utf-8")
+            source_results = [
+                {"test_id": "T-PASS", "outcome": "PASS", "started_at_utc": "old", "evidence": ["evidence/T-PASS/command.log"]},
+                {"test_id": "T-FAIL", "outcome": "FAIL", "started_at_utc": "old", "evidence": []},
+                {"test_id": "T-CHANGED", "outcome": "PASS", "started_at_utc": "old", "evidence": []},
+            ]
+            (source / "results.jsonl").write_text(
+                "".join(json.dumps(item) + "\n" for item in source_results), encoding="utf-8"
+            )
+            selected = [definition("T-PASS"), definition("T-FAIL"), definition("T-CHANGED", "new"), definition("T-NEW")]
+
+            reused, pending, manifest = _resume_results("new-run", source, selected, destination)
+
+            self.assertEqual([item["test_id"] for item in reused], ["T-PASS"])
+            self.assertEqual([item["id"] for item in pending], ["T-FAIL", "T-CHANGED", "T-NEW"])
+            self.assertEqual(reused[0]["reused_from_run"], "source-run")
+            self.assertEqual(reused[0]["execution_source"], "imported")
+            self.assertTrue((destination / "T-PASS" / "command.log").is_file())
+            self.assertEqual(manifest["rerun_test_ids"], ["T-FAIL", "T-CHANGED", "T-NEW"])
+
     def test_service_manager_writes_reused_service_evidence_on_fresh_run(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -160,6 +240,45 @@ class EvidenceTests(unittest.TestCase):
         outside = Path.home() / "verification-path-escape.txt"
         with self.assertRaises(ValueError):
             safe_output_path(outside)
+
+    def test_dashboard_adjudication_can_override_an_automated_result_and_persists_history(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory) / "repository"
+            artifacts = repository / "artifacts" / "verification"
+            dashboard = repository / "verification" / "dashboard"
+            run = artifacts / "2026-09-23T120000Z_test"
+            catalogs = run / "catalogs"
+            catalogs.mkdir(parents=True)
+            dashboard.mkdir(parents=True)
+            requirements = [{"uid": "REQ-1", "jira": "SCRUM-1", "level": "LLR", "component": "test", "status": "active"}]
+            tests = [{"id": "AUTO-01", "method": "automated", "requirements": ["REQ-1"], "rationale": "test rationale"}]
+            (catalogs / "requirements.yaml").write_text(json.dumps(requirements), encoding="utf-8")
+            (catalogs / "tests.yaml").write_text(json.dumps(tests), encoding="utf-8")
+            (catalogs / "setup_groups.yaml").write_text(json.dumps({"software": {"title": "Software", "instructions": ["None"]}}), encoding="utf-8")
+            result = {
+                "test_id": "AUTO-01", "title": "Automated", "subsystem": "test", "method": "automated",
+                "outcome": "FAIL", "failure_reason": "fixture was stale", "duration_ms": 1,
+                "evidence": [], "requirements": ["REQ-1"], "setup_group": "software",
+                "started_at_utc": "2026-09-23T12:00:00+00:00", "profile": "full", "run_id": run.name,
+            }
+            (run / "results.jsonl").write_text(json.dumps(result) + "\n", encoding="utf-8")
+            (run / "run.json").write_text(json.dumps({"run_id": run.name, "profile": "full", "outcome": "FAIL"}), encoding="utf-8")
+            for name in ("fixture-status.json", "instrumentation-status.json"):
+                (run / name).write_text("{}", encoding="utf-8")
+            (run / "setup-transitions.json").write_text("[]", encoding="utf-8")
+
+            with patch("verification.runner.ARTIFACTS", artifacts), patch("verification.runner.DASHBOARD", dashboard), patch(
+                "verification.reporters.dashboard_data.ARTIFACTS", artifacts
+            ), patch("verification.reporters.dashboard_data.DASHBOARD", dashboard):
+                ok, message = adjudicate(run.name, "AUTO-01", "PASS_OVERRIDE", "Retained evidence proves the product passed.", "Operator")
+
+            self.assertTrue(ok, message)
+            stored = json.loads((run / "results.jsonl").read_text(encoding="utf-8"))
+            self.assertEqual(stored["outcome"], "PASS_OVERRIDE")
+            self.assertEqual(stored["original_outcome"], "FAIL")
+            self.assertTrue(stored["adjudication"]["override"])
+            self.assertEqual(len(stored["adjudication_history"]), 1)
+            self.assertTrue((dashboard / "latest.json").is_file())
 
     def test_common_secrets_are_redacted(self) -> None:
         value = redact("Authorization: Bearer abc\npassword=hunter2 mysql://u:p@mysql/db passkey=123456 MYSQL_ROOT_PASSWORD=rootpw mysql -pclipw")

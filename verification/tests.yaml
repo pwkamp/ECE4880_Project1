@@ -658,7 +658,7 @@
   {
     "id": "FW-04",
     "setup_group": "uart_live",
-    "title": "LCD, Buttons, and Backlight",
+    "title": "LCD and Buttons",
     "subsystem": "firmware",
     "method": "semi-automated",
     "profiles": [
@@ -670,7 +670,6 @@
       "lcd_real",
       "sensor_button_1",
       "sensor_button_2",
-      "selected_backlight_input",
       "sensor_1",
       "sensor_2"
     ],
@@ -680,12 +679,12 @@
       "lcd_render_timestamp",
       "manual_visual_confirmation"
     ],
-    "description": "Exercises both buttons, ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and backlight levels including the 20 ms software contribution.",
-    "rationale": "Guided manipulation of both physical controls and visual inspection cover behavior unavailable to unit tests; timestamp evidence is required for timing so human reaction time is never treated as firmware latency.",
+    "description": "Automatically detects both physical button presses from UART, correlates their LCD render markers and backend state changes, and verifies ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and the 20 ms software contribution. Adjustable backlight control is outside this test.",
+    "rationale": "Firmware UART markers automatically identify the debounced physical press and matching completed LCD render, eliminating operator confirmation timing and directly measuring the software contribution; guided visual inspection covers rendering qualities unavailable to machine telemetry.",
     "limitations": [
       "Operator visual confirmation and physical timestamp markers are mandatory."
     ],
-    "human_intervention": "Operator visual confirmation and physical timestamp markers are mandatory.",
+    "human_intervention": "The operator physically presses each requested button and visually confirms LCD cases; UART detects and times the presses automatically without a confirmation response.",
     "requirements": [
       "HWE-LLR-202",
       "HWE-LLR-207",
@@ -785,7 +784,7 @@
       },
       {
         "id": "procedure",
-        "instruction": "Exercises both buttons, ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and backlight levels including the 20 ms software contribution.",
+        "instruction": "Exercise both buttons and verify ON/OFF/DISCONNECTED/numeric/average rendering, signed values, readability, and the 20 ms software contribution.",
         "prompt": "Acceptance criteria satisfied?",
         "expected": "yes/no"
       },
@@ -1934,8 +1933,7 @@
     "description": "Checks email-only recipients/rules, email validation, configurable thresholds/messages, Gmail-compatible SMTP delivery, and persistence schema.",
     "rationale": "UI/API tests verify editable persistent email rules and validation, adapter tests verify Gmail-compatible SMTP behavior, and SYS-05 reserves a real-inbox confirmation for evidence that mocks cannot supply.",
     "limitations": [
-      "A real Gmail inbox confirmation remains part of SYS-05 because automated tests use a capture provider.",
-      "Jira SWE-WEB-LLR-610/611 remain BLOCKED: the current UI supports recipient add/remove and a persisted shared rule, but not per-recipient edit/enable controls or per-recipient thresholds."
+      "A real Gmail inbox confirmation remains part of SYS-05 because automated tests use a capture provider."
     ],
     "human_intervention": null,
     "requirements": [
@@ -2154,10 +2152,8 @@
       "provider_capture"
     ],
     "description": "Checks edge-triggered HIGH/LOW episodes, suppression while out of range, NORMAL reset, and re-alert.",
-    "rationale": "Explicit state-sequence tests are necessary to prove alerts occur on transitions rather than every poll; unresolved Jira semantics remain visibly blocked instead of being guessed by the harness.",
-    "limitations": [
-      "Jira marks this policy TBD; results remain BLOCKED until that requirement is approved."
-    ],
+    "rationale": "Explicit deterministic state-sequence tests prove alerts occur once on HIGH/LOW transitions, remain suppressed during a continuous excursion, reset on NORMAL, and fire again on a new episode.",
+    "limitations": [],
     "human_intervention": null,
     "requirements": [
       "SWE-ALR-LLR-711",

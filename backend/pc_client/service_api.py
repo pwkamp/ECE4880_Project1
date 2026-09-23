@@ -68,6 +68,7 @@ class HealthResponse(BaseModel):
     connected: bool
     database_adapter_available: bool
     persistence_configured: bool
+    verification_contract: int
 
 
 class StatusResponse(BaseModel):
@@ -371,6 +372,7 @@ def create_app(service: ThermometerBleService | None = None) -> FastAPI:
             "connected": service_status.connected,
             "database_adapter_available": service_status.last_database_error is None,
             "persistence_configured": service_status.persistence_configured,
+            "verification_contract": 2,
         }
 
     @app.get("/api/v1/ble/status", response_model=StatusResponse)

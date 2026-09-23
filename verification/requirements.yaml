@@ -429,7 +429,8 @@
     "jira": "SCRUM-428",
     "level": "MLR",
     "component": "Third Box Hardware",
-    "status": "active",
+    "status": "not_applicable",
+    "disposition_note": "Adjustable LCD backlight control was removed from project scope on 2026-09-23; the fixed readable backlight remains covered by LCD readability checks.",
     "parents": [
       "SYS-HLR-400",
       "SYS-HLR-410"
@@ -446,7 +447,8 @@
     "jira": "SCRUM-429",
     "level": "MLR",
     "component": "Third Box Hardware",
-    "status": "tbd",
+    "status": "not_applicable",
+    "disposition_note": "Adjustable LCD backlight control was removed from project scope on 2026-09-23.",
     "parents": [
       "SYS-HLR-400"
     ],
@@ -705,7 +707,8 @@
     "jira": "SCRUM-445",
     "level": "LLR",
     "component": "Third Box Hardware",
-    "status": "active",
+    "status": "not_applicable",
+    "disposition_note": "Multiple backlight brightness levels are no longer part of the selected hardware design.",
     "parents": [
       "HWE-MLR-207"
     ],
@@ -721,7 +724,8 @@
     "jira": "SCRUM-446",
     "level": "LLR",
     "component": "Third Box Hardware",
-    "status": "tbd",
+    "status": "not_applicable",
+    "disposition_note": "The project does not use a backlight-control button.",
     "parents": [
       "HWE-MLR-208"
     ],
@@ -737,7 +741,8 @@
     "jira": "SCRUM-447",
     "level": "LLR",
     "component": "Third Box Hardware",
-    "status": "tbd",
+    "status": "not_applicable",
+    "disposition_note": "The project does not use a backlight-control potentiometer.",
     "parents": [
       "HWE-MLR-208"
     ],
@@ -1028,7 +1033,8 @@
     "jira": "SCRUM-465",
     "level": "MLR",
     "component": "ESP32 Firmware",
-    "status": "active",
+    "status": "not_applicable",
+    "disposition_note": "Adjustable LCD backlight control was removed from firmware scope on 2026-09-23.",
     "parents": [
       "SYS-HLR-400"
     ],
@@ -1429,7 +1435,8 @@
     "jira": "SCRUM-490",
     "level": "LLR",
     "component": "ESP32 Firmware",
-    "status": "active",
+    "status": "not_applicable",
+    "disposition_note": "No runtime backlight adjustment interface is required by the selected design.",
     "parents": [
       "SWE-EMB-MLR-309"
     ],
@@ -1445,7 +1452,8 @@
     "jira": "SCRUM-491",
     "level": "LLR",
     "component": "ESP32 Firmware",
-    "status": "tbd",
+    "status": "not_applicable",
+    "disposition_note": "The project does not use a backlight-control button.",
     "parents": [
       "SWE-EMB-MLR-309"
     ],
@@ -1461,7 +1469,8 @@
     "jira": "SCRUM-492",
     "level": "LLR",
     "component": "ESP32 Firmware",
-    "status": "tbd",
+    "status": "not_applicable",
+    "disposition_note": "The project does not use a backlight-control potentiometer.",
     "parents": [
       "SWE-EMB-MLR-309"
     ],
@@ -3334,7 +3343,7 @@
     "jira": "SCRUM-608",
     "level": "MLR",
     "component": "Alerting/Security",
-    "status": "tbd",
+    "status": "active",
     "parents": [
       "SYS-HLR-700"
     ],
@@ -3543,7 +3552,7 @@
     "jira": "SCRUM-621",
     "level": "LLR",
     "component": "Alerting/Security",
-    "status": "tbd",
+    "status": "active",
     "parents": [
       "SWE-ALR-MLR-705"
     ],
@@ -3559,7 +3568,7 @@
     "jira": "SCRUM-622",
     "level": "LLR",
     "component": "Alerting/Security",
-    "status": "tbd",
+    "status": "active",
     "parents": [
       "SWE-ALR-MLR-705"
     ],
@@ -3575,7 +3584,7 @@
     "jira": "SCRUM-623",
     "level": "LLR",
     "component": "Alerting/Security",
-    "status": "tbd",
+    "status": "active",
     "parents": [
       "SWE-ALR-MLR-705"
     ],

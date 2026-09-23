@@ -54,31 +54,35 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [alertConfig]);
 
-  // Adapt the single UI config into the alert engine's rule/recipient model.
-  // One rule per physical sensor; each saved email is its own recipient.
+  // Each recipient owns independent thresholds/messages and one rule per
+  // physical sensor. recipientId prevents a cross-product between rules and
+  // recipients in the alert engine.
   const rules = useMemo<AlertRule[]>(() => {
-    const shared = {
-      minC: alertConfig.minC,
-      maxC: alertConfig.maxC,
-      enabled: alertConfig.enabled,
-      highMessage: alertConfig.maxMessage,
-      lowMessage: alertConfig.minMessage,
-      clearMessage: CLEAR_MESSAGE,
-    };
-    return [
-      { id: 'sensor-1', source: AlertSource.SENSOR_1, ...shared },
-      { id: 'sensor-2', source: AlertSource.SENSOR_2, ...shared },
-    ];
+    return alertConfig.recipients.flatMap((recipient) => {
+      const shared = {
+        recipientId: recipient.id,
+        minC: recipient.minC,
+        maxC: recipient.maxC,
+        enabled: alertConfig.enabled && recipient.enabled,
+        highMessage: recipient.maxMessage,
+        lowMessage: recipient.minMessage,
+        clearMessage: CLEAR_MESSAGE,
+      };
+      return [
+        { id: `${recipient.id}:sensor-1`, source: AlertSource.SENSOR_1, ...shared },
+        { id: `${recipient.id}:sensor-2`, source: AlertSource.SENSOR_2, ...shared },
+      ];
+    });
   }, [alertConfig]);
 
   const recipients = useMemo<AlertRecipient[]>(
     () =>
-      alertConfig.destinations.map((destination) => ({
-        id: destination,
-        destination,
-        enabled: true,
+      alertConfig.recipients.map((recipient) => ({
+        id: recipient.id,
+        destination: recipient.destination,
+        enabled: alertConfig.enabled && recipient.enabled,
       })),
-    [alertConfig.destinations],
+    [alertConfig],
   );
 
   const alerts = useAlertEngine(frame, rules, recipients);
