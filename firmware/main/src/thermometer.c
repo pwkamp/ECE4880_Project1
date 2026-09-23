@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "esp_log.h"
 #include "esp_random.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -17,6 +18,8 @@ typedef struct {
     uint16_t failed_reads;
     uint16_t successful_reads;
 } sensor_runtime_t;
+
+static const char *TAG = "thermometer";
 
 static SemaphoreHandle_t s_state_mutex;
 static SemaphoreHandle_t s_display_mutex;
@@ -103,10 +106,9 @@ static void apply_sensor_reading(sensor_runtime_t *sensor,
 
         if (sensor->latest.data_status == THERMOMETER_DATA_VALID ||
             sensor->successful_reads >= THERMOMETER_SUCCESSFUL_READ_LIMIT) {
-            if (sensor->latest.data_status != THERMOMETER_DATA_VALID) {
-                /* Requirement: SWE-EMB-LLR-311 (SCRUM-481). Recovery starts OFF. */
-                sensor->latest.display_enabled = false;
-            }
+            /* SWE-EMB-LLR-311 (SCRUM-481): display_enabled deliberately
+             * survives a fault. Recovery restores the state that was active
+             * immediately before disconnection without requiring a PC. */
             sensor->latest.temperature_centi_c = reading.temperature_centi_c;
             sensor->latest.data_status = THERMOMETER_DATA_VALID;
         }
@@ -120,7 +122,7 @@ static void apply_sensor_reading(sensor_runtime_t *sensor,
     if (sensor->failed_reads >= THERMOMETER_FAILED_READ_LIMIT) {
         /* Requirement: SWE-EMB-LLR-310 (SCRUM-480). Failed reads disconnect. */
         sensor->latest.data_status = THERMOMETER_DATA_DISCONNECTED;
-        sensor->latest.display_enabled = false;
+        /* Preserve display_enabled so reconnection restores ON or OFF. */
     }
 }
 
@@ -192,6 +194,10 @@ esp_err_t thermometer_start(void)
     }
 
     memset(s_sensors, 0, sizeof(s_sensors));
+    /* Verification events are sparse and intentionally remain visible even
+     * with the production WARN default. A host UART capture timestamps these
+     * markers for end-to-end display-latency evidence. */
+    esp_log_level_set(TAG, ESP_LOG_INFO);
     memset(s_history_snapshot, 0, sizeof(s_history_snapshot));
     s_history_snapshot_valid = false;
     for (size_t sensor_index = 0; sensor_index < THERMOMETER_SENSOR_COUNT;
@@ -325,6 +331,8 @@ bool thermometer_set_display(uint8_t sensor_id, bool enabled,
 
     if (state_changed) {
         render_current_display();
+        ESP_LOGI(TAG, "VERIFY DISPLAY_RENDER sensor=%u enabled=%u",
+                 (unsigned)sensor_id, enabled ? 1U : 0U);
     }
     return available;
 }
@@ -339,13 +347,17 @@ bool thermometer_toggle_display(uint8_t sensor_id)
     thermometer_sensor_snapshot_t *sensor =
         &s_sensors[sensor_id - 1U].latest;
     const bool available = sensor_is_available(sensor);
+    bool enabled_after_toggle = sensor->display_enabled;
     if (available) {
         sensor->display_enabled = !sensor->display_enabled;
+        enabled_after_toggle = sensor->display_enabled;
     }
     xSemaphoreGive(s_state_mutex);
 
     if (available) {
         render_current_display();
+        ESP_LOGI(TAG, "VERIFY LOCAL_DISPLAY_RENDER sensor=%u enabled=%u",
+                 (unsigned)sensor_id, enabled_after_toggle ? 1U : 0U);
     }
     return available;
 }

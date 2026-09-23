@@ -1,11 +1,7 @@
 # Database Module
 
 MySQL storage for the temperature monitoring system. Owns the `thermometer`
-database and its `temperature_samples` table (SCRUM-371).
-
-The `users`/`alert_recipients`/`alert_rules`/`alert_rule_recipients` tables
-originally scoped under SCRUM-372 were removed in the Lab 1 cleanup pass; see
-"Descoped: user/alert tables" below.
+database and its tables: `temperature_samples` plus email-alert configuration.
 
 ## Build
 
@@ -26,9 +22,13 @@ a per-machine server setting, not part of this file.
 | Table | Purpose | Requirement |
 |---|---|---|
 | `temperature_samples` | One row per 1 Hz poll: both probes, computed average, per-sensor status | SWE-DB-LLR-550 |
+| `alert_recipients` | Enabled email destinations | SWE-DB-LLR-555 |
+| `alert_rules` | Threshold rules with messages and monitored series | SWE-DB-LLR-556 |
+| `alert_rule_recipients` | Junction linking rules to recipients (many-to-many) | SWE-DB-LLR-556 |
 
 Rows in `temperature_samples` arrive from the BLE connection service through the
-database adapter.
+database adapter. The frontend Node service reads/writes the alert tables through
+the local `/api/alert-config` endpoint.
 
 `temperature_samples` also has a nullable `failure_reason VARCHAR(255)` column
 (SCRUM-341), populated for `PROVISIONAL` rows with why the 1 Hz slot was
@@ -46,6 +46,10 @@ connector actively populates it.
 | Celsius storage | SWE-DB-LLR-559 |
 | UTC timestamps | SWE-DB-LLR-560 |
 | Series + status model | SWE-DB-MLR-551 |
+| History and email-alert configuration storage | SWE-DB-MLR-552 |
+| deliberate absence of application-user tables | SWE-DB-LLR-554 |
+| alert_recipients table | SWE-DB-LLR-555 |
+| alert_rules table | SWE-DB-LLR-556 |
 
 ## Key design decisions
 
@@ -76,6 +80,27 @@ connector actively populates it.
   `device_id` column would hold no distinguishing information. It is omitted; this
   is a closed deviation, not an open question.
 
+### Email alerts and trusted-local operation
+
+- **Surrogate primary key on every table**, mirroring `temperature_samples`.
+- **No application accounts.** The stakeholder-approved trusted-local design
+  has no `users` table, passwords, login, or USER/ADMIN roles.
+- **Email only.** `alert_recipients.type` accepts only `EMAIL`; SMS/phone
+  delivery and validation are out of scope. Multiple email rows are supported.
+- **`enabled` defaults TRUE.** New email recipients and rules are active.
+- **Rule/recipient link is many-to-many.** A rule can notify several recipients
+  and a recipient can serve several rules, so the link is a junction table
+  (`alert_rule_recipients`) rather than a column. Both foreign keys are
+  `ON DELETE CASCADE`: deleting a rule or a recipient removes its links but not
+  the other party.
+- **Thresholds are `DECIMAL(5,2)` Celsius**, matching `temperature_samples`. Both
+  `min_threshold` and `max_threshold` are required (every rule is a bounded band
+  with a message for each side).
+- **`monitored_series` is `ENUM('SENSOR1','SENSOR2')`.** The UI applies its
+  shared threshold configuration to both physical sensors, so persistence
+  writes one rule row for each source. Average-based alerts were removed from
+  the application model during the Lab 1 cleanup.
+
 ## Timestamp handling
 
 - All timestamps are UTC per SWE-DB-LLR-560. The MySQL server timezone must be
@@ -87,6 +112,9 @@ connector actively populates it.
 - `HISTORY` rows are backfilled; their timestamps are reconstructed by the
   service from a live anchor and the 1 Hz sample period, so they are
   PC-clock-derived, not device-observed.
+- `created_at_utc` / `updated_at_utc` on the alert tables use
+  `DEFAULT CURRENT_TIMESTAMP`; `updated_at_utc` also carries
+  `ON UPDATE CURRENT_TIMESTAMP` so it re-stamps on every edit.
 
 ### Local server setup (per machine, for testing)
 
@@ -124,34 +152,23 @@ a MySQL server against this schema:
   / derived-unavailable` terms; updating that text to match the implementation is
   a requirements-doc task, not a schema change.
 
-## Descoped: user/alert tables
+## Superseded baseline
 
-- **`users`, `alert_recipients`, `alert_rules`, `alert_rule_recipients`
-  (SWE-DB-LLR-554/555/556, SWE-DB-MLR-552) were removed in the Lab 1 cleanup
-  pass.** The schema shipped (password-hash `USER`/`ADMIN` accounts, EMAIL/SMS
-  recipients, threshold rules) but was never consumed: no adapter code, no
-  route, no test anywhere in the repo read or wrote these tables. The alert
-  system that actually shipped stores thresholds and recipients client-side
-  (`frontend/src/components/AlertSettings.tsx`,
-  `frontend/src/lib/alertEngine.ts`) and delivers through
-  `frontend/server/notify.ts`, with no server-side persistence and no login
-  layer. The `sessionCookie.ts` module written ahead of that login layer
-  (`frontend/src/lib/sessionCookie.ts`) was removed alongside these tables for
-  the same reason: real, deliberate design work for a subsystem that was never
-  built.
+- **Application user accounts remain removed.** The trusted-local deployment
+  has no `users` table, passwords, session cookie, login, or USER/ADMIN roles.
+  The later qualification work added a real `/api/alert-config` consumer for
+  the email-only recipient and rule tables, so those tables are no longer
+  dead schema. SMS and average-source alert configuration remain removed.
 
-## On hold / superseded
-
-- **Remote-control command queue (SCRUM-373) is on hold, pending team sign-off,
-  and is expected to be superseded.** The original design routed display-control
+- **Remote-control command queue is superseded by stakeholder decision.** The original design routed display-control
   commands through a MySQL `control_commands` queue that the BLE service would
   poll. The merged BLE integration replaces this with authenticated localhost
   REST: the web backend calls the BLE service directly and the command completes
   over BLE before the database is touched. Code review confirmed no executable
   code references a command queue, and no process polls the database for
   commands. The DB is not on the remote-control path. No `control_commands`
-  table is built here. Final closure of SCRUM-373 waits on team/instructor
-  acceptance of the deviation, which changes an approved requirement.
+  table is built here. The affected Jira descriptions and dated baseline-change
+  comments record this decision.
 
 ## Scope questions (not built here, pending confirmation)
 

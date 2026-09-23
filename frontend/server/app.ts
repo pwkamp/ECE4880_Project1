@@ -2,6 +2,7 @@ import express from 'express';
 import type { Config } from './config.ts';
 import { handleNotify } from './notify.ts';
 import type { SampleStore } from './samples.ts';
+import { PersistedAlertConfigSchema, type AlertConfigStore } from './alertConfig.ts';
 import type { EmailSender } from './email/types.ts';
 
 /** Cap on remembered event ids (oldest evicted first). */
@@ -11,6 +12,7 @@ export function createApp(deps: {
   config: Config;
   sender: EmailSender;
   samples?: SampleStore | null;
+  alertConfig?: AlertConfigStore | null;
 }) {
   const app = express();
   app.use(express.json({ limit: '16kb' }));
@@ -72,6 +74,36 @@ export function createApp(deps: {
         configured: true,
         error: err instanceof Error ? err.message : 'sample query failed',
       });
+    }
+  });
+
+  app.get('/api/alert-config', async (_req, res) => {
+    if (!deps.alertConfig) {
+      res.status(503).json({ configured: false, error: 'alert configuration persistence is unavailable' });
+      return;
+    }
+    try {
+      res.json({ configured: true, config: await deps.alertConfig.load() });
+    } catch (err) {
+      res.status(503).json({ configured: true, error: err instanceof Error ? err.message : 'alert configuration query failed' });
+    }
+  });
+
+  app.put('/api/alert-config', async (req, res) => {
+    if (!deps.alertConfig) {
+      res.status(503).json({ configured: false, error: 'alert configuration persistence is unavailable' });
+      return;
+    }
+    const parsed = PersistedAlertConfigSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ configured: true, error: 'invalid alert configuration', detail: parsed.error.issues });
+      return;
+    }
+    try {
+      await deps.alertConfig.save(parsed.data);
+      res.json({ configured: true, config: parsed.data });
+    } catch (err) {
+      res.status(503).json({ configured: true, error: err instanceof Error ? err.message : 'alert configuration save failed' });
     }
   });
 

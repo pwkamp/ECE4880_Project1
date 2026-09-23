@@ -1,0 +1,3 @@
+# BLE-04 — BLE Link-Loss Recovery
+
+Disconnect every ESP32 micro-USB/UART cable and power the box only through its battery or intended switched supply. With the complete web application running, create a physical link loss by switching the ESP32 box OFF. Mark the event, switch it ON when prompted, and verify state changes, automatic scanning, fresh-advertisement reconnect, current polling, database updates, and UI recovery without restarting the web application or manually pressing Connect. Preserve backend and connection-state timelines. UART is deliberately not used because its power would invalidate this restart test.

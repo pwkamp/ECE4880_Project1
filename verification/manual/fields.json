@@ -1,0 +1,101 @@
+{
+  "BE-01": [
+    {"id": "operator_cable_actions", "prompt": "Both guided sensor disconnect/reconnect actions completed", "type": "boolean", "expected": true}
+  ],
+  "HW-01": [
+    {"id": "sensor_1_cable_length_m", "prompt": "Measured Sensor 1 cable length [m]", "type": "number", "minimum": 0.9, "maximum": 1.1},
+    {"id": "sensor_2_cable_length_m", "prompt": "Measured Sensor 2 cable length [m]", "type": "number", "minimum": 0.9, "maximum": 1.1},
+    {"id": "construction_inspection_pass", "prompt": "Strain relief, port labels, connector support, power design, and enclosure pass inspection?", "type": "boolean", "expected": true},
+    {"id": "lcd_readable_and_complete", "prompt": "LCD shows required labels/signed values and is readable at usable brightness levels?", "type": "boolean", "expected": true},
+    {"id": "component_models_and_datasheet_revisions", "prompt": "ESP32, sensor, LCD, battery/regulator models and datasheet revisions", "type": "text"},
+    {"id": "photo_evidence_paths", "prompt": "Photo evidence file path", "type": "photo"}
+  ],
+  "HW-02": [
+    {"id": "drop_height_m", "prompt": "Approved drop height [m]", "type": "number", "minimum": 0},
+    {"id": "drop_surface", "prompt": "Drop surface", "type": "text"},
+    {"id": "enclosure_drop_pass", "prompt": "Enclosure drop passed?", "type": "boolean", "expected": true},
+    {"id": "upside_down_pass", "prompt": "Upside-down operation passed?", "type": "boolean", "expected": true},
+    {"id": "connected_cable_drop_pass", "prompt": "Connected-cable drop passed under the Jira allowance?", "type": "boolean", "expected": true},
+    {"id": "ordinary_handling_pass", "prompt": "Ordinary handling passed?", "type": "boolean", "expected": true},
+    {"id": "sensor_immersion_pass", "prompt": "Approved sensor immersion passed?", "type": "boolean", "expected": true},
+    {"id": "post_test_smoke_pass", "prompt": "Post-test functional smoke test passed?", "type": "boolean", "expected": true},
+    {"id": "damage_or_detachment", "prompt": "Post-test damage or permitted detachment classification", "type": "choice", "choices": ["No damage or detachment", "Permitted cable detachment only", "Damage/failure observed"]},
+    {"id": "before_after_photo_path", "prompt": "Before/after photo evidence file path", "type": "photo"}
+  ],
+  "HW-03": [
+    {"id": "sensor_1_hotplug_pass", "prompt": "Sensor 1 hot-plug fault, independent Sensor 2 operation, and recovery passed?", "type": "boolean", "expected": true},
+    {"id": "sensor_2_hotplug_pass", "prompt": "Sensor 2 hot-plug fault, independent Sensor 1 operation, and recovery passed?", "type": "boolean", "expected": true},
+    {"id": "unexpected_esp32_restarts", "prompt": "Unexpected ESP32 boot markers during hot-plug", "type": "integer", "minimum": 0, "maximum": 0},
+    {"id": "power_off_no_current_data", "prompt": "Power OFF stopped local operation and remote current data?", "type": "boolean", "expected": true},
+    {"id": "power_on_automatic_recovery", "prompt": "Power ON recovered automatically?", "type": "boolean", "expected": true}
+  ],
+  "HW-04": [
+    {"id": "sensor_1_room_c", "prompt": "Sensor 1 stabilized room reading [deg C]", "type": "number", "minimum": 18, "maximum": 26},
+    {"id": "sensor_2_room_c", "prompt": "Sensor 2 stabilized room reading [deg C]", "type": "number", "minimum": 18, "maximum": 26},
+    {"id": "sensor_1_ice_c", "prompt": "Sensor 1 stirred ice-water reading [deg C]", "type": "number", "minimum": -2, "maximum": 2},
+    {"id": "sensor_2_ice_c", "prompt": "Sensor 2 stirred ice-water reading [deg C]", "type": "number", "minimum": -2, "maximum": 2},
+    {"id": "both_hand_rises_observed", "prompt": "Observable hand-heating rise recorded for both sensors?", "type": "boolean", "expected": true},
+    {"id": "both_soldering_rises_faster", "prompt": "Soldering-iron response was faster than hand heating for both sensors?", "type": "boolean", "expected": true},
+    {"id": "measurement_csv_path", "prompt": "Full time-series CSV path", "type": "text"}
+  ],
+  "FW-04": [
+    {"id": "lcd_render_cases_pass", "prompt": "Numeric, OFF, DISCONNECTED, signed, and average LCD cases passed?", "type": "boolean", "expected": true},
+    {"id": "buttons_independent_pass", "prompt": "Both physical buttons operate independently in connected/disconnected states?", "type": "boolean", "expected": true},
+    {"id": "backlight_readability_pass", "prompt": "Every selected backlight level is usable indoors?", "type": "boolean", "expected": true},
+    {"id": "maximum_button_to_render_ms", "prompt": "Maximum measured button-event-to-LCD-render contribution [ms]", "type": "number", "minimum": 0, "maximum": 20}
+  ],
+  "FW-05": [
+    {"id": "sensor_1_shared_state_pass", "prompt": "Sensor 1 local/remote commands share one authoritative state?", "type": "boolean", "expected": true},
+    {"id": "sensor_2_shared_state_pass", "prompt": "Sensor 2 local/remote commands share one authoritative state?", "type": "boolean", "expected": true},
+    {"id": "invalid_commands_leave_state_unchanged", "prompt": "Invalid sensor/value/length commands were rejected without state change?", "type": "boolean", "expected": true}
+  ],
+  "BLE-02": [
+    {"id": "authorized_physical_display_change", "prompt": "Authorized SET_DISPLAY changed the physical LCD?", "type": "boolean", "expected": true},
+    {"id": "unauthorized_change_rejected", "prompt": "Unbonded/unauthenticated state change was rejected?", "type": "boolean", "expected": true},
+    {"id": "malformed_matrix_pass", "prompt": "Invalid sensor, value, length, and version cases returned defined errors with no state change?", "type": "boolean", "expected": true},
+    {"id": "ble_trace_path", "prompt": "BLE and serial trace path(s)", "type": "text"}
+  ],
+  "BLE-03": [
+    {"id": "negotiated_mtu_bytes", "prompt": "Negotiated ATT MTU [bytes]", "type": "integer", "minimum": 23},
+    {"id": "sensor_1_records", "prompt": "Reconstructed Sensor 1 history records", "type": "integer", "minimum": 300},
+    {"id": "sensor_2_records", "prompt": "Reconstructed Sensor 2 history records", "type": "integer", "minimum": 300},
+    {"id": "history_transfer_ms", "prompt": "History transfer and persistence duration [ms]", "type": "number", "minimum": 0, "maximum": 10000},
+    {"id": "oldest_first_exact_reconstruction", "prompt": "Oldest-first boot/sequence/status/value reconstruction was exact?", "type": "boolean", "expected": true},
+    {"id": "retry_and_small_mtu_pass", "prompt": "Retry and small-MTU cases passed with only complete records?", "type": "boolean", "expected": true}
+  ],
+  "BLE-04": [
+    {"id": "link_loss_state_visible", "prompt": "Link loss produced the required backend/UI state instead of stale data?", "type": "boolean", "expected": true},
+    {"id": "automatic_reconnect_without_click", "prompt": "Fresh-advertisement reconnect completed without restart or manual Connect?", "type": "boolean", "expected": true},
+    {"id": "polling_database_ui_recovered", "prompt": "Polling, database writes, and UI all recovered?", "type": "boolean", "expected": true},
+    {"id": "reconnect_duration_ms", "prompt": "Measured reconnect duration [ms]", "type": "number", "minimum": 0}
+  ],
+  "SYS-01": [
+    {"id": "sensor_1_all_hops_correlated", "prompt": "Sensor 1 stimulus correlated through LCD, BLE, backend, MySQL, API, readout, and graph?", "type": "boolean", "expected": true},
+    {"id": "sensor_2_all_hops_correlated", "prompt": "Sensor 2 stimulus correlated through LCD, BLE, backend, MySQL, API, readout, and graph?", "type": "boolean", "expected": true},
+    {"id": "correlated_evidence_paths", "prompt": "Correlated evidence set paths", "type": "text"}
+  ],
+  "SYS-02": [
+    {"id": "sensor_1_disconnect_recovery_pass", "prompt": "Sensor 1 disconnect/recovery passed across LCD, DB, graph, and state?", "type": "boolean", "expected": true},
+    {"id": "sensor_2_disconnect_recovery_pass", "prompt": "Sensor 2 disconnect/recovery passed across LCD, DB, graph, and state?", "type": "boolean", "expected": true},
+    {"id": "no_stale_numeric_values", "prompt": "No stale numeric value remained during either disconnection?", "type": "boolean", "expected": true},
+    {"id": "graph_gaps_present", "prompt": "Graph contains a missing-data gap for each disconnection?", "type": "boolean", "expected": true}
+  ],
+  "SYS-03": [
+    {"id": "power_on_to_usable_ms", "prompt": "Case A: physical power ON to current and graph usable [ms]", "type": "number", "minimum": 0, "maximum": 10000},
+    {"id": "sensor_1_history_records", "prompt": "Case B: Sensor 1 history records persisted and browser-usable", "type": "integer", "minimum": 300},
+    {"id": "sensor_2_history_records", "prompt": "Case B: Sensor 2 history records persisted and browser-usable", "type": "integer", "minimum": 300},
+    {"id": "history_to_browser_usable_ms", "prompt": "Case B: reconnect to all history browser-usable [ms]", "type": "number", "minimum": 0, "maximum": 10000}
+  ],
+  "SYS-04": [
+    {"id": "sensor_1_trials", "prompt": "Sensor 1 ON/OFF timing trials", "type": "integer", "minimum": 10},
+    {"id": "sensor_2_trials", "prompt": "Sensor 2 ON/OFF timing trials", "type": "integer", "minimum": 10},
+    {"id": "maximum_end_to_end_latency_ms", "prompt": "Maximum browser-command-to-physical-LCD-render latency [ms]", "type": "number", "minimum": 0, "exclusive_maximum": 1000},
+    {"id": "timings_csv_path", "prompt": "Per-command timings CSV path", "type": "text"}
+  ],
+  "SYS-05": [
+    {"id": "high_episode_end_to_end_pass", "prompt": "High crossing correlated from DB sample through exact delivered message?", "type": "boolean", "expected": true},
+    {"id": "low_episode_end_to_end_pass", "prompt": "Low crossing correlated from DB sample through exact delivered message?", "type": "boolean", "expected": true},
+    {"id": "configured_source_recipients_messages_match", "prompt": "Monitored source, recipients, thresholds, and messages matched configuration?", "type": "boolean", "expected": true},
+    {"id": "provider_capture_path", "prompt": "Controlled provider capture path", "type": "text"}
+  ]
+}

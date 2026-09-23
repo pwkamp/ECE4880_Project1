@@ -90,6 +90,7 @@ esp_err_t local_display_init(void)
         result = write_line(1U, "Starting sensors");
     }
     if (result != ESP_OK) {
+        ESP_LOGE(TAG, "LCD startup write failed: %s", esp_err_to_name(result));
         return result;
     }
 

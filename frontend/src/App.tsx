@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertLog } from './components/AlertLog';
 import { AlertSettings } from './components/AlertSettings';
 import { ChartRecorder } from './components/ChartRecorder';
@@ -19,6 +19,7 @@ import {
 import { DEFAULT_ALERT_CONFIG, type AlertConfig } from './lib/alerts';
 import { useTheme } from './hooks/useTheme';
 import type { Unit } from './lib/temperature';
+import { loadAlertConfig, saveAlertConfig } from './lib/alertConfigClient';
 
 /** Sent when a sensor comes back inside the configured band (SCRUM-624). */
 const CLEAR_MESSAGE = 'Temperature back within the configured range.';
@@ -28,6 +29,30 @@ export default function App() {
   const [unit, setUnit] = useState<Unit>('C');
   const [theme, setTheme] = useTheme();
   const [alertConfig, setAlertConfig] = useState<AlertConfig>(DEFAULT_ALERT_CONFIG);
+  const alertConfigLoaded = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    void loadAlertConfig()
+      .then((saved) => {
+        if (active && saved) setAlertConfig(saved);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) alertConfigLoaded.current = true;
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!alertConfigLoaded.current) return;
+    const timer = window.setTimeout(() => {
+      void saveAlertConfig(alertConfig).catch(() => undefined);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [alertConfig]);
 
   // Adapt the single UI config into the alert engine's rule/recipient model.
   // One rule per physical sensor; each saved email is its own recipient.

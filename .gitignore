@@ -85,14 +85,15 @@ superpowers/
 .superpowers/
 
 # Per-device secrets and local runtime state
-
-# Per-device secrets and local runtime state
 /firmware/device_config.cmake
 /backend/paired_devices.csv
 backend/paired_devices.csv
 /backend/.paired_devices.csv.*.tmp
 
 # Build artifacts
+/artifacts/verification/
+/frontend/test-results/
+/verification/dashboard/latest.json
 **/build/
 **/build-*/
 **/out/

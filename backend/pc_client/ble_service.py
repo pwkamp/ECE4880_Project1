@@ -736,6 +736,8 @@ class ThermometerBleService:
                 history_sync = {
                     "state": "RUNNING",
                     "progress": operation.progress,
+                    "operation_id": operation.operation_id,
+                    "source": operation.kind.removeprefix("history_sync:"),
                 }
         return ServiceStatus(
             phase=state.phase,
@@ -1606,7 +1608,11 @@ class ThermometerBleService:
             assert self._history_operation_id is not None
             return self._operations[self._history_operation_id]
         operation = self._new_operation(f"history_sync:{source}")
-        self._last_history_sync = None
+        self._last_history_sync = {
+            "state": "RUNNING",
+            "operation_id": operation.operation_id,
+            "source": source,
+        }
         operation.state = OperationState.RUNNING
         operation.updated_at_utc = self._utc_now()
         target_generation = self._target_generation
@@ -1622,6 +1628,8 @@ class ThermometerBleService:
                 self._cancel_operation(operation.operation_id, "history sync cancelled")
                 self._last_history_sync = {
                     "state": "CANCELLED",
+                    "operation_id": operation.operation_id,
+                    "source": source,
                     "failure_reason": "history sync cancelled",
                 }
             else:
@@ -1630,6 +1638,8 @@ class ThermometerBleService:
                     self._fail_operation(operation, error)
                     self._last_history_sync = {
                         "state": "FAILED",
+                        "operation_id": operation.operation_id,
+                        "source": source,
                         "failure_reason": describe_ble_error(error),
                     }
                     retry = True
@@ -1638,6 +1648,8 @@ class ThermometerBleService:
                     retry = not history.complete
                     self._last_history_sync = {
                         "state": "COMPLETE" if history.complete else "INCOMPLETE",
+                        "operation_id": operation.operation_id,
+                        "source": source,
                         "expected_counts": list(history.expected_counts),
                         "retrieved_counts": list(history.retrieved_counts),
                         "sample_count": len({record.sequence for record in history.records}),

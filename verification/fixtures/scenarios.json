@@ -1,0 +1,14 @@
+{
+  "normal": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": 21.5}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "sensor_1_disconnected": {"box_available": true, "sensor1": {"status": "DISCONNECTED", "temperature_c": null}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "sensor_2_disconnected": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": 21.5}, "sensor2": {"status": "DISCONNECTED", "temperature_c": null}},
+  "both_disconnected": {"box_available": true, "sensor1": {"status": "DISCONNECTED", "temperature_c": null}, "sensor2": {"status": "DISCONNECTED", "temperature_c": null}},
+  "box_off": {"box_available": false, "sensor1": {"status": "MISSING", "temperature_c": null}, "sensor2": {"status": "MISSING", "temperature_c": null}},
+  "history_gap": {"box_available": true, "sensor1": {"status": "MISSING", "temperature_c": null}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "off_scale_low": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": 5.0}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "off_scale_high": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": 55.0}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "display_command_success": {"box_available": true, "command": {"state": "SUCCEEDED", "sensor_id": 1, "enabled": true}},
+  "display_command_failure": {"box_available": true, "command": {"state": "FAILED", "sensor_id": 1, "enabled": false}},
+  "alert_high": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": 40.0}, "sensor2": {"status": "VALID", "temperature_c": 22.5}},
+  "alert_low": {"box_available": true, "sensor1": {"status": "VALID", "temperature_c": -1.0}, "sensor2": {"status": "VALID", "temperature_c": 22.5}}
+}

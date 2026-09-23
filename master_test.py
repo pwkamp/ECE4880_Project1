@@ -9,7 +9,10 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent
 BACKEND_ROOT = REPOSITORY_ROOT / "backend"
-TEST_DIRECTORY = BACKEND_ROOT / "pc_client" / "tests"
+TEST_DIRECTORIES = (
+    (BACKEND_ROOT / "pc_client" / "tests", BACKEND_ROOT),
+    (REPOSITORY_ROOT / "verification" / "checks", REPOSITORY_ROOT),
+)
 
 
 def main() -> int:
@@ -18,11 +21,15 @@ def main() -> int:
         if root_text not in sys.path:
             sys.path.insert(0, root_text)
 
-    suite = unittest.defaultTestLoader.discover(
-        str(TEST_DIRECTORY),
-        pattern="test_*.py",
-        top_level_dir=str(BACKEND_ROOT),
-    )
+    suite = unittest.TestSuite()
+    for directory, top_level in TEST_DIRECTORIES:
+        suite.addTests(
+            unittest.defaultTestLoader.discover(
+                str(directory),
+                pattern="test_*.py",
+                top_level_dir=str(top_level),
+            )
+        )
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     return 0 if result.wasSuccessful() else 1
 

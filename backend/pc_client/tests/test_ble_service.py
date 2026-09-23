@@ -436,6 +436,8 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         await wait_until(lambda: service._history_task is None)
         summary = service.get_status().history_sync
         self.assertEqual(summary["state"], "COMPLETE")
+        self.assertEqual(summary["source"], "automatic")
+        self.assertTrue(summary["operation_id"])
         self.assertEqual(summary["sample_count"], 300)
         self.assertEqual(summary["retrieved_counts"], [300, 300])
         self.assertTrue(summary["persisted"])
@@ -458,6 +460,7 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         client.release_first_chunk.set()
         display = await display_task
         await service.wait_for_operation(history_operation.operation_id, 1)
+        summary = service.get_status().history_sync
 
         calls = client.calls
         first_chunk = max(
@@ -468,6 +471,8 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertLess(display_index, next_chunk)
         self.assertTrue(display.result.display_enabled)
         self.assertEqual(duplicate.operation_id, history_operation.operation_id)
+        self.assertEqual(summary["operation_id"], history_operation.operation_id)
+        self.assertEqual(summary["source"], "manual")
 
     async def test_late_display_reply_is_confirmed_from_device_state(self):
         class SlowDisplayClient(FakeClient):
@@ -651,6 +656,11 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
             lambda: service.get_status().phase is ConnectionPhase.RECONNECTING
         )
         await wait_until(lambda: len(self.clients) >= 2)
+
+        # Client construction happens immediately before awaiting connect().
+        # Wait until that direct stale-target attempt has actually failed so
+        # restoring advertising cannot race the simulated failure.
+        await wait_until(lambda: "close" in self.clients[1].calls)
 
         # Windows scans can miss bonded devices. A direct bounded GATT attempt
         # is still made and its failure is retried without user intervention.

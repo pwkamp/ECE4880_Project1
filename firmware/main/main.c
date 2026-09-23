@@ -1,4 +1,5 @@
 #include "ble_server.h"
+#include "esp_log.h"
 #include "esp_pm.h"
 #include "local_controls.h"
 #include "local_display.h"
@@ -6,6 +7,8 @@
 #include "sdkconfig.h"
 #include "temperature_sensors.h"
 #include "thermometer.h"
+
+static const char *TAG = "main";
 
 static void initialize_nonvolatile_storage(void)
 {
@@ -39,10 +42,30 @@ void app_main(void)
     enable_automatic_power_saving();
 
     ESP_ERROR_CHECK(temperature_sensors_init());
-    ESP_ERROR_CHECK(local_display_init());
+
+    /* The LCD is an optional local interface. A disconnected, miswired, or
+     * failed display must never reset the ESP32 before BLE starts. Rendering
+     * remains disabled when initialization fails. */
+    const esp_err_t display_result = local_display_init();
+    if (display_result != ESP_OK) {
+        ESP_LOGE(TAG, "LCD unavailable; continuing without local display: %s",
+                 esp_err_to_name(display_result));
+    }
     ESP_ERROR_CHECK(thermometer_start());
-    ESP_ERROR_CHECK(
-        thermometer_set_backlight(THERMOMETER_DEFAULT_BACKLIGHT_PERCENT));
-    ESP_ERROR_CHECK(local_controls_start());
+
+    if (display_result == ESP_OK) {
+        const esp_err_t backlight_result = thermometer_set_backlight(
+            THERMOMETER_DEFAULT_BACKLIGHT_PERCENT);
+        if (backlight_result != ESP_OK) {
+            ESP_LOGW(TAG, "LCD backlight setup failed: %s",
+                     esp_err_to_name(backlight_result));
+        }
+    }
+
+    const esp_err_t controls_result = local_controls_start();
+    if (controls_result != ESP_OK) {
+        ESP_LOGE(TAG, "local buttons unavailable; continuing: %s",
+                 esp_err_to_name(controls_result));
+    }
     ESP_ERROR_CHECK(ble_server_start());
 }

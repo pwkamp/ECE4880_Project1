@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ECE4880 Verification</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <main>
+    <header><h1>ECE4880 Verification</h1><p id="run-meta">No run loaded</p></header>
+    <section><h2>Qualification summary</h2><div id="summary" class="cards"></div></section>
+    <section><h2>Requirement coverage</h2><div id="coverage" class="cards"></div><p id="unmapped"></p></section>
+    <section><h2>Fixture readiness</h2><div class="table-wrap"><table><thead><tr><th>Fixture</th><th>Status</th><th>Detail</th></tr></thead><tbody id="fixtures"></tbody></table></div></section>
+    <section><h2>Instrumentation readiness</h2><div class="table-wrap"><table><thead><tr><th>Instrumentation</th><th>Status</th><th>Detail</th></tr></thead><tbody id="instrumentation"></tbody></table></div></section>
+    <section><h2>Hardware setup sections</h2><p>These records show exactly which wiring/power configuration the operator confirmed before each compatible group of tests.</p><div id="setup-sections"></div></section>
+    <section><h2>Test matrix</h2><p id="manual-notice" class="manual-notice"></p><p>Rows explicitly distinguish automated evidence from tests requiring a human operator. Yellow rows require or retain a human decision. Select one to inspect evidence and record a traceable PASS, FAIL, or BLOCKED decision for this run.</p><div class="table-wrap"><table><thead><tr><th>Test</th><th>Setup</th><th>Subsystem</th><th>Method</th><th>Latest</th><th>Human intervention / limitations</th><th>Evidence</th></tr></thead><tbody id="tests"></tbody></table></div><div id="test-detail" class="detail" hidden></div></section>
+    <section><h2>Requirement details</h2><div class="table-wrap"><table><thead><tr><th>Requirement</th><th>Jira</th><th>Status</th><th>Tests</th><th>Human tests</th><th>Reason</th></tr></thead><tbody id="requirements"></tbody></table></div></section>
+  </main>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

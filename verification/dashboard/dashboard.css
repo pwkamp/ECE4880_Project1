@@ -1,0 +1,32 @@
+:root { color-scheme: light dark; font-family: Inter, system-ui, sans-serif; background: #10151d; color: #e9eef5; }
+body { margin: 0; background: #10151d; }
+main { width: min(1500px, calc(100% - 2rem)); margin: 1rem auto 4rem; }
+header, section { background: #18212c; border: 1px solid #2c3b4c; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+h1, h2 { margin-top: 0; }
+.cards { display: flex; flex-wrap: wrap; gap: .7rem; }
+.card { min-width: 9rem; background: #222f3e; padding: .8rem; border-radius: 7px; }
+.card strong { display: block; font-size: 1.5rem; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; padding: .55rem; border-bottom: 1px solid #334559; }
+.PASS, .READY, .CONFIRMED { color: #62d68b; font-weight: 700; }
+.FAIL, .NOT_READY { color: #ff6b6b; font-weight: 700; }
+.BLOCKED, .WARNING, .CONFIRM_REQUIRED { color: #ffd166; font-weight: 700; }
+.SKIPPED, .NOT_APPLICABLE, .NOT_REQUIRED { color: #a7b0bd; font-weight: 700; }
+#unmapped.bad { padding: .7rem; border: 2px solid #ff6b6b; color: #ffb0b0; }
+a { color: #79b8ff; }
+.test-select { color: #79b8ff; background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; }
+.detail { margin-top: 1rem; padding: 1rem; border: 1px solid #40546a; border-radius: 7px; background: #111923; }
+.detail pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.manual-row { background: rgba(255, 209, 102, .07); }
+.manual-notice { padding: .7rem; border-left: 4px solid #ffd166; background: #222b34; }
+.adjudication { display: grid; grid-template-columns: minmax(10rem, .4fr) minmax(18rem, 1fr); gap: .6rem; align-items: center; }
+.adjudication input, .adjudication select, .adjudication button { font: inherit; padding: .5rem; }
+.adjudication button { grid-column: 1 / -1; cursor: pointer; }
+.adjudication-message { grid-column: 1 / -1; min-height: 1.3rem; }
+.setup-card { margin: .7rem 0; padding: .8rem 1rem; border: 1px solid #40546a; border-left-width: 5px; border-radius: 7px; background: #111923; }
+.setup-card h3 { margin: 0 0 .35rem; }
+.setup-card ol { margin-bottom: 0; }
+.setup-confirmed { border-left-color: #62d68b; }
+.setup-blocked { border-left-color: #ffd166; }
+@media (max-width: 600px) { main { width: calc(100% - 1rem); } header, section { padding: .7rem; } }

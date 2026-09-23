@@ -2,6 +2,8 @@
 
 ESP32 firmware, Python BLE connector, MySQL schema, and the computer console.
 
+Requirements-driven qualification is documented in [verification/README.md](verification/README.md). Run all unattended software checks with `python verification/runner.py run software`; HIL and full profiles keep operator-dependent evidence separate.
+
 ## Computer console
 
 The web app lives in [`frontend/`](frontend/). The **computer** component of

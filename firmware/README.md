@@ -103,7 +103,8 @@ and cannot be run by `master_test.py`.
 
 The DS18B20 sensors, HD44780 LCD, and two physical buttons are the default
 production configuration. The deterministic backend remains available only
-for explicit simulation testing.
+for explicit simulation testing. LCD or button initialization errors are
+logged but do not prevent sensor sampling or BLE startup.
 
 ## Flashing without holding BOOT
 

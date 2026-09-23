@@ -1,0 +1,1 @@
+"""Consolidated qualification checks."""

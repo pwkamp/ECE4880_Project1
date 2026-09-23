@@ -1,0 +1,4067 @@
+[
+  {
+    "uid": "PRJ-REQ-001",
+    "jira": "SCRUM-399",
+    "level": "Project",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The project shall produce design documentation that describes the construction and operation of the temperature measurement system.",
+    "jira_summary": "PRJ-REQ-001 - Design Documentation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-399",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "PRJ-REQ-002",
+    "jira": "SCRUM-400",
+    "level": "Project",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The project shall produce a prototype demonstrating that the proposed design functions.",
+    "jira_summary": "PRJ-REQ-002 - Functional Prototype",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-400",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "PRJ-REQ-003",
+    "jira": "SCRUM-401",
+    "level": "Project",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The final system shall satisfy the applicable stakeholder requirements or document an approved stakeholder change for any deviation.",
+    "jira_summary": "PRJ-REQ-003 - Requirements Compliance",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-401",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "PRJ-REQ-004",
+    "jira": "SCRUM-402",
+    "level": "Project",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "Ambiguous or conflicting stakeholder requirements shall be clarified before the affected design is finalized.",
+    "jira_summary": "PRJ-REQ-004 - Requirements Clarification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-402",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-100",
+    "jira": "SCRUM-403",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The system shall consist of a computer, two temperature-sensor assemblies, a battery-operated third-box assembly, and support for delivery of email alerts to one or more receiving addresses. SMS/text-message delivery is out of scope.",
+    "jira_summary": "SYS-HLR-100 - System Composition",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-403",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-110",
+    "jira": "SCRUM-404",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "Temperature information produced by the third-box thermometer shall be accessible through an internet-connected computer while the required system components are operational.",
+    "jira_summary": "SYS-HLR-110 - Internet-Accessible Temperature Data",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-404",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-200",
+    "jira": "SCRUM-405",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The sensor assemblies, third box, cables, controls, and connectors shall satisfy the stakeholder-specified physical construction, handling, drop, and connection requirements.",
+    "jira_summary": "SYS-HLR-200 - Physical and Mechanical Robustness",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-405",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-210",
+    "jira": "SCRUM-406",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The system shall tolerate temperature-sensor disconnection and reconnection without requiring user intervention to restore normal operation.",
+    "jira_summary": "SYS-HLR-210 - Sensor Hot-Plug Recovery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-406",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-220",
+    "jira": "SCRUM-407",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The third-box power switch shall control availability of local thermometer functionality and current remotely accessible temperature data.",
+    "jira_summary": "SYS-HLR-220 - Third-Box Power Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-407",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-300",
+    "jira": "SCRUM-408",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The system design shall support temperatures from at least -10 deg C through +63 deg C.",
+    "jira_summary": "SYS-HLR-300 - Temperature Design Range",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-408",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-310",
+    "jira": "SCRUM-409",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The temperature-measurement system shall visibly respond to sensor heating under the stakeholder-specified hand and soldering-iron tests.",
+    "jira_summary": "SYS-HLR-310 - Thermal Response",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-409",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-320",
+    "jira": "SCRUM-410",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The thermometer shall satisfy the specified room-temperature and ice-water measurement tolerances.",
+    "jira_summary": "SYS-HLR-320 - Temperature Accuracy",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-410",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-400",
+    "jira": "SCRUM-411",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "When powered ON, the third box shall display temperature information according to the independently controlled display state of Sensor 1 and Sensor 2.",
+    "jira_summary": "SYS-HLR-400 - Local Temperature Display and Controls",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-411",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-410",
+    "jira": "SCRUM-412",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The third-box display shall present correct temperature information with the required response time and indoor readability.",
+    "jira_summary": "SYS-HLR-410 - Local Display Performance",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-412",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-420",
+    "jira": "SCRUM-413",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The third box shall notify the local user when a temperature sensor is disconnected or otherwise malfunctioning.",
+    "jira_summary": "SYS-HLR-420 - Local Sensor Fault Indication",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-413",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-500",
+    "jira": "SCRUM-414",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "When the computer software and third box are operational, the system shall provide remotely accessible real-time temperature/status information for both temperature sensors.",
+    "jira_summary": "SYS-HLR-500 - Remote Real-Time Display",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-414",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-510",
+    "jira": "SCRUM-415",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The computer user shall be able to remotely enable or disable the local third-box temperature display for each temperature sensor, with a response in less than one second.",
+    "jira_summary": "SYS-HLR-510 - Remote Third-Box Display Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-415",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-520",
+    "jira": "SCRUM-416",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "If the computer software is already running while the third box is OFF, required temperature information shall become available within 10 seconds after the third box is turned ON.",
+    "jira_summary": "SYS-HLR-520 - Startup and Recovery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-416",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-600",
+    "jira": "SCRUM-417",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "The computer interface shall provide a chart-recorder-style graphical representation of the most recent 300 seconds of temperature data with the specified units, axes, missing-data behavior, and scrolling behavior.",
+    "jira_summary": "SYS-HLR-600 - Historical Temperature Graph",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-417",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-700",
+    "jira": "SCRUM-418",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "When the computer and third box are ON, the system shall send configurable email notifications when real-time temperature exceeds a configured maximum or falls below a configured minimum. SMS/text-message delivery is out of scope.",
+    "jira_summary": "SYS-HLR-700 - Temperature Alerting",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-418",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-321",
+    "jira": "SCRUM-419",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-320"
+    ],
+    "text": "At laboratory room temperature, the thermometer output shall be approximately 22 deg C +/- 4 deg C.",
+    "jira_summary": "SYS-HLR-321 - Room-Temperature Accuracy",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-419",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SYS-HLR-322",
+    "jira": "SCRUM-420",
+    "level": "HLR",
+    "component": "System",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-320"
+    ],
+    "text": "When a sensor is placed in a water-ice mixture, the thermometer output shall be 0 deg C +/- 2 deg C.",
+    "jira_summary": "SYS-HLR-322 - Ice-Water Accuracy",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-420",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-200",
+    "jira": "SCRUM-421",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "The hardware shall provide two temperature sensors, each at the end of a 1.0 +/- 0.1 meter cable.",
+    "jira_summary": "HWE-MLR-200 - Sensor Quantity and Cable Length",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-421",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-201",
+    "jira": "SCRUM-422",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "The sensor assemblies shall tolerate ordinary handling and placement in ice water without damage.",
+    "jira_summary": "HWE-MLR-201 - Sensor Mechanical Robustness",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-422",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-202",
+    "jira": "SCRUM-423",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "The third box shall be enclosed and shall remain functional after the specified workbench-to-floor drop and upside-down operation.",
+    "jira_summary": "HWE-MLR-202 - Third-Box Enclosure and Drop Survival",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-423",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-203",
+    "jira": "SCRUM-424",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "External cable connectors shall be securely mounted, casual-user connectable, and shall not break during the specified connected-cable drop.",
+    "jira_summary": "HWE-MLR-203 - External Connector Robustness",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-424",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-204",
+    "jira": "SCRUM-425",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-210"
+    ],
+    "text": "The sensor electrical interface shall permit powered connection and disconnection without damaging the sensor or third-box electronics.",
+    "jira_summary": "HWE-MLR-204 - Hot-Plug Electrical Protection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-425",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-205",
+    "jira": "SCRUM-426",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-100",
+      "SYS-HLR-220"
+    ],
+    "text": "The third box shall contain a battery and physical ON/OFF power switch and shall operate as a standalone battery-powered thermometer.",
+    "jira_summary": "HWE-MLR-205 - Battery and Power Switch",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-426",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-206",
+    "jira": "SCRUM-427",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-100"
+    ],
+    "text": "The third box shall be designed around an ESP32 microcontroller capable of running the required firmware and BLE interface.",
+    "jira_summary": "HWE-MLR-206 - ESP32 Processing Platform",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-427",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-207",
+    "jira": "SCRUM-428",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-400",
+      "SYS-HLR-410"
+    ],
+    "text": "The third-box local display shall be a character LCD with variable backlight brightness.",
+    "jira_summary": "HWE-MLR-207 - Character LCD",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-428",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-208",
+    "jira": "SCRUM-429",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "tbd",
+    "parents": [
+      "SYS-HLR-400"
+    ],
+    "text": "The third box shall provide one local physical means of adjusting LCD backlight brightness using either a button-based control or a potentiometer.",
+    "jira_summary": "HWE-MLR-208 - Physical Backlight Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-429",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-209",
+    "jira": "SCRUM-430",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "Each sensor shall connect to the third box through a USB-C termination, and Sensor 1 and Sensor 2 ports shall be visually distinguishable.",
+    "jira_summary": "HWE-MLR-209 - USB-C Sensor Connections",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-430",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-210",
+    "jira": "SCRUM-431",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "The custom sensor USB-C interface shall be electrically arranged or protected so that foreseeable accidental connection of a standard USB-C cable or power source does not damage the third box or sensor.",
+    "jira_summary": "HWE-MLR-210 - USB-C Misconnection Protection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-431",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-211",
+    "jira": "SCRUM-432",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-300",
+      "SYS-HLR-400",
+      "SYS-HLR-420"
+    ],
+    "text": "The LCD hardware shall support all characters required to display sensor labels, OFF/DISCONNECTED/error indications, signed temperatures across the required range, and the average value.",
+    "jira_summary": "HWE-MLR-211 - Display Character Capability",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-432",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-212",
+    "jira": "SCRUM-433",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-300",
+      "SYS-HLR-320"
+    ],
+    "text": "The selected sensors and associated electrical interface shall support the required temperature range and sufficient accuracy to meet the end-to-end accuracy requirements.",
+    "jira_summary": "HWE-MLR-212 - Sensor/Signal-Chain Capability",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-433",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-200",
+    "jira": "SCRUM-434",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-200"
+    ],
+    "text": "Each completed sensor cable assembly shall measure between 0.9 m and 1.1 m from the third-box connector interface to the sensing element.",
+    "jira_summary": "HWE-LLR-200 - Cable Length Verification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-434",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-201",
+    "jira": "SCRUM-435",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-201"
+    ],
+    "text": "The sensor head and exposed cable region intended for immersion shall use insulation/encapsulation suitable for temporary immersion in an ice-water mixture.",
+    "jira_summary": "HWE-LLR-201 - Wet Sensor Construction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-435",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-202",
+    "jira": "SCRUM-436",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-202"
+    ],
+    "text": "The ESP32 board/module, LCD, battery, connectors, and other internal assemblies shall be mechanically retained so they do not become loose during the required drop test.",
+    "jira_summary": "HWE-LLR-202 - Internal Retention",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-436",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-203",
+    "jira": "SCRUM-437",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-202"
+    ],
+    "text": "Internal wiring and mounted parts shall not depend on gravity or enclosure orientation for electrical continuity.",
+    "jira_summary": "HWE-LLR-203 - Orientation-Independent Mounting",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-437",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-204",
+    "jira": "SCRUM-438",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-203"
+    ],
+    "text": "Each external cable connector shall be panel-mounted or mechanically supported independently of PCB solder joints.",
+    "jira_summary": "HWE-LLR-204 - Panel Connector Support",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-438",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-205",
+    "jira": "SCRUM-439",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-203"
+    ],
+    "text": "Sensor cable assemblies shall include strain relief at the probe end and connector end.",
+    "jira_summary": "HWE-LLR-205 - Cable Strain Relief",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-439",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-206",
+    "jira": "SCRUM-440",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-204"
+    ],
+    "text": "Sensor input circuitry shall tolerate insertion/removal transients without requiring a third-box reset.",
+    "jira_summary": "HWE-LLR-206 - Hot-Plug Input Protection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-440",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-207",
+    "jira": "SCRUM-441",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-205"
+    ],
+    "text": "The battery and regulator path shall supply the simultaneous peak current required by the ESP32, BLE radio, LCD/backlight, and both sensor interfaces.",
+    "jira_summary": "HWE-LLR-207 - Battery Supply Capacity",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-441",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-208",
+    "jira": "SCRUM-442",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-205"
+    ],
+    "text": "The power switch shall remove or disable operating power such that the ESP32/LCD cannot continue providing current temperature data when the switch is OFF.",
+    "jira_summary": "HWE-LLR-208 - Physical OFF State",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-442",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-209",
+    "jira": "SCRUM-443",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-206"
+    ],
+    "text": "The selected ESP32 device/module shall include BLE capability supported by the selected ESP-IDF version.",
+    "jira_summary": "HWE-LLR-209 - ESP32 BLE Capability",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-443",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-210",
+    "jira": "SCRUM-444",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-207"
+    ],
+    "text": "The character LCD shall be electrically interfaced to the ESP32 using the selected supported digital interface and shall provide enough character positions to render the required local states.",
+    "jira_summary": "HWE-LLR-210 - LCD Electrical Interface",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-444",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-211",
+    "jira": "SCRUM-445",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-207"
+    ],
+    "text": "The backlight circuit shall support more than two discernible brightness levels without exceeding the LCD backlight current rating.",
+    "jira_summary": "HWE-LLR-211 - Variable Backlight Drive",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-445",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-212",
+    "jira": "SCRUM-446",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "tbd",
+    "parents": [
+      "HWE-MLR-208"
+    ],
+    "text": "If the button option is selected, the backlight control shall provide a debounced ESP32 digital input used to step through defined brightness levels.",
+    "jira_summary": "HWE-LLR-212 - Backlight Control Input - Button Option",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-446",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-213",
+    "jira": "SCRUM-447",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "tbd",
+    "parents": [
+      "HWE-MLR-208"
+    ],
+    "text": "If the potentiometer option is selected, the backlight control shall provide an ESP32 ADC-readable voltage spanning the usable control range.",
+    "jira_summary": "HWE-LLR-213 - Backlight Control Input - Potentiometer Option",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-447",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-214",
+    "jira": "SCRUM-448",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-209"
+    ],
+    "text": "Sensor 1 shall terminate in a dedicated USB-C receptacle/plug pair assigned to the Sensor 1 electrical interface.",
+    "jira_summary": "HWE-LLR-214 - Sensor 1 USB-C Port",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-448",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-215",
+    "jira": "SCRUM-449",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-209"
+    ],
+    "text": "Sensor 2 shall terminate in a dedicated USB-C receptacle/plug pair assigned to the Sensor 2 electrical interface.",
+    "jira_summary": "HWE-LLR-215 - Sensor 2 USB-C Port",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-449",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-216",
+    "jira": "SCRUM-450",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-209"
+    ],
+    "text": "The enclosure shall use permanent labels, symbols, or other visual differentiation to identify Sensor 1 and Sensor 2 ports.",
+    "jira_summary": "HWE-LLR-216 - Port Identification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-450",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-217",
+    "jira": "SCRUM-451",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-210"
+    ],
+    "text": "The custom sensor connector design shall prevent an accidental standard USB-C VBUS connection from applying damaging voltage to sensor-signal pins or the ESP32.",
+    "jira_summary": "HWE-LLR-217 - USB-C VBUS Protection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-451",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-218",
+    "jira": "SCRUM-452",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-210"
+    ],
+    "text": "Custom sensor signals shall not be exposed on standard USB-C pins in a way that can damage a standard USB host/device during foreseeable accidental connection.",
+    "jira_summary": "HWE-LLR-218 - USB-C Signal Isolation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-452",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-219",
+    "jira": "SCRUM-453",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-211"
+    ],
+    "text": "The physical display size shall permit rendering at least a sensor identifier/state and a signed temperature value within -10 to +63 deg C.",
+    "jira_summary": "HWE-LLR-219 - LCD Signed Temperature Support",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-453",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-220",
+    "jira": "SCRUM-454",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-212"
+    ],
+    "text": "The selected sensor datasheet shall specify an operating/measurement range that includes -10 through +63 deg C.",
+    "jira_summary": "HWE-LLR-220 - Sensor Range Selection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-454",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-221",
+    "jira": "SCRUM-455",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-212"
+    ],
+    "text": "The hardware error budget at 0 deg C and approximately 22 deg C shall leave sufficient margin for software conversion/rounding while meeting the stakeholder tolerances.",
+    "jira_summary": "HWE-LLR-221 - Accuracy Budget",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-455",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-300",
+    "jira": "SCRUM-456",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-100"
+    ],
+    "text": "Third-box firmware shall be implemented for the ESP32 using ESP-IDF and the C programming language.",
+    "jira_summary": "SWE-EMB-MLR-300 - ESP-IDF C Firmware",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-456",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-301",
+    "jira": "SCRUM-457",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-300",
+      "SYS-HLR-310"
+    ],
+    "text": "The third-box firmware shall continuously acquire readings/status from both temperature sensors while powered ON.",
+    "jira_summary": "SWE-EMB-MLR-301 - Continuous Sensor Acquisition",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-457",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-302",
+    "jira": "SCRUM-458",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The third box shall maintain separate rolling buffers containing the last 300 one-second records for Sensor 1 and Sensor 2.",
+    "jira_summary": "SWE-EMB-MLR-302 - Two 300-Reading History Buffers",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-458",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-303",
+    "jira": "SCRUM-459",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-400",
+      "SYS-HLR-420"
+    ],
+    "text": "The third box shall expose three user-visible states per sensor: ON, OFF, and DISCONNECTED.",
+    "jira_summary": "SWE-EMB-MLR-303 - Sensor State Model",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-459",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-304",
+    "jira": "SCRUM-460",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-210",
+      "SYS-HLR-420"
+    ],
+    "text": "A disconnected/faulted sensor shall be reported as DISCONNECTED while the fault exists and shall return to the OFF display state after a valid reconnection unless the user subsequently enables it.",
+    "jira_summary": "SWE-EMB-MLR-304 - Disconnect Transition Behavior",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-460",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-305",
+    "jira": "SCRUM-461",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-400"
+    ],
+    "text": "The firmware shall independently control whether Sensor 1 and Sensor 2 temperatures are shown on the LCD.",
+    "jira_summary": "SWE-EMB-MLR-305 - Independent Local Display Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-461",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-306",
+    "jira": "SCRUM-462",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-400"
+    ],
+    "text": "When both sensor display states are ON and both readings are valid, the LCD shall display Sensor 1, Sensor 2, and the average of the two readings.",
+    "jira_summary": "SWE-EMB-MLR-306 - Local Average Display",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-462",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-307",
+    "jira": "SCRUM-463",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-410"
+    ],
+    "text": "The firmware shall update the LCD to reflect a local sensor-display control action within approximately 20 ms.",
+    "jira_summary": "SWE-EMB-MLR-307 - Local Display Response Time",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-463",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-308",
+    "jira": "SCRUM-464",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-420"
+    ],
+    "text": "The firmware shall render a clear local fault/disconnected indication instead of a valid temperature for an unavailable sensor.",
+    "jira_summary": "SWE-EMB-MLR-308 - Local Fault Display",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-464",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-309",
+    "jira": "SCRUM-465",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-400"
+    ],
+    "text": "The firmware shall support variable LCD backlight brightness using the selected physical backlight input.",
+    "jira_summary": "SWE-EMB-MLR-309 - Backlight Brightness Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-465",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-310",
+    "jira": "SCRUM-466",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-300",
+      "SYS-HLR-400"
+    ],
+    "text": "The third-box LCD shall present temperature values in degrees Celsius and support signed values across the required system range.",
+    "jira_summary": "SWE-EMB-MLR-310 - Local Celsius Presentation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-466",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-311",
+    "jira": "SCRUM-467",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The firmware shall provide an internally consistent current snapshot containing both sensor values, sensor states, display-enable states, average validity/value, and sample identity for a computer request.",
+    "jira_summary": "SWE-EMB-MLR-311 - Atomic Current Snapshot",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-467",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-312",
+    "jira": "SCRUM-468",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-210"
+    ],
+    "text": "Sensor acquisition shall automatically resume after reconnection without restarting the ESP32 firmware.",
+    "jira_summary": "SWE-EMB-MLR-312 - Automatic Sensor Recovery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-468",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-MLR-313",
+    "jira": "SCRUM-469",
+    "level": "MLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The firmware shall accept validated remote commands that change the same sensor display-enable state controlled by the physical sensor buttons.",
+    "jira_summary": "SWE-EMB-MLR-313 - Remote Display Command Handling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-469",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-300",
+    "jira": "SCRUM-470",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-300"
+    ],
+    "text": "The ESP-IDF application shall initialize sensor drivers, LCD/backlight drivers, input handlers, shared state, history buffers, and the BLE service from app_main().",
+    "jira_summary": "SWE-EMB-LLR-300 - Firmware Entry Point",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-470",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-301",
+    "jira": "SCRUM-471",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-301"
+    ],
+    "text": "Firmware shall maintain one runtime record per sensor containing latest temperature in Celsius, validity/connection state, display-enabled state, and the latest sample sequence number.",
+    "jira_summary": "SWE-EMB-LLR-301 - Per-Sensor Runtime Record",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-471",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-302",
+    "jira": "SCRUM-472",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-301"
+    ],
+    "text": "The sensor acquisition task shall begin a new read for each sensor whenever the previous read cycle is complete and shall update the shared runtime record only after validating the result.",
+    "jira_summary": "SWE-EMB-LLR-302 - Continuous Acquisition Loop",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-472",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-303",
+    "jira": "SCRUM-473",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-301"
+    ],
+    "text": "A read failure on one sensor shall not skip or block acquisition of the other sensor.",
+    "jira_summary": "SWE-EMB-LLR-303 - Independent Sensor Reads",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-473",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-304",
+    "jira": "SCRUM-474",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-302"
+    ],
+    "text": "A periodic timer/task shall snapshot each sensor runtime record into its history buffer once every 1000 ms.",
+    "jira_summary": "SWE-EMB-LLR-304 - One-Second History Timer",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-474",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-305",
+    "jira": "SCRUM-475",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-302"
+    ],
+    "text": "Each sensor history buffer shall be implemented as a fixed-capacity circular buffer of 300 records; adding record 301 shall overwrite the oldest record.",
+    "jira_summary": "SWE-EMB-LLR-305 - Fixed-Size Circular Buffers",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-475",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-306",
+    "jira": "SCRUM-476",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-302"
+    ],
+    "text": "Each stored history record shall contain at least the sample sequence number, temperature value when valid, and a sensor status value sufficient to distinguish valid and missing/disconnected data.",
+    "jira_summary": "SWE-EMB-LLR-306 - History Record Contents",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-476",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-307",
+    "jira": "SCRUM-477",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-302"
+    ],
+    "text": "History retrieval code shall expose records in chronological order from oldest available to newest available regardless of circular-buffer wrap position.",
+    "jira_summary": "SWE-EMB-LLR-307 - History Ordering",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-477",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-308",
+    "jira": "SCRUM-478",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-303"
+    ],
+    "text": "Firmware shall maintain sensor connection/health separately from the user display-enable flag and shall derive the externally visible ON/OFF/DISCONNECTED state from those values.",
+    "jira_summary": "SWE-EMB-LLR-308 - Internal State Separation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-478",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-309",
+    "jira": "SCRUM-479",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-303"
+    ],
+    "text": "A valid connected sensor with display_enabled=true shall report ON; a valid connected sensor with display_enabled=false shall report OFF; an invalid/disconnected sensor shall report DISCONNECTED.",
+    "jira_summary": "SWE-EMB-LLR-309 - Visible State Mapping",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-479",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-310",
+    "jira": "SCRUM-480",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-304"
+    ],
+    "text": "After the configured sensor-driver fault criterion is met, firmware shall set the sensor connection/health state to DISCONNECTED and invalidate its current temperature.",
+    "jira_summary": "SWE-EMB-LLR-310 - Fault Entry",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-480",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-311",
+    "jira": "SCRUM-481",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-304"
+    ],
+    "text": "When a DISCONNECTED sensor produces valid readings again and meets the configured recovery criterion, firmware shall mark it connected and restore the sensor's display-enabled state from immediately before the disconnection. A sensor that was ON shall return ON; a sensor that was OFF shall remain OFF. This state retention shall be implemented locally in the third-box firmware and shall not depend on a computer connection. Verification: exercise ON-disconnect-reconnect and OFF-disconnect-reconnect cases for each sensor while the computer is absent or disconnected, and confirm the restored local state matches the pre-disconnection state.",
+    "jira_summary": "SWE-EMB-LLR-311 - Reconnection State",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-481",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-312",
+    "jira": "SCRUM-482",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-305"
+    ],
+    "text": "A debounced press of Sensor 1 or Sensor 2 button shall toggle that sensor display_enabled flag only when the sensor is connected.",
+    "jira_summary": "SWE-EMB-LLR-312 - Physical Button Toggle",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-482",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-313",
+    "jira": "SCRUM-483",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-305"
+    ],
+    "text": "Pressing a sensor display button while that sensor is DISCONNECTED shall not cause a valid temperature to be displayed or change the reported DISCONNECTED state.",
+    "jira_summary": "SWE-EMB-LLR-313 - Disconnected Button Behavior",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-483",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-314",
+    "jira": "SCRUM-484",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-306"
+    ],
+    "text": "The firmware shall calculate the displayed average as (sensor1_c + sensor2_c) / 2 using sufficient intermediate precision to avoid overflow or unnecessary rounding error.",
+    "jira_summary": "SWE-EMB-LLR-314 - Average Calculation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-484",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-315",
+    "jira": "SCRUM-485",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-306"
+    ],
+    "text": "The local average shall be valid/displayed only when both sensors are connected, valid, and their display_enabled flags are true.",
+    "jira_summary": "SWE-EMB-LLR-315 - Average Validity",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-485",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-316",
+    "jira": "SCRUM-486",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-307"
+    ],
+    "text": "Local button handling shall render from the latest cached sensor values rather than waiting for a new sensor conversion.",
+    "jira_summary": "SWE-EMB-LLR-316 - Cached Display Data",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-486",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-317",
+    "jira": "SCRUM-487",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-307"
+    ],
+    "text": "The local input handler shall signal the LCD update path immediately after a valid button-state change so that software scheduling does not intentionally delay the update beyond 20 ms.",
+    "jira_summary": "SWE-EMB-LLR-317 - Button-to-Render Scheduling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-487",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-318",
+    "jira": "SCRUM-488",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-308"
+    ],
+    "text": "For a disconnected/faulted sensor, the LCD rendering layer shall display a DISCONNECTED or equivalent clear error label instead of a numeric temperature.",
+    "jira_summary": "SWE-EMB-LLR-318 - Disconnected LCD Text",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-488",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-319",
+    "jira": "SCRUM-489",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-305"
+    ],
+    "text": "For a connected sensor with display_enabled=false, the LCD rendering layer shall display Sensor 1 OFF or Sensor 2 OFF, as applicable.",
+    "jira_summary": "SWE-EMB-LLR-319 - Off LCD Text",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-489",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-320",
+    "jira": "SCRUM-490",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-309"
+    ],
+    "text": "Firmware shall expose a backlight-set function accepting a normalized brightness level and isolate physical-input-specific logic from LCD rendering logic.",
+    "jira_summary": "SWE-EMB-LLR-320 - Backlight Abstraction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-490",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-321",
+    "jira": "SCRUM-491",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "tbd",
+    "parents": [
+      "SWE-EMB-MLR-309"
+    ],
+    "text": "If the button option is selected, each debounced backlight-button press shall cycle through a finite set of defined brightness levels including at least low, medium, and high.",
+    "jira_summary": "SWE-EMB-LLR-321 - Button Backlight Algorithm",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-491",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-322",
+    "jira": "SCRUM-492",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "tbd",
+    "parents": [
+      "SWE-EMB-MLR-309"
+    ],
+    "text": "If the potentiometer option is selected, firmware shall periodically sample the ADC input, map the usable ADC range to backlight brightness, and suppress insignificant jitter before updating the backlight.",
+    "jira_summary": "SWE-EMB-LLR-322 - Potentiometer Backlight Algorithm",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-492",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-323",
+    "jira": "SCRUM-493",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-310"
+    ],
+    "text": "All third-box internal temperature calculations and BLE payload temperatures shall use Celsius as the canonical unit.",
+    "jira_summary": "SWE-EMB-LLR-323 - Canonical Temperature Unit",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-493",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-324",
+    "jira": "SCRUM-494",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-311"
+    ],
+    "text": "The current-data response shall copy both sensor runtime records under a synchronization mechanism so one response cannot mix values from different update instants.",
+    "jira_summary": "SWE-EMB-LLR-324 - Snapshot Locking",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-494",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-325",
+    "jira": "SCRUM-495",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-311"
+    ],
+    "text": "Firmware shall generate or increment a boot/session identifier at startup and include it with current/history metadata so computer software can distinguish samples across third-box restarts.",
+    "jira_summary": "SWE-EMB-LLR-325 - Boot Identifier",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-495",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-326",
+    "jira": "SCRUM-496",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-312"
+    ],
+    "text": "A successful sensor read after a disconnected period shall restore acquisition status without restarting the acquisition task, BLE service, or whole device.",
+    "jira_summary": "SWE-EMB-LLR-326 - Recovery Without Restart",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-496",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-327",
+    "jira": "SCRUM-497",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-313"
+    ],
+    "text": "Remote display commands and physical buttons shall update the same display_enabled fields and invoke the same LCD rendering path.",
+    "jira_summary": "SWE-EMB-LLR-327 - Remote/Local Shared State",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-497",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-EMB-LLR-328",
+    "jira": "SCRUM-498",
+    "level": "LLR",
+    "component": "ESP32 Firmware",
+    "status": "active",
+    "parents": [
+      "SWE-EMB-MLR-313"
+    ],
+    "text": "Firmware shall reject remote display-control requests containing an invalid sensor identifier or unsupported state value without changing local state.",
+    "jira_summary": "SWE-EMB-LLR-328 - Remote Command Validation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-498",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-400",
+    "jira": "SCRUM-499",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-110",
+      "SYS-HLR-500"
+    ],
+    "text": "The third box and computer connection component shall communicate using Bluetooth Low Energy.",
+    "jira_summary": "INT-MLR-400 - BLE Transport",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-499",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-401",
+    "jira": "SCRUM-500",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The third box shall transmit application data only in response to a computer-initiated BLE request; unsolicited application telemetry shall not be required.",
+    "jira_summary": "INT-MLR-401 - Request/Response Application Protocol",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-500",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-402",
+    "jira": "SCRUM-501",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The BLE interface shall support a request that returns the current state and value of both sensors and the current local display state.",
+    "jira_summary": "INT-MLR-402 - Current Data Transaction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-501",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-403",
+    "jira": "SCRUM-502",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The BLE interface shall support validated remote commands to change Sensor 1 and Sensor 2 local display-enable states and shall expose the resulting state.",
+    "jira_summary": "INT-MLR-403 - Remote Display Control Transaction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-502",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-404",
+    "jira": "SCRUM-503",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The BLE interface shall permit retrieval of both 300-record sensor history buffers from the third box.",
+    "jira_summary": "INT-MLR-404 - Historical Data Transaction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-503",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-405",
+    "jira": "SCRUM-504",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-520"
+    ],
+    "text": "The BLE protocol and computer client shall support automatic reconnection/recovery without requiring application restart.",
+    "jira_summary": "INT-MLR-405 - Connection Recovery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-504",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-406",
+    "jira": "SCRUM-505",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The BLE interface shall use an authentication/bonding mechanism sufficient to prevent an arbitrary nearby BLE client from issuing third-box control commands.",
+    "jira_summary": "INT-MLR-406 - BLE Access Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-505",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-MLR-407",
+    "jira": "SCRUM-506",
+    "level": "MLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-510",
+      "SYS-HLR-600"
+    ],
+    "text": "The BLE application protocol shall provide protocol-version identification and explicit success/error status for commands.",
+    "jira_summary": "INT-MLR-407 - Protocol Versioning and Error Reporting",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-506",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-400",
+    "jira": "SCRUM-507",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-400"
+    ],
+    "text": "The ESP32 shall expose one custom 128-bit GATT service dedicated to thermometer application communication; the computer connection process shall identify compatible devices by this service UUID.",
+    "jira_summary": "INT-LLR-400 - Custom GATT Service",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-507",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-401",
+    "jira": "SCRUM-508",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-401"
+    ],
+    "text": "Application temperature and history data shall be transmitted only in response to computer-initiated GATT transactions. The third box shall not transmit application temperature or history data using unsolicited GATT notifications or indications.",
+    "jira_summary": "INT-LLR-401 - No Application Notifications",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-508",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-402",
+    "jira": "SCRUM-509",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-401"
+    ],
+    "text": "Each application request shall carry a request identifier, and each response shall echo that identifier so the client can match responses to requests.",
+    "jira_summary": "INT-LLR-402 - Request Identifier",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-509",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-403",
+    "jira": "SCRUM-510",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-407"
+    ],
+    "text": "Each application message shall contain at least protocol version, opcode, request identifier, payload length, and response status when applicable. Optionally, the application messages may include parity bits",
+    "jira_summary": "INT-LLR-403 - Protocol Header",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-510",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-404",
+    "jira": "SCRUM-511",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-402"
+    ],
+    "text": "The protocol shall define a GET_CURRENT request whose response includes boot identifier, newest sample sequence, Sensor 1 temperature/status/display state and Sensor 2 temperature/status/display state.",
+    "jira_summary": "INT-LLR-404 - GET_CURRENT Opcode",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-511",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-405",
+    "jira": "SCRUM-512",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-403"
+    ],
+    "text": "The protocol shall define a SET_DISPLAY request containing sensor identifier and desired display-enabled Boolean value.",
+    "jira_summary": "INT-LLR-405 - SET_DISPLAY Opcode",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-512",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-406",
+    "jira": "SCRUM-513",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-403"
+    ],
+    "text": "The SET_DISPLAY response shall return success/error and the resulting externally visible sensor state.",
+    "jira_summary": "INT-LLR-406 - SET_DISPLAY Response",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-513",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-407",
+    "jira": "SCRUM-514",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-404"
+    ],
+    "text": "The protocol shall define a GET_HISTORY_META request returning boot identifier, newest sequence, and available record count for each sensor buffer.",
+    "jira_summary": "INT-LLR-407 - GET_HISTORY_META Opcode",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-514",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-408",
+    "jira": "SCRUM-515",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-404"
+    ],
+    "text": "The protocol shall define a GET_HISTORY_CHUNK request containing sensor identifier, chronological starting offset/sequence, and requested record count.",
+    "jira_summary": "INT-LLR-408 - GET_HISTORY_CHUNK Opcode",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-515",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-409",
+    "jira": "SCRUM-516",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-404"
+    ],
+    "text": "A history-chunk response shall contain only complete history records and shall identify the sensor, starting record position/sequence, and number of records returned.",
+    "jira_summary": "INT-LLR-409 - History Chunk Response",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-516",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-410",
+    "jira": "SCRUM-517",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-404"
+    ],
+    "text": "The history retrieval implementation shall segment the 300-record history into BLE-safe chunks and shall not assume the entire history fits in one ATT payload.",
+    "jira_summary": "INT-LLR-410 - History Chunk Size",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-517",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-411",
+    "jira": "SCRUM-518",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-404"
+    ],
+    "text": "The computer BLE client shall request a larger ATT MTU when supported. If a smaller MTU is negotiated, the history transfer shall remain functional by reducing the number of complete history records included in each chunk so that each response fits within the negotiated MTU.",
+    "jira_summary": "INT-LLR-411 - MTU Negotiation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-518",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-412",
+    "jira": "SCRUM-519",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-407"
+    ],
+    "text": "The protocol shall define at least SUCCESS, INVALID_COMMAND, INVALID_SENSOR, INVALID_VALUE, NOT_AVAILABLE, and INTERNAL_ERROR response statuses.",
+    "jira_summary": "INT-LLR-412 - Status Codes",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-519",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-413",
+    "jira": "SCRUM-520",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-407"
+    ],
+    "text": "A receiver shall reject an application message using an unsupported protocol version without applying state-changing commands.",
+    "jira_summary": "INT-LLR-413 - Unsupported Version Handling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-520",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-414",
+    "jira": "SCRUM-521",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-406"
+    ],
+    "text": "The ESP32 and computer client shall use BLE pairing/bonding with authenticated/encrypted access for state-changing characteristics/commands.",
+    "jira_summary": "INT-LLR-414 - BLE Pairing/Bonding",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-521",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-415",
+    "jira": "SCRUM-522",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-405"
+    ],
+    "text": "After BLE link loss, the computer client shall resume scanning/connection attempts automatically and shall not require a user to restart the web application.",
+    "jira_summary": "INT-LLR-415 - Reconnect Discovery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-522",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-500",
+    "jira": "SCRUM-523",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-110",
+      "SYS-HLR-500"
+    ],
+    "text": "The computer application shall consist of a MySQL database, a web application/server, and a third-box connection component.",
+    "jira_summary": "SWE-CONN-MLR-500 - Three-Component Computer Architecture",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-523",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-501",
+    "jira": "SCRUM-524",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The third-box BLE connection component shall run in separately (I.E: via different operating-system process or thread) from the web UI/server.",
+    "jira_summary": "SWE-CONN-MLR-501 - Separate BLE Connection Process",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-524",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-502",
+    "jira": "SCRUM-525",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The third-box connection process shall request current data from the third box at a nominal 1 Hz rate and publish each result to MySQL.",
+    "jira_summary": "SWE-CONN-MLR-502 - One-Hertz Third-Box Polling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-525",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-503",
+    "jira": "SCRUM-526",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600",
+      "SYS-HLR-520"
+    ],
+    "text": "On application startup or BLE reconnection, the connection process shall retrieve available third-box history and persist it so the most recent 300 seconds can be displayed within the stakeholder time limit.",
+    "jira_summary": "SWE-CONN-MLR-503 - Startup History Synchronization",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-526",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-504",
+    "jira": "SCRUM-527",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600"
+    ],
+    "text": "While third-box data is unavailable, the computer software shall preserve the one-second time base and represent missing data distinctly from valid sensor measurements.",
+    "jira_summary": "SWE-CONN-MLR-504 - Unavailable-Data Recording",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-527",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-505",
+    "jira": "SCRUM-528",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The web application and BLE process shall exchange remote third-box control requests through a defined inter-process mechanism that supports the less-than-one-second response requirement.",
+    "jira_summary": "SWE-CONN-MLR-505 - Control Command Relay",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-528",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-506",
+    "jira": "SCRUM-529",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-520"
+    ],
+    "text": "The connection process shall automatically detect, reconnect to, and resume polling a compatible third box after it becomes available.",
+    "jira_summary": "SWE-CONN-MLR-506 - Automatic BLE Reconnect",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-529",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-MLR-550",
+    "jira": "SCRUM-530",
+    "level": "MLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-110",
+      "SYS-HLR-600"
+    ],
+    "text": "MySQL shall provide persistent storage for temperature history and shared state used by the computer application.",
+    "jira_summary": "SWE-DB-MLR-550 - MySQL Persistent Storage",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-530",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-MLR-551",
+    "jira": "SCRUM-531",
+    "level": "MLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600"
+    ],
+    "text": "The database shall persist one-second temperature records for three series: probe 1, probe 2, and the computed average of the two, with per-series value and status, third-box device and session identity, and sample identity. Series status shall distinguish valid readings from unplugged-sensor, no-data, provisional, and derived-unavailable conditions.",
+    "jira_summary": "SWE-DB-MLR-551 - Temperature Sample Schema",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-531",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-MLR-552",
+    "jira": "SCRUM-532",
+    "level": "MLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510",
+      "SYS-HLR-700"
+    ],
+    "text": "The database shall persist temperature-sample history and email alert recipients/rules required by the web application. Application user roles and third-box control-command state are not persisted because this is a trusted local application with no user accounts and control commands are sent directly to the Python BLE backend.",
+    "jira_summary": "SWE-DB-MLR-552 - Configuration and Authorization Storage",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-532",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-MLR-553",
+    "jira": "SCRUM-533",
+    "level": "MLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "MySQL shall be the authoritative source for historical temperature samples displayed by the web application. Third-box control commands shall be sent directly from the web application to the Python BLE backend and shall not pass through a MySQL command queue. Verification: issue a display-toggle command via the web UI and confirm the third-box display changes in under 1 second.",
+    "jira_summary": "SWE-DB-MLR-553 - Control Command Queue",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-533",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-MLR-554",
+    "jira": "SCRUM-534",
+    "level": "MLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600",
+      "SYS-HLR-700"
+    ],
+    "text": "Persisted temperature values shall use Celsius as the canonical unit, with conversion to Fahrenheit performed at presentation only. This supports the user-selectable display units required by {Req 5.a} and {Req 5.c.i}, and the third-box display in {Req 4}. Temperatures shall be stored with fixed-point precision sufficient to cover the {Req 8.a} design range of −10 to +63 °C without rounding error affecting alert threshold comparisons. Application-created timestamps shall be stored in UTC. This is a team design decision rather than a spec-derived requirement {Req 5.c.iii} labels the graph axis in relative \"seconds ago\" and no wall-clock time is displayed. UTC is retained because local time is not monotonic across timezone transitions, and both the history index (**SWE-DB-LLR-552**) and the time-range replacement in **SWE-CONN-LLR-509** assume ordered timestamps.",
+    "jira_summary": "SWE-DB-MLR-554 - Canonical Time and Units",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-534",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-500",
+    "jira": "SCRUM-535",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-501"
+    ],
+    "text": "The BLE connection component shall start as an independent process/service with its own main loop and database connection.",
+    "jira_summary": "SWE-CONN-LLR-500 - Connection Worker Executable",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-535",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-501",
+    "jira": "SCRUM-536",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-502"
+    ],
+    "text": "The connection worker shall issue GET_CURRENT transactions at 1 Hz, scheduled against a monotonic clock so that sample spacing is unaffected by system time adjustments. Scheduled poll times shall not deviate by more than ±100 ms from one-second boundaries. Verification: log poll timestamps over 300 seconds and confirm the count is 300 ±1 and no interval exceeds the stated tolerance.",
+    "jira_summary": "SWE-CONN-LLR-501 - One-Hertz Poll Scheduler",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-536",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-502",
+    "jira": "SCRUM-537",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-502"
+    ],
+    "text": "For each valid GET_CURRENT response, the computer BLE connection worker shall store the received sensor temperatures, statuses, display states, boot identifier, and sample sequence number in the database. The worker shall also store the UTC response-receive time and the average temperature, calculated from the same sample when both sensor readings are valid.",
+    "jira_summary": "SWE-CONN-LLR-502 - Successful Poll Persistence",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-537",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-503",
+    "jira": "SCRUM-538",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-504"
+    ],
+    "text": "If a scheduled 1 Hz poll does not yield a valid reading, the worker shall persist a record for that one-second interval rather than repeating the previous value, so gaps remain distinguishable from valid data {Req 5.c.iv} and the graph continues scrolling {Req 5.c.v}. Missed-poll records shall be marked provisional, indicating an interval for which no third-box reading was obtained and which may be superseded if that data is later recovered. The worker cannot determine at poll time whether the box is powered off or merely unreachable, so no distinction is made when the record is written. Resolution of provisional records on reconnection is specified in **SWE-CONN-LLR-509**. Verification: interrupt the third-box connection during operation and confirm records continue to be written at 1 Hz marked provisional, with no value carried forward from the previous reading.",
+    "jira_summary": "SWE-CONN-LLR-503 - Missing Poll Persistence",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-538",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-504",
+    "jira": "SCRUM-539",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-506"
+    ],
+    "text": "After disconnection, the worker shall retry compatible-device discovery/connection frequently enough that a newly powered third box is detected within 10 seconds.",
+    "jira_summary": "SWE-CONN-LLR-504 - Reconnect Retry Interval",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-539",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-505",
+    "jira": "SCRUM-540",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-503"
+    ],
+    "text": "The worker shall initiate a history synchronization after first connection and after reconnecting to a new boot identifier.",
+    "jira_summary": "SWE-CONN-LLR-505 - History Sync Trigger",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-540",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-506",
+    "jira": "SCRUM-541",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-503"
+    ],
+    "text": "Before requesting history chunk data, the worker shall request history metadata from the third box, comprising: the boot/session identifier, the oldest and newest available sample sequence numbers, and the sample count available per sensor. The worker shall use this to determine which chunks are required rather than fetching blindly. If metadata cannot be obtained within [N] seconds, synchronization shall abort and retry rather than proceeding to chunk requests, so as not to exceed the 10-second startup budget in {Req 5.c}. Verification: initiate synchronization with a populated third-box buffer and confirm a metadata request precedes any chunk request, and that requested chunk ranges fall within the reported available range.",
+    "jira_summary": "SWE-CONN-LLR-506 - History Metadata First",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-541",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-507",
+    "jira": "SCRUM-542",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-503"
+    ],
+    "text": "Following metadata retrieval, the worker shall request history chunks until the most recent 300 seconds of available records have been obtained, or until the synchronization time budget is exhausted. The combined metadata and chunk-retrieval budget shall not exceed [N] seconds, preserving the 10-second startup requirement in {Req 5.c}. Individual chunk requests shall be retried up to 2 times on failure. If the budget expires before the full 300 seconds is retrieved, synchronization shall persist the records obtained and leave the remaining interval as a gap rather than discarding partial history; gaps remain distinguishable per {Req 5.c.iv}. Verification: initiate synchronization against a full third-box buffer and confirm 300 seconds of records are retrieved within the budget; repeat with an artificially delayed link and confirm partial history is persisted and the budget is not exceeded.",
+    "jira_summary": "SWE-CONN-LLR-507 - History Chunk Loop",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-542",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-508",
+    "jira": "SCRUM-543",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-503"
+    ],
+    "text": "For third-box records lacking absolute timestamps, the worker shall reconstruct observation times by anchoring the newest recovered sample to the time its response was received and assigning preceding samples at one-second intervals by descending sample sequence. Reconstructed timestamps are approximate; accumulated error across a 300-second recovery shall not exceed 2 seconds, consistent with the \"seconds ago\" axis labelling in {Req 5.c.iii}. Where a reconstructed timestamp overlaps an interval already covered by live polling, the live sample shall take precedence. Verification: recover a known-length history and confirm reconstructed timestamps are monotonically decreasing at one-second spacing, that the newest aligns with the first live sample without duplication or gap, and that total span matches the recovered sample count.",
+    "jira_summary": "SWE-CONN-LLR-508 - History Timestamp Reconstruction",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-543",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-509",
+    "jira": "SCRUM-544",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-503"
+    ],
+    "text": "On history synchronization, the worker shall upsert recovered samples keyed on device, boot, and sample identity so that repeated synchronization does not create duplicate records. Provisional records written by **SWE-CONN-LLR-503** carry no third-box sample sequence and shall be resolved by time range rather than by upsert: * If the recovered boot identity matches the session active before the gap, provisional records within the recovered range shall be replaced by the recovered samples. * If the boot identity differs, the third box was power-cycled and no data exists for the gap; provisional records preceding the new session's first sample shall be reclassified as no-data {Req 5.a.ii}. Verification: (a) synchronize history twice in succession and confirm record count is unchanged; (b) drop the connection with the box powered, reconnect, and confirm provisional records are replaced by recovered samples; (c) power-cycle the box and confirm provisional records for the off period become no-data.",
+    "jira_summary": "SWE-CONN-LLR-509 - History De-Duplication",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-544",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-510",
+    "jira": "SCRUM-545",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-505"
+    ],
+    "text": "The connection worker shall accept validated direct control requests from the backend API and schedule them promptly ahead of background history synchronization so the end-to-end display response can remain under 1 second. Verification: issue display toggles from the web UI across ten trials and measure browser-to-third-box response latency.",
+    "jira_summary": "SWE-CONN-LLR-510 - Pending Command Poll",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-545",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-511",
+    "jira": "SCRUM-546",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-505"
+    ],
+    "text": "The backend shall serialize each accepted direct display-control operation, execute it once through the BLE connection worker, and report success or failure to the caller. A connection loss or timeout shall produce an explicit failed result rather than leaving an operation indefinitely active. Verification: submit a command, confirm one BLE execution and a terminal response, then repeat with the third box unavailable and confirm failure is reported.",
+    "jira_summary": "SWE-CONN-LLR-511 - Command Claiming",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-546",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-512",
+    "jira": "SCRUM-547",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-505"
+    ],
+    "text": "After executing a direct remote display command, the backend shall return command success or failure and the resulting third-box display state through the backend API and diagnostic logs. Command completion is not required to be stored in MySQL.",
+    "jira_summary": "SWE-CONN-LLR-512 - Command Completion",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-547",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-513",
+    "jira": "SCRUM-548",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-506"
+    ],
+    "text": "The worker shall update a database device-state record with connected/unavailable state and last-seen time whenever BLE availability changes.",
+    "jira_summary": "SWE-CONN-LLR-513 - Connection State Publication",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-548",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-514",
+    "jira": "SCRUM-549",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-502"
+    ],
+    "text": "A BLE poll failure or database write failure shall be handled as an error for that cycle and shall not terminate the worker process without a controlled fatal condition.",
+    "jira_summary": "SWE-CONN-LLR-514 - Polling Failure Isolation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-549",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-550",
+    "jira": "SCRUM-550",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-551"
+    ],
+    "text": "Create a temperature_samples table containing device_id, boot_id, sample_seq, observed_at_utc, sensor1_c, sensor1_status, sensor2_c, sensor2_status, average_c, average_valid, and record_source fields.",
+    "jira_summary": "SWE-DB-LLR-550 - temperature_samples Table",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-550",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-551",
+    "jira": "SCRUM-551",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-551"
+    ],
+    "text": "Re-inserting a temperature sample that has already been stored shall not create a duplicate record. Uniqueness shall be enforced by a database constraint on third-box device identity, session identity, and sample sequence extended to include series identity if series are stored as separate rows. Verification: attempt to insert a record matching an existing key and confirm the database rejects it without creating a second row.",
+    "jira_summary": "SWE-DB-LLR-551 - Sample Uniqueness",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-551",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-552",
+    "jira": "SCRUM-552",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-551"
+    ],
+    "text": "The temperature_samples table shall carry an index on (device_id, observed_at_utc) supporting the two required access patterns: retrieval of the most recent sample per series and retrieval of all samples within a bounded time window of up to 300 seconds. If series are stored as separate rows, series identity shall be included in the index. Verification: EXPLAIN on both query forms shows the index in use rather than a full table scan.",
+    "jira_summary": "SWE-DB-LLR-552 - History Index",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-552",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-553",
+    "jira": "SCRUM-553",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-550"
+    ],
+    "text": "Temperature samples shall be retained for a minimum of 300 seconds after the observed timestamp. Samples older than 600 seconds shall be eligible for automatic deletion. The retention floor shall exceed the maximum user-selectable graph window (300s) with margin sufficient to avoid contention between deletion and history queries.",
+    "jira_summary": "SWE-DB-LLR-553 - Persistent Retention",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-553",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-554",
+    "jira": "SCRUM-554",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-552"
+    ],
+    "text": "The database schema shall not store application user accounts, passwords, password hashes, or USER/ADMIN roles. The application is operated as a trusted local tool and does not implement user accounts. Verification: inspect the schema and confirm no users or credential table is present.",
+    "jira_summary": "SWE-DB-LLR-554 - users Table",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-554",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-555",
+    "jira": "SCRUM-555",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-552"
+    ],
+    "text": "Create an alert_recipients table storing an email destination address and enabled/configuration audit fields needed by the alerting implementation. The table shall support multiple email recipients. SMS recipients are out of scope. Verification: insert multiple email recipients and confirm all persist and are retrievable by alerting logic.",
+    "jira_summary": "SWE-DB-LLR-555 - alert_recipients Table",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-555",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-556",
+    "jira": "SCRUM-556",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-552"
+    ],
+    "text": "Create an alert_rules table storing a minimum threshold, maximum threshold, high-temperature message, low-temperature message, and the monitored series, linked to one or more alert_recipients. Verification: create a rule with both thresholds and messages, confirm all five editable fields persist and are retrievable.",
+    "jira_summary": "SWE-DB-LLR-556 - alert_rules Table",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-556",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-557",
+    "jira": "SCRUM-557",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-553"
+    ],
+    "text": "The database schema shall not require or create a control_commands table. Third-box display commands shall be validated and sent directly to the Python BLE backend. Verification: confirm the command table is absent and exercise a display request through the direct backend endpoint.",
+    "jira_summary": "SWE-DB-LLR-557 - control_commands Table",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-557",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-558",
+    "jira": "SCRUM-558",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-553"
+    ],
+    "text": "Direct control operations shall return an explicit accepted/completed or failed result through the backend API, including timeout or unavailable-device failures. Database command states and expiry are not required because commands are not queued in MySQL. Verification: submit a command with the third box unavailable and confirm the API terminates with an actionable failure.",
+    "jira_summary": "SWE-DB-LLR-558 - Command Status Values",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-558",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-559",
+    "jira": "SCRUM-559",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-554"
+    ],
+    "text": "All numeric threshold and temperature fields stored in MySQL shall use Celsius regardless of the user-selected display unit.",
+    "jira_summary": "SWE-DB-LLR-559 - Celsius Storage",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-559",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-560",
+    "jira": "SCRUM-560",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-554"
+    ],
+    "text": "All timestamps stored in the database shall use UTC, including sample observation times and alert-configuration audit timestamps. This applies to application-generated timestamps and database defaults; the database server timezone shall be UTC. Conversion to local time is presentation-only.",
+    "jira_summary": "SWE-DB-LLR-560 - UTC Timestamp Storage",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-560",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-DB-LLR-561",
+    "jira": "SCRUM-561",
+    "level": "LLR",
+    "component": "MySQL Database",
+    "status": "active",
+    "parents": [
+      "SWE-DB-MLR-550"
+    ],
+    "text": "Database credentials and secrets shall be supplied through environment/configuration outside version-controlled source files.",
+    "jira_summary": "SWE-DB-LLR-561 - Database Credentials",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-561",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-600",
+    "jira": "SCRUM-562",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-110",
+      "SYS-HLR-500"
+    ],
+    "text": "The computer shall host a web application/server that provides the browser UI and mediates access to database-backed temperature, configuration, and control functions.",
+    "jira_summary": "SWE-WEB-MLR-600 - Computer-Hosted Web Application",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-562",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-601",
+    "jira": "SCRUM-563",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The web UI shall obtain current temperature/status data from MySQL at a nominal 1 Hz rate.",
+    "jira_summary": "SWE-WEB-MLR-601 - One-Hertz UI Data Refresh",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-563",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-602",
+    "jira": "SCRUM-564",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-510",
+      "SYS-HLR-700"
+    ],
+    "text": "The web application shall be usable on desktop and mobile displays. It is a trusted local application and shall not implement application user accounts or USER/ADMIN roles. Deployment shall restrict exposed services to the intended local host/network boundary.",
+    "jira_summary": "SWE-WEB-MLR-602 - Responsive User/Admin Modes",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-564",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-603",
+    "jira": "SCRUM-565",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "The UI shall provide settings for configuring multiple email recipients and alert thresholds/messages. SMS configuration is out of scope.",
+    "jira_summary": "SWE-WEB-MLR-603 - Settings Page",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-565",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-604",
+    "jira": "SCRUM-566",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600"
+    ],
+    "text": "The main view shall be a graph page supporting simultaneous selection of Sensor 1, Sensor 2, and Average series, with current values for selected series.",
+    "jira_summary": "SWE-WEB-MLR-604 - Main Graph Page and Series Selection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-566",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-605",
+    "jira": "SCRUM-567",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600"
+    ],
+    "text": "The web UI shall allow the user to display real-time and historical temperatures in Celsius or Fahrenheit.",
+    "jira_summary": "SWE-WEB-MLR-605 - Celsius/Fahrenheit Presentation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-567",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-606",
+    "jira": "SCRUM-568",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500",
+      "SYS-HLR-600"
+    ],
+    "text": "The UI shall distinguish disconnected sensors, unavailable third-box data, missing graph data, and valid off-scale graph data.",
+    "jira_summary": "SWE-WEB-MLR-606 - Missing/Unavailable Presentation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-568",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-607",
+    "jira": "SCRUM-569",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The UI shall provide a local control page or section for remotely selecting the temperature information displayed on the third-box LCD. No application ADMIN account is required.",
+    "jira_summary": "SWE-WEB-MLR-607 - Control Page",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-569",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-608",
+    "jira": "SCRUM-570",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The stakeholder-required graph shall use fixed limits of 10 to 50 deg C or 50 to 122 deg F.",
+    "jira_summary": "SWE-WEB-MLR-608 - Compliance Graph Y-Axis",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-570",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-609",
+    "jira": "SCRUM-571",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "conflict",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The implementation design requests a configurable graph range within -10 to +63 deg C. This feature conflicts with the stakeholder requirement that the graph always use fixed 10 to 50 deg C limits and shall remain blocked until stakeholder approval or be implemented only as a separate non-required view.",
+    "jira_summary": "SWE-WEB-MLR-609 - Configurable Graph Y-Axis",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-571",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-610",
+    "jira": "SCRUM-572",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The stakeholder-required graph shall display a total time record of 300 seconds.",
+    "jira_summary": "SWE-WEB-MLR-610 - Compliance Graph Time Window",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-572",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-611",
+    "jira": "SCRUM-573",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "conflict",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The implementation design requests a selectable graph time range up to 300 seconds. This conflicts with the stakeholder statement that the total displayed record is 300 seconds and shall remain blocked until stakeholder approval or be implemented only as a separate non-required view.",
+    "jira_summary": "SWE-WEB-MLR-611 - Configurable Graph Time Window",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-573",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-600",
+    "jira": "SCRUM-574",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-600"
+    ],
+    "text": "The web server shall provide a read-only API endpoint that returns the latest database-backed Sensor 1, Sensor 2, average, sensor-status, box-availability, and display-state data.",
+    "jira_summary": "SWE-WEB-LLR-600 - Current Data API",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-574",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-601",
+    "jira": "SCRUM-575",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-600"
+    ],
+    "text": "The web server shall provide a read-only history endpoint accepting a requested duration up to the permitted limit and returning timestamped sensor/average values and status/missing markers.",
+    "jira_summary": "SWE-WEB-LLR-601 - History API",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-575",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-602",
+    "jira": "SCRUM-576",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-607"
+    ],
+    "text": "The web/backend service shall provide an endpoint that validates a sensor display request and sends the corresponding command directly to the Python BLE backend. It shall not insert commands into MySQL and does not require application-user authentication in the trusted local deployment.",
+    "jira_summary": "SWE-WEB-LLR-602 - Display Control API",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-576",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-603",
+    "jira": "SCRUM-577",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-607"
+    ],
+    "text": "The web/backend service shall expose the success, failure, timeout, and resulting display state of a submitted direct third-box control command through its API. No ADMIN authorization or database command-status record is required in the trusted local deployment.",
+    "jira_summary": "SWE-WEB-LLR-603 - Command Status API",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-577",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-604",
+    "jira": "SCRUM-578",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-601"
+    ],
+    "text": "The graph/current-value client shall request current data from the web server every 1000 ms while the page is active.",
+    "jira_summary": "SWE-WEB-LLR-604 - Browser Poll Timer",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-578",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-605",
+    "jira": "SCRUM-579",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-601"
+    ],
+    "text": "When the current API reports box unavailable or sensor invalid, the browser shall replace the prior numeric current value with the appropriate status text instead of retaining it as current.",
+    "jira_summary": "SWE-WEB-LLR-605 - No Stale Current Value",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-579",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-606",
+    "jira": "SCRUM-580",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-602"
+    ],
+    "text": "The graph, current-value cards, settings forms, and control page shall use responsive layout rules that avoid horizontal overflow at common phone and desktop viewport widths.",
+    "jira_summary": "SWE-WEB-LLR-606 - Responsive Layout",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-580",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-607",
+    "jira": "SCRUM-581",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-602"
+    ],
+    "text": "The application shall operate without application user accounts or USER/ADMIN roles. The operator is trusted by the local deployment boundary. Verification: confirm no login, user-role model, or account database is required for normal operation.",
+    "jira_summary": "SWE-WEB-LLR-607 - Role Model",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-581",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-608",
+    "jira": "SCRUM-582",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-602"
+    ],
+    "text": "A local operator shall be permitted to view current temperatures and graphs, control the third-box displays, and configure email alerts. The application does not distinguish USER and ADMIN roles.",
+    "jira_summary": "SWE-WEB-LLR-608 - User Permissions",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-582",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-609",
+    "jira": "SCRUM-583",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-602"
+    ],
+    "text": "A local operator shall be permitted to use third-box control and email notification/settings functions without an application ADMIN account.",
+    "jira_summary": "SWE-WEB-LLR-609 - Admin Permissions",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-583",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-610",
+    "jira": "SCRUM-584",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-603"
+    ],
+    "text": "The settings page shall display all configured email recipients and allow the local operator to add, edit, enable/disable, and remove recipients. SMS recipients and ADMIN authorization are out of scope.",
+    "jira_summary": "SWE-WEB-LLR-610 - Recipient List UI",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-584",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-611",
+    "jira": "SCRUM-585",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-603"
+    ],
+    "text": "The settings page shall allow the local operator to configure minimum and maximum Celsius-equivalent thresholds independently for each email alert recipient/rule.",
+    "jira_summary": "SWE-WEB-LLR-611 - Per-Recipient Threshold UI",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-585",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-612",
+    "jira": "SCRUM-586",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-603"
+    ],
+    "text": "The settings page shall allow the local operator to edit the high-temperature and low-temperature message text associated with an email alert rule.",
+    "jira_summary": "SWE-WEB-LLR-612 - Message Configuration UI",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-586",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-613",
+    "jira": "SCRUM-587",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-604"
+    ],
+    "text": "The graph page shall provide independent controls for displaying Sensor 1, Sensor 2, and Average, and shall permit any combination of the three.",
+    "jira_summary": "SWE-WEB-LLR-613 - Series Toggle Controls",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-587",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-614",
+    "jira": "SCRUM-588",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-604"
+    ],
+    "text": "The graph page shall show a current-value indicator for each selected series and suppress or mark the average unavailable when one or both sensor readings are invalid.",
+    "jira_summary": "SWE-WEB-LLR-614 - Selected Current Values",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-588",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-615",
+    "jira": "SCRUM-589",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-604"
+    ],
+    "text": "The web application shall calculate or read Average only from valid Sensor 1 and Sensor 2 values from the same sample record.",
+    "jira_summary": "SWE-WEB-LLR-615 - Average Calculation Source",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-589",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-616",
+    "jira": "SCRUM-590",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-605"
+    ],
+    "text": "The web layer shall treat Celsius database values as canonical and convert to Fahrenheit using F = C * 9/5 + 32 for presentation.",
+    "jira_summary": "SWE-WEB-LLR-616 - Canonical Conversion",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-590",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-617",
+    "jira": "SCRUM-591",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-605"
+    ],
+    "text": "Changing the unit selector shall update current-value labels, graph values, graph-axis labels, and configured threshold presentation without altering stored Celsius data.",
+    "jira_summary": "SWE-WEB-LLR-617 - Unit Switch Refresh",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-591",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-618",
+    "jira": "SCRUM-592",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-606"
+    ],
+    "text": "For a disconnected sensor, the current-value UI shall display a textual indication of an unplugged sensor instead of a numeric temperature. I.E: “Sensor X Unplugged”",
+    "jira_summary": "SWE-WEB-LLR-618 - Unplugged Sensor Text",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-592",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-619",
+    "jira": "SCRUM-593",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-606"
+    ],
+    "text": "When the third box is OFF/unavailable, the current-value UI shall display the exact text \"No data available\" instead of a numeric temperature.",
+    "jira_summary": "SWE-WEB-LLR-619 - No Data Available Text",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-593",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-620",
+    "jira": "SCRUM-594",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-606"
+    ],
+    "text": "A missing/unavailable sample shall be rendered as a visible gap and/or dedicated missing marker and shall not be connected as if it were a valid temperature sample.",
+    "jira_summary": "SWE-WEB-LLR-620 - Graph Missing Gap",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-594",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-621",
+    "jira": "SCRUM-595",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-606"
+    ],
+    "text": "A valid sample below/above the visible Y-axis shall be represented differently from a missing sample, for example by a boundary/clipped indicator while preserving its valid status.",
+    "jira_summary": "SWE-WEB-LLR-621 - Off-Scale Marker",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-595",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-622",
+    "jira": "SCRUM-596",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-607"
+    ],
+    "text": "The control page shall provide independent local-operator controls for Sensor 1 and Sensor 2 LCD display-enable state.",
+    "jira_summary": "SWE-WEB-LLR-622 - Sensor Display Controls",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-596",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-623",
+    "jira": "SCRUM-597",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-607"
+    ],
+    "text": "After submitting a display-control command, the control page shall update from the command result/current state rather than assuming the command succeeded.",
+    "jira_summary": "SWE-WEB-LLR-623 - Control State Confirmation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-597",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-624",
+    "jira": "SCRUM-598",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-608"
+    ],
+    "text": "In the stakeholder compliance graph, Celsius Y-axis minimum shall be 10 and maximum shall be 50.",
+    "jira_summary": "SWE-WEB-LLR-624 - Fixed Celsius Axis",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-598",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-625",
+    "jira": "SCRUM-599",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-608"
+    ],
+    "text": "In the stakeholder compliance graph, Fahrenheit Y-axis minimum shall be 50 and maximum shall be 122.",
+    "jira_summary": "SWE-WEB-LLR-625 - Fixed Fahrenheit Axis",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-599",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-626",
+    "jira": "SCRUM-600",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-610"
+    ],
+    "text": "The stakeholder compliance graph shall request/render 300 seconds of history and label the X-axis in seconds ago from 300 on the left to 0 on the right.",
+    "jira_summary": "SWE-WEB-LLR-626 - 300-Second X Axis",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-600",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-627",
+    "jira": "SCRUM-601",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "conflict",
+    "parents": [
+      "SWE-WEB-MLR-609"
+    ],
+    "text": "If stakeholder approval is obtained for the design extension, an advanced/custom graph view may accept validated Celsius-equivalent Y-axis limits within -10 to +63 deg C and require min < max.",
+    "jira_summary": "SWE-WEB-LLR-627 - Custom Y-Axis Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-601",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-628",
+    "jira": "SCRUM-602",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "conflict",
+    "parents": [
+      "SWE-WEB-MLR-611"
+    ],
+    "text": "If stakeholder approval is obtained for the design extension, an advanced/custom graph view may accept a time window greater than 0 and less than or equal to 300 seconds.",
+    "jira_summary": "SWE-WEB-LLR-628 - Custom Time-Window Control",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-602",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-700",
+    "jira": "SCRUM-603",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "The computer software shall support email alerts and shall allow multiple configurable email destinations. SMS alerts are out of scope.",
+    "jira_summary": "SWE-ALR-MLR-700 - Email and SMS Delivery",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-603",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-701",
+    "jira": "SCRUM-604",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "Each configured recipient shall support independently configurable high and low temperature thresholds.",
+    "jira_summary": "SWE-ALR-MLR-701 - Per-Recipient Alert Rules",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-604",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-702",
+    "jira": "SCRUM-605",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "The high-temperature and low-temperature alert message text shall be configurable from the computer UI.",
+    "jira_summary": "SWE-ALR-MLR-702 - Configurable Alert Messages",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-605",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-703",
+    "jira": "SCRUM-606",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "Notification delivery shall be performed by the computer through a configured third-party email service API or SMTP service rather than by the third box. SMS delivery is out of scope.",
+    "jira_summary": "SWE-ALR-MLR-703 - Third-Party Notification Adapters",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-606",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-704",
+    "jira": "SCRUM-607",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "Only valid current temperature measurements shall be evaluated against alert thresholds.",
+    "jira_summary": "SWE-ALR-MLR-704 - Valid-Data Alert Evaluation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-607",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-705",
+    "jira": "SCRUM-608",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "The software shall avoid sending an alert every second while a temperature remains continuously out of range; an edge/episode-based notification policy shall be used unless the stakeholder specifies otherwise.",
+    "jira_summary": "SWE-ALR-MLR-705 - Alert Repetition Policy",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-608",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-MLR-750",
+    "jira": "SCRUM-609",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-510",
+      "SYS-HLR-700"
+    ],
+    "text": "The web application shall not implement application user accounts, login, or role-based authorization. It shall be deployed as a trusted local tool with services bound to the documented local access boundary, while server-side validation remains mandatory for control and email-alert configuration inputs.",
+    "jira_summary": "SWE-SEC-MLR-750 - Web Authentication and Authorization",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-609",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-700",
+    "jira": "SCRUM-610",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-700"
+    ],
+    "text": "Each alert recipient record shall identify an email destination address. EMAIL is the only supported delivery type; SMS is out of scope.",
+    "jira_summary": "SWE-ALR-LLR-700 - Recipient Types",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-610",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-701",
+    "jira": "SCRUM-611",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-700"
+    ],
+    "text": "The alert evaluator shall process all enabled recipient/rule records applicable to a valid sample rather than stopping after the first matching recipient.",
+    "jira_summary": "SWE-ALR-LLR-701 - Multiple Recipients",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-611",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-702",
+    "jira": "SCRUM-612",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-701"
+    ],
+    "text": "Each alert rule shall contain minimum and maximum Celsius thresholds and a monitored source identifier.",
+    "jira_summary": "SWE-ALR-LLR-702 - Threshold Rule Fields",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-612",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-703",
+    "jira": "SCRUM-613",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-701"
+    ],
+    "text": "The alert evaluator shall compare each enabled recipient rule using that rule's own thresholds; one recipient's thresholds shall not alter another recipient's evaluation.",
+    "jira_summary": "SWE-ALR-LLR-703 - Per-Recipient Evaluation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-613",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-704",
+    "jira": "SCRUM-614",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-702"
+    ],
+    "text": "A high-threshold notification shall use the configured high-message text for the matching rule/recipient.",
+    "jira_summary": "SWE-ALR-LLR-704 - High Message Selection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-614",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-705",
+    "jira": "SCRUM-615",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-702"
+    ],
+    "text": "A low-threshold notification shall use the configured low-message text for the matching rule/recipient.",
+    "jira_summary": "SWE-ALR-LLR-705 - Low Message Selection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-615",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-706",
+    "jira": "SCRUM-616",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-703"
+    ],
+    "text": "Implement an email provider adapter that accepts destination and message text and invokes the configured third-party email API or SMTP service using credentials supplied outside source control. The adapter shall support Gmail-compatible SMTP configuration for integration testing.",
+    "jira_summary": "SWE-ALR-LLR-706 - SMS Provider Adapter",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-616",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-707",
+    "jira": "SCRUM-617",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-703"
+    ],
+    "text": "Implement an email provider adapter that accepts destination and message text and invokes the configured third-party email API using credentials supplied outside source control.",
+    "jira_summary": "SWE-ALR-LLR-707 - Email Provider Adapter",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-617",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-708",
+    "jira": "SCRUM-618",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-703"
+    ],
+    "text": "A notification-provider failure shall be logged/recorded and shall not block subsequent one-second temperature polling.",
+    "jira_summary": "SWE-ALR-LLR-708 - Provider Failure Handling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-618",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-709",
+    "jira": "SCRUM-619",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-704"
+    ],
+    "text": "The alert evaluator shall skip a sensor/rule evaluation when the underlying sample status is unavailable/disconnected/invalid.",
+    "jira_summary": "SWE-ALR-LLR-709 - Invalid Sample Skip",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-619",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-710",
+    "jira": "SCRUM-620",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-ALR-MLR-704"
+    ],
+    "text": "If Average is supported as an alert source, it shall be evaluated only when both Sensor 1 and Sensor 2 values in the same sample are valid.",
+    "jira_summary": "SWE-ALR-LLR-710 - Average Alert Validity",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-620",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-711",
+    "jira": "SCRUM-621",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SWE-ALR-MLR-705"
+    ],
+    "text": "For each enabled recipient/rule/source combination, maintain alert state NORMAL, HIGH, or LOW.",
+    "jira_summary": "SWE-ALR-LLR-711 - Alert Episode State",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-621",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-712",
+    "jira": "SCRUM-622",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SWE-ALR-MLR-705"
+    ],
+    "text": "Send the high alert only when the rule state transitions from NORMAL/LOW into HIGH; do not resend each one-second sample while it remains HIGH.",
+    "jira_summary": "SWE-ALR-LLR-712 - High Edge Trigger",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-622",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-713",
+    "jira": "SCRUM-623",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SWE-ALR-MLR-705"
+    ],
+    "text": "Send the low alert only when the rule state transitions from NORMAL/HIGH into LOW; do not resend each one-second sample while it remains LOW.",
+    "jira_summary": "SWE-ALR-LLR-713 - Low Edge Trigger",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-623",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-714",
+    "jira": "SCRUM-624",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SWE-ALR-MLR-705"
+    ],
+    "text": "Return the rule state to NORMAL when the valid temperature is between the configured minimum and maximum, allowing a later new excursion to generate another alert.",
+    "jira_summary": "SWE-ALR-LLR-714 - Rearm In Range",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-624",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-LLR-750",
+    "jira": "SCRUM-625",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-SEC-MLR-750"
+    ],
+    "text": "The application shall not store application-user credentials, plaintext passwords, or password hashes because application user accounts are out of scope. Service credentials, including email-provider credentials, shall be supplied outside source control.",
+    "jira_summary": "SWE-SEC-LLR-750 - Password Hashing",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-625",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-LLR-751",
+    "jira": "SCRUM-626",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-SEC-MLR-750"
+    ],
+    "text": "The trusted local deployment shall not require an application authenticated session or token for control/settings operations. Backend and frontend services shall be limited to the documented local access boundary.",
+    "jira_summary": "SWE-SEC-LLR-751 - Authenticated Session",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-626",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-LLR-752",
+    "jira": "SCRUM-627",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-SEC-MLR-750"
+    ],
+    "text": "Every third-box control and email-alert configuration API endpoint shall enforce server-side input validation independent of UI controls. Application ADMIN authorization is not required in the trusted local deployment.",
+    "jira_summary": "SWE-SEC-LLR-752 - Server-Side Authorization",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-627",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-LLR-753",
+    "jira": "SCRUM-628",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-SEC-MLR-750"
+    ],
+    "text": "The application shall not create authentication cookies because application login is out of scope. Any non-sensitive preference or session cookie that is used shall apply an appropriate SameSite setting and shall not contain credentials.",
+    "jira_summary": "SWE-SEC-LLR-753 - Session Cookie Protection",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-628",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-SEC-LLR-754",
+    "jira": "SCRUM-629",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "active",
+    "parents": [
+      "SWE-SEC-MLR-750"
+    ],
+    "text": "Server-side validation shall reject malformed email addresses, invalid threshold ordering, unsupported sensor identifiers, and out-of-range control values before persistence or command execution. Phone-number validation is out of scope.",
+    "jira_summary": "SWE-SEC-LLR-754 - Input Validation",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-629",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-612",
+    "jira": "SCRUM-630",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "tbd",
+    "parents": [
+      "SYS-HLR-510"
+    ],
+    "text": "The implementation-decision phrase \"power states of the sensors (on/off)\" shall be interpreted as the third-box LCD display-enable state unless the team explicitly changes the hardware architecture; literal sensor power gating conflicts with continuous sensor acquisition and the stakeholder virtual-button requirement.",
+    "jira_summary": "SWE-WEB-MLR-612 - Sensor ON/OFF Control Semantics",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-630",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-629",
+    "jira": "SCRUM-631",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "tbd",
+    "parents": [
+      "SWE-WEB-MLR-612"
+    ],
+    "text": "Until clarified otherwise, the control page sensor ON/OFF action shall submit SET_DISPLAY commands and shall not electrically power down the sensor.",
+    "jira_summary": "SWE-WEB-LLR-629 - Remote Sensor Toggle Semantics",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-631",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-MLR-706",
+    "jira": "SCRUM-632",
+    "level": "MLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SYS-HLR-700"
+    ],
+    "text": "The team shall define whether each recipient threshold applies to Sensor 1, Sensor 2, both sensors independently, and/or Average. The database and evaluator shall support an explicit monitored-source field so the choice is not implicit.",
+    "jira_summary": "SWE-ALR-MLR-706 - Alert Source Scope",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-632",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-ALR-LLR-715",
+    "jira": "SCRUM-633",
+    "level": "LLR",
+    "component": "Alerting/Security",
+    "status": "tbd",
+    "parents": [
+      "SWE-ALR-MLR-706"
+    ],
+    "text": "Define a monitored-source enumeration supporting SENSOR_1 and SENSOR_2 and optionally AVERAGE; each alert rule shall store exactly one source value.",
+    "jira_summary": "SWE-ALR-LLR-715 - Alert Source Enum",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-633",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-213",
+    "jira": "SCRUM-634",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-410"
+    ],
+    "text": "The third-box LCD shall be clearly readable under normal indoor lighting conditions.",
+    "jira_summary": "HWE-MLR-213 - Indoor LCD Readability",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-634",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-214",
+    "jira": "SCRUM-635",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-410"
+    ],
+    "text": "No stakeholder-mandated physical display size or pixel/character resolution applies beyond the requirements to render all required information correctly and readably.",
+    "jira_summary": "HWE-MLR-214 - Display Size and Resolution Unconstrained",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-635",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-215",
+    "jira": "SCRUM-636",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-200"
+    ],
+    "text": "During the required drop with cables attached, a cable may become disconnected, but the cable and connector shall not break.",
+    "jira_summary": "HWE-MLR-215 - Drop Disconnect Allowance",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-636",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-MLR-216",
+    "jira": "SCRUM-637",
+    "level": "MLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-310"
+    ],
+    "text": "The selected sensor assembly shall respond observably after a few seconds of hand heating and shall respond more quickly to nearby/brief soldering-iron heating.",
+    "jira_summary": "HWE-MLR-216 - Sensor Thermal Response Capability",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-637",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-222",
+    "jira": "SCRUM-638",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-213"
+    ],
+    "text": "Verify the selected LCD/backlight combination can be read at normal laboratory viewing distance under normal indoor lighting at the intended enclosure orientation.",
+    "jira_summary": "HWE-LLR-222 - Indoor Readability Verification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-638",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-223",
+    "jira": "SCRUM-639",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-215"
+    ],
+    "text": "A connected-cable drop test passes if the cables/connectors remain unbroken and functional after reconnection even when one or more cables detach during impact.",
+    "jira_summary": "HWE-LLR-223 - Connected-Cable Drop Acceptance",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-639",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-224",
+    "jira": "SCRUM-640",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-216"
+    ],
+    "text": "Verify that holding each sensor in a hand produces an increasing reported temperature after a few seconds.",
+    "jira_summary": "HWE-LLR-224 - Hand-Heating Verification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-640",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "HWE-LLR-225",
+    "jira": "SCRUM-641",
+    "level": "LLR",
+    "component": "Third Box Hardware",
+    "status": "active",
+    "parents": [
+      "HWE-MLR-216"
+    ],
+    "text": "Verify that bringing a soldering iron near or briefly against each sensor produces an increasing reported temperature more rapidly than the hand-heating test.",
+    "jira_summary": "HWE-LLR-225 - Soldering-Iron Response Verification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-641",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-507",
+    "jira": "SCRUM-642",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "When the third box is available, the connection/database path shall make the previous 300 seconds of available history usable by the web application within 10 seconds of computer-software startup.",
+    "jira_summary": "SWE-CONN-MLR-507 - Startup History Availability Timing",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-642",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-MLR-508",
+    "jira": "SCRUM-643",
+    "level": "MLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-520"
+    ],
+    "text": "When the computer software is already running, real-time and graph data shall become available within 10 seconds after the third box is turned ON.",
+    "jira_summary": "SWE-CONN-MLR-508 - Third-Box Power-On Recovery Timing",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-643",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-515",
+    "jira": "SCRUM-644",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-507"
+    ],
+    "text": "The startup connection, history retrieval, history persistence, and first current-data publication path shall be implemented and tested so the required 300-second history can be served within 10 seconds when the third box is already available.",
+    "jira_summary": "SWE-CONN-LLR-515 - Ten-Second Startup Sync Budget",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-644",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-CONN-LLR-516",
+    "jira": "SCRUM-645",
+    "level": "LLR",
+    "component": "Computer BLE Connection Process",
+    "status": "active",
+    "parents": [
+      "SWE-CONN-MLR-508"
+    ],
+    "text": "The reconnect scan interval, BLE connection setup, first current poll, and database publication shall collectively satisfy the 10-second third-box power-on recovery requirement.",
+    "jira_summary": "SWE-CONN-LLR-516 - Ten-Second Power-On Recovery Budget",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-645",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "INT-LLR-416",
+    "jira": "SCRUM-646",
+    "level": "LLR",
+    "component": "BLE Interface",
+    "status": "active",
+    "parents": [
+      "INT-MLR-403"
+    ],
+    "text": "The direct backend API request, BLE SET_DISPLAY transaction, firmware state update, and LCD rendering path shall be tested end-to-end to complete the physical display response in less than 1 second after the computer user action.",
+    "jira_summary": "INT-LLR-416 - Remote Control End-to-End Timing",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-646",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-613",
+    "jira": "SCRUM-647",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-500"
+    ],
+    "text": "The web interface shall display current Sensor 1 and Sensor 2 temperatures prominently using a large-font presentation when the values are valid.",
+    "jira_summary": "SWE-WEB-MLR-613 - Prominent Current Temperature Display",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-647",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-MLR-614",
+    "jira": "SCRUM-648",
+    "level": "MLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SYS-HLR-600"
+    ],
+    "text": "The graph shall place newest data on the right, older data toward the left, add a new value once per second, and remove values that age beyond the displayed 300-second record.",
+    "jira_summary": "SWE-WEB-MLR-614 - Chart-Recorder Scrolling Behavior",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-648",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-630",
+    "jira": "SCRUM-649",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-613"
+    ],
+    "text": "The graph/main page shall render valid current temperature values in dedicated current-value elements visually larger than normal body text and immediately visible without opening settings/control views.",
+    "jira_summary": "SWE-WEB-LLR-630 - Large Current-Value Styling",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-649",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-631",
+    "jira": "SCRUM-650",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-614"
+    ],
+    "text": "The graph rendering data order shall map the newest sample to the rightmost X-axis position.",
+    "jira_summary": "SWE-WEB-LLR-631 - Newest Sample Placement",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-650",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-632",
+    "jira": "SCRUM-651",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-614"
+    ],
+    "text": "On each one-second graph update, existing samples shall move logically one second farther from the right edge so older data appears to scroll left.",
+    "jira_summary": "SWE-WEB-LLR-632 - Leftward Aging",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-651",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "SWE-WEB-LLR-633",
+    "jira": "SCRUM-652",
+    "level": "LLR",
+    "component": "Web Application",
+    "status": "active",
+    "parents": [
+      "SWE-WEB-MLR-614"
+    ],
+    "text": "The graph data model shall exclude samples older than 300 seconds from the stakeholder compliance view after each update.",
+    "jira_summary": "SWE-WEB-LLR-633 - Expired Sample Removal",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-652",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  },
+  {
+    "uid": "PRJ-REQ-005",
+    "jira": "SCRUM-653",
+    "level": "Project",
+    "component": "System",
+    "status": "active",
+    "parents": [],
+    "text": "Physical testing of the complete -10 through +63 deg C range is not required, but the design documentation shall demonstrate that the chosen components and representations support that range.",
+    "jira_summary": "PRJ-REQ-005 - Full-Range Design Verification",
+    "jira_url": "https://pkamp.atlassian.net/browse/SCRUM-653",
+    "jira_snapshot_status": "Approved",
+    "source": "Atlassian Jira SCRUM read-only snapshot",
+    "snapshot_date": "2026-09-22"
+  }
+]
