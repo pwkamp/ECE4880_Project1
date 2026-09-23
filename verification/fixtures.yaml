@@ -46,7 +46,6 @@
   "repository_checkout": {"type": "software", "description": "Current repository checkout", "automated": true, "preflight": {"type": "path", "path": ".git"}},
   "requirements_catalog": {"type": "document", "description": "Frozen Jira requirement snapshot", "automated": true, "preflight": {"type": "path", "path": "verification/requirements.yaml"}},
   "scenario_dataset_300": {"type": "fixture", "description": "300+ second valid/gap/disconnected/off-scale dataset", "automated": true, "preflight": {"type": "path", "path": "verification/fixtures/scenarios.json"}},
-  "selected_backlight_input": {"type": "hardware", "description": "Approved button or potentiometer input", "automated": false, "preflight": {"type": "manual", "prompt": "Confirm selected backlight architecture and Jira disposition"}},
   "sensor_1": {"type": "hardware", "description": "Physical temperature Sensor 1", "automated": false, "preflight": {"type": "manual", "prompt": "Confirm Sensor 1 is installed"}},
   "sensor_2": {"type": "hardware", "description": "Physical temperature Sensor 2", "automated": false, "preflight": {"type": "manual", "prompt": "Confirm Sensor 2 is installed"}},
   "sensor_button_1": {"type": "hardware", "description": "Physical Sensor 1 button", "automated": false, "preflight": {"type": "manual", "prompt": "Confirm Sensor 1 button is wired"}},

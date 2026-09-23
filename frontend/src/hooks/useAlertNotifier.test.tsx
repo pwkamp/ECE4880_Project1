@@ -66,13 +66,15 @@ test('ignores NORMAL (recovery) transitions', async () => {
 
 test('records the resolved delivery result', async () => {
   vi.mocked(notifyAlert).mockResolvedValueOnce({ ok: false, status: 'failed', reason: 'boom' });
-  let statuses: Record<string, unknown> = {};
   function Probe({ events }: { events: AlertEvent[] }) {
-    statuses = useAlertNotifier(events);
-    return null;
+    const statuses = useAlertNotifier(events);
+    return <output data-testid="delivery-statuses">{JSON.stringify(statuses)}</output>;
   }
   await act(async () => {
     root.render(<Probe events={[evt({ id: 'e3' })]} />);
   });
+  const statuses = JSON.parse(
+    container.querySelector('[data-testid="delivery-statuses"]')?.textContent ?? '{}',
+  ) as Record<string, unknown>;
   expect(statuses.e3).toEqual({ ok: false, status: 'failed', reason: 'boom' });
 });

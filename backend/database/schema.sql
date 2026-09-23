@@ -30,6 +30,16 @@ CREATE TABLE alert_recipients( -- SWE-DB-LLR-555
     PRIMARY KEY (id)                               -- no unique constraint: multiple recipients per type must be allowed
 );
 
+CREATE TABLE alert_settings(
+    id TINYINT UNSIGNED NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CHECK (id = 1)
+);
+
+INSERT INTO alert_settings (id, enabled) VALUES (1, TRUE);
+
 CREATE TABLE alert_rules( -- SWE-DB-LLR-556
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     min_threshold DECIMAL(5,2) NOT NULL,           -- Celsius, matches temperature_samples precision

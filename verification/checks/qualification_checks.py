@@ -261,8 +261,8 @@ def main() -> int:
     if test_id == "FE-06":
         result = require_files({
             "backend/database/schema.sql": ["CREATE TABLE alert_recipients", "ENUM('EMAIL')", "CREATE TABLE alert_rules"],
-            "frontend/src/components/AlertSettings.tsx": ["Alert emails", "valid email"],
-            "frontend/server/alertConfig.ts": ["PersistedAlertConfigSchema", "createMysqlAlertConfigStore", "DELETE FROM alert_rules"],
+            "frontend/src/components/AlertSettings.tsx": ["Alert emails", "valid email", "Recipient enabled", "maximum threshold"],
+            "frontend/server/alertConfig.ts": ["PersistedAlertConfigSchema", "createMysqlAlertConfigStore", "recipient.enabled", "recipient.minC"],
             "frontend/src/lib/alertConfigClient.ts": ["/api/alert-config", "saveAlertConfig"],
             "frontend/server/email/smtpSender.ts": ["sendMail"],
             "frontend/server/config.ts": ["smtp.gmail.com", "EMAIL_MODE"],
@@ -270,24 +270,16 @@ def main() -> int:
         })
         if result:
             return result
-        result = frontend_tests("server/app.test.ts", "server/notify.test.ts", "server/config.test.ts", "src/components/AlertSettings.test.tsx")
+        result = frontend_tests("server/app.test.ts", "server/alertConfig.test.ts", "server/notify.test.ts", "server/config.test.ts", "src/components/AlertSettings.test.tsx")
         if result:
             return result
-        print(
-            "BLOCKED: Jira SWE-WEB-LLR-610/611 additionally require per-recipient "
-            "edit/enable controls and per-recipient thresholds. The current UI persists "
-            "one shared rule and supports recipient add/remove only."
-        )
-        return 2
+        return frontend_tests("src/lib/alertEngine.test.ts")
     if test_id == "FE-07":
         return frontend_tests("src/components/SensorControls.test.tsx", "src/components/DevicePanel.test.tsx", "src/datasource/pythonBleSource.test.ts")
     if test_id == "ALR-01":
         return frontend_tests("src/lib/alertEngine.test.ts")
     if test_id == "ALR-02":
-        # Jira deliberately marks the episode policy TBD. Exercise it but do
-        # not convert an unresolved stakeholder decision into a qualification pass.
-        result = frontend_tests("src/lib/alertEngine.test.ts")
-        return 2 if result == 0 else result
+        return frontend_tests("src/lib/alertEngine.test.ts")
     if test_id == "ALR-03":
         return frontend_tests("server/email/index.test.ts", "server/email/consoleSender.test.ts", "server/email/smtpSender.test.ts", "src/hooks/useAlertNotifier.test.tsx")
     if test_id == "DOC-01":

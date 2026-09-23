@@ -40,9 +40,14 @@ command -v curl >/dev/null 2>&1 || fail "curl is required for the backend health
 project_name="$(env_value COMPOSE_PROJECT_NAME)"
 backend_port="$(env_value BACKEND_PORT)"
 frontend_port="$(env_value FRONTEND_PORT)"
+email_mode="$(env_value EMAIL_MODE)"
 project_name="${project_name:-ece4880-integration}"
 backend_port="${backend_port:-8000}"
 frontend_port="${frontend_port:-5173}"
+if [[ "$email_mode" == "live" ]]; then
+  [[ -n "$(env_value SMTP_USER)" ]] || fail "EMAIL_MODE=live requires SMTP_USER in backend/.env"
+  [[ -n "$(env_value SMTP_PASS)" ]] || fail "EMAIL_MODE=live requires SMTP_PASS in backend/.env"
+fi
 
 # Linux always reaches FastAPI through Vite's same-origin proxy.
 export VITE_BLE_API_BASE=""

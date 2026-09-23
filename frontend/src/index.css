@@ -470,6 +470,23 @@ body {
   padding: 0;
 }
 
+.recipient-list {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0.8rem 0;
+}
+
+.recipient-card {
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.8rem;
+}
+
+.recipient-card legend {
+  padding: 0 0.35rem;
+  font-weight: 700;
+}
+
 .email-chip {
   display: flex;
   align-items: center;

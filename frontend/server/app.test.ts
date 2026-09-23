@@ -45,7 +45,7 @@ it('GET /api/health reports the mode', () => {
     .get('/api/health')
     .then((res) => {
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ status: 'ok', mode: 'console' });
+      expect(res.body).toEqual({ status: 'ok', mode: 'console', verification_contract: 2 });
     });
 });
 
@@ -66,11 +66,10 @@ it('persists and reloads validated email-only alert configuration', async () => 
   const app = createApp({ config: consoleConfig, sender: okSender, alertConfig: store });
   const config: PersistedAlertConfig = {
     enabled: true,
-    minC: 10,
-    maxC: 30,
-    minMessage: 'too cold',
-    maxMessage: 'too hot',
-    destinations: ['one@example.com', 'two@example.com'],
+    recipients: [
+      { id: 'one', destination: 'one@example.com', enabled: true, minC: 10, maxC: 30, minMessage: 'cold one', maxMessage: 'hot one' },
+      { id: 'two', destination: 'two@example.com', enabled: false, minC: 5, maxC: 35, minMessage: 'cold two', maxMessage: 'hot two' },
+    ],
   };
   const update = await request(app).put('/api/alert-config').send(config);
   expect(update.status).toBe(200);
@@ -83,11 +82,10 @@ it('rejects invalid alert thresholds and non-email destinations', async () => {
   const app = createApp({ config: consoleConfig, sender: okSender, alertConfig: store });
   const invalid = await request(app).put('/api/alert-config').send({
     enabled: true,
-    minC: 30,
-    maxC: 10,
-    minMessage: 'low',
-    maxMessage: 'high',
-    destinations: ['not-an-email'],
+    recipients: [{
+      id: 'bad', destination: 'not-an-email', enabled: true,
+      minC: 30, maxC: 10, minMessage: 'low', maxMessage: 'high',
+    }],
   });
   expect(invalid.status).toBe(400);
 });

@@ -29,6 +29,12 @@ python verification/runner.py run hil
 python verification/runner.py run full
 python verification/runner.py run full --defer-photos
 
+# Create a new run while importing unchanged conclusive results and evidence.
+python verification/runner.py run full --resume-from latest --defer-photos
+
+# Or select a specific recent run.
+python verification/runner.py run full --resume-from 2026-09-23T042948Z_a106867
+
 # Attach required photographs after a deferred run.
 python verification/runner.py evidence add latest HW-01 --photo C:\evidence\box.jpg --complete
 
@@ -51,6 +57,8 @@ python verification/generate_report.py latest --include-requirement-pages
 python verification/runner.py run full --non-interactive
 ```
 
+`--resume-from` always creates a separate run folder. It reuses only `PASS`, `PASS_OVERRIDE`, and `NOT_APPLICABLE` results whose complete frozen test definitions exactly match the current catalog. Evidence for every reused test is physically copied into the new run, and `resume.json` records every reuse/rerun decision. `FAIL`, `BLOCKED`, `SKIPPED`, missing/new tests, and tests with changed procedures, rationale, mappings, or acceptance policy execute again. This prevents an old pass from concealing a changed qualification procedure.
+
 The setup sections intentionally prevent USB power from invalidating restart tests:
 
 | Section | Required physical state | Important restriction |
@@ -68,7 +76,7 @@ Guided procedures read their typed measurement fields from `manual/fields.json`.
 
 ## Outcomes and artifacts
 
-Only `PASS`, `FAIL`, `BLOCKED`, `SKIPPED`, and `NOT_APPLICABLE` are valid test outcomes. Jira requirements marked `TBD` or `Conflict` remain `BLOCKED` even when related implementation tests pass.
+Valid test outcomes are `PASS`, `PASS_OVERRIDE` (displayed as **PASS (OVERRIDE)**), `FAIL`, `BLOCKED`, `SKIPPED`, and `NOT_APPLICABLE`. Every post-run edit requires an operator and an evidence-based comment. Use `PASS_OVERRIDE` only when retained evidence proves the test actually passed despite the original result; the original outcome/reason and the complete adjudication history remain in `results.jsonl`. Jira requirements marked `TBD` or `Conflict` remain `BLOCKED` even when related implementation tests pass.
 
 A complete run exits `0`; failed assertions exit `1`; an otherwise successful but incomplete/blocked run exits `2`. This keeps a pending stakeholder decision or missing human evidence distinct from a product failure.
 
@@ -79,11 +87,16 @@ Each run writes to `artifacts/verification/<run-id>/`:
 - `requirements-coverage.json` and `.csv`;
 - `fixture-status.json` and `instrumentation-status.json`;
 - `summary.md`;
+- `resume.json` for resumed runs, including the source and every per-test reuse/rerun decision;
 - redacted evidence under `evidence/<TEST-ID>/`.
 
-The dashboard is loopback-only at `http://127.0.0.1:8765`. Its server exposes only dashboard assets and generated verification artifacts, not repository configuration or `.env` files. Manual and semi-automated rows are highlighted; opening one exposes a per-run PASS/FAIL/BLOCKED adjudication form that requires an operator name and evidence-based rationale. Automated results cannot be manually overridden.
+The dashboard is loopback-only at `http://127.0.0.1:8765`. Its server exposes only dashboard assets and generated verification artifacts, not repository configuration or `.env` files. Manual and semi-automated rows are highlighted, reused rows identify their source run, and every row opens a full result editor. The editor shows the frozen description, rationale, required hardware setup, manual steps or automated command/workflow, pass policy, limitations, measurements, and retained evidence before accepting a decision. It supports every outcome plus **PASS (OVERRIDE)** and requires an operator name and evidence-based comment. Each update is written directly to that run's `results.jsonl`, preserves the original outcome and adjudication history, recalculates coverage/JUnit/summary/dashboard artifacts, and is automatically incorporated the next time `generate_report.py` creates Markdown, LaTeX, or PDF output.
 
 For SYS-04, you may set `THERMOMETER_UART_PORT` in advance (for example `COM8`) and optionally `THERMOMETER_UART_BAUD` (default `115200`), or select the detected port when the UART section begins. Close ESP-IDF Monitor during capture because only one process can normally own the serial port. The runner uses Playwright on the live GUI and firmware `VERIFY DISPLAY_RENDER` UART markers; missing UART produces BLOCKED instead of an operator-reaction-time measurement. SYS-03 and every other power/restart test explicitly run earlier with the UART cable physically disconnected.
+
+FW-04 uses the same UART session to detect each debounced physical button press and its matching `VERIFY LOCAL_DISPLAY_RENDER` marker automatically. Press the requested button within 30 seconds; no typed press confirmation is required. `THERMOMETER_BUTTON_TIMEOUT_SECONDS` can increase that window when necessary.
+
+For SYS-05 on Windows, run `frontend\configure-smtp.ps1` before starting the frontend. The script securely prompts for a Gmail address and Google App Password, writes live SMTP settings only to the gitignored `backend/.env`, and never prints the password. Restart `frontend/run.ps1` afterward so the container receives `EMAIL_MODE=live`. Linux users set the equivalent `EMAIL_MODE=live`, `SMTP_USER`, `SMTP_PASS`, and optional SMTP host/port/from values directly in `backend/.env` before restarting `frontend/run.sh`.
 
 `generate_report.py` creates `document/qualification-report.md` and `.tex` inside the selected run, plots each assisted `sample-timeline.csv`, embeds screenshots/graphs, and includes a Jira-linked requirement matrix plus a section for every test. `--include-requirement-pages` adds the future-facing one-page-per-requirement rationale appendix.
 

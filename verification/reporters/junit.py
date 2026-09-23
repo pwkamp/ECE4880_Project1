@@ -6,6 +6,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
+from verification.core.outcomes import PASSING_OUTCOMES
+
 
 def write(results: list[dict[str, Any]], path: Path) -> None:
     suite = ET.Element("testsuite", {
@@ -23,7 +25,7 @@ def write(results: list[dict[str, Any]], path: Path) -> None:
         })
         if result["outcome"] == "FAIL":
             ET.SubElement(case, "failure", {"message": result.get("failure_reason", "qualification failed")}).text = result.get("failure_reason", "")
-        elif result["outcome"] != "PASS":
+        elif result["outcome"] not in PASSING_OUTCOMES:
             ET.SubElement(case, "skipped", {"message": result.get("failure_reason", result["outcome"])})
         ET.SubElement(case, "system-out").text = "\n".join(result.get("evidence", []))
     ET.ElementTree(suite).write(path, encoding="utf-8", xml_declaration=True)

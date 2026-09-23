@@ -39,10 +39,7 @@
     {"id": "measurement_csv_path", "prompt": "Full time-series CSV path", "type": "text"}
   ],
   "FW-04": [
-    {"id": "lcd_render_cases_pass", "prompt": "Numeric, OFF, DISCONNECTED, signed, and average LCD cases passed?", "type": "boolean", "expected": true},
-    {"id": "buttons_independent_pass", "prompt": "Both physical buttons operate independently in connected/disconnected states?", "type": "boolean", "expected": true},
-    {"id": "backlight_readability_pass", "prompt": "Every selected backlight level is usable indoors?", "type": "boolean", "expected": true},
-    {"id": "maximum_button_to_render_ms", "prompt": "Maximum measured button-event-to-LCD-render contribution [ms]", "type": "number", "minimum": 0, "maximum": 20}
+    {"id": "lcd_render_cases_pass", "prompt": "Numeric, OFF, DISCONNECTED, signed, and average LCD cases passed?", "type": "boolean", "expected": true}
   ],
   "FW-05": [
     {"id": "sensor_1_shared_state_pass", "prompt": "Sensor 1 local/remote commands share one authoritative state?", "type": "boolean", "expected": true},

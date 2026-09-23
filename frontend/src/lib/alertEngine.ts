@@ -54,6 +54,8 @@ export interface AlertRule {
   minC: number;
   maxC: number;
   enabled: boolean;
+  /** When present, this rule applies only to the matching recipient. */
+  recipientId?: string;
   /** Message for the NORMAL/LOW -> HIGH transition. */
   highMessage: string;
   /** Message for the NORMAL/HIGH -> LOW transition. */
@@ -163,6 +165,7 @@ export function stepAlertEngine(
 
     for (const rule of rules) {
       if (!rule.enabled) continue;
+      if (rule.recipientId && rule.recipientId !== recipient.id) continue;
 
       const key = ruleStateKey(recipient.id, rule.id, rule.source);
       const current = states[key] ?? 'NORMAL';

@@ -41,7 +41,7 @@ export function createApp(deps: {
   });
 
   app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', mode: deps.config.mode });
+    res.json({ status: 'ok', mode: deps.config.mode, verification_contract: 2 });
   });
 
   app.get('/api/samples/latest', async (_req, res) => {

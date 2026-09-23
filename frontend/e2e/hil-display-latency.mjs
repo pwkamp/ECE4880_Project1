@@ -13,9 +13,13 @@ try {
   // deterministic readiness boundary.
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { level: 1, name: 'Networked Thermometer' }).waitFor();
+  if (evidenceDir) {
+    await fs.mkdir(evidenceDir, { recursive: true });
+    await page.screenshot({ path: path.join(evidenceDir, 'live-display-controls-before.png'), fullPage: true });
+  }
   for (let trial = 1; trial <= 20; trial += 1) {
     const sensor = trial % 2 === 1 ? 1 : 2;
-    const control = page.getByRole('checkbox', { name: `Sensor ${sensor} display` });
+    const control = page.locator(`input[type="checkbox"][aria-label="Sensor ${sensor} display"]`);
     await control.waitFor({ state: 'visible' });
     const desired = !(await control.isChecked());
     const actionWallNs = BigInt(Date.now()) * 1_000_000n;
@@ -32,6 +36,12 @@ try {
     await fs.mkdir(evidenceDir, { recursive: true });
     await page.screenshot({ path: path.join(evidenceDir, 'live-display-controls.png'), fullPage: true });
   }
+} catch (error) {
+  if (evidenceDir) {
+    await fs.mkdir(evidenceDir, { recursive: true });
+    await page.screenshot({ path: path.join(evidenceDir, 'live-display-controls-failure.png'), fullPage: true });
+  }
+  throw error;
 } finally {
   await browser.close();
 }

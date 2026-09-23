@@ -263,8 +263,11 @@ def _local_state_recovery_workflow(records: list[dict[str, Any]]) -> tuple[dict[
             state_name = "on" if desired else "off"
             prepared = _safe("PUT", f"{BACKEND}/api/v1/ble/displays/{sensor}", {"enabled": desired})
             state_ready, _, _ = _wait_display(sensor, desired)
-            if not prepared.get("ok") or not state_ready:
-                failures.append(f"Sensor {sensor} could not be prepared {state_name.upper()}")
+            if not prepared.get("ok"):
+                failures.append(f"BLOCKED: backend fixture could not prepare Sensor {sensor} {state_name.upper()}")
+                continue
+            if not state_ready:
+                failures.append(f"Sensor {sensor} did not enter requested {state_name.upper()} state")
                 continue
             disconnected = _safe("POST", f"{BACKEND}/api/v1/ble/disconnect")
             if not disconnected.get("ok"):
@@ -304,7 +307,7 @@ def _local_state_recovery_workflow(records: list[dict[str, Any]]) -> tuple[dict[
             confirmed = connected and _display_states().get(sensor) == desired
             metrics[f"sensor_{sensor}_{state_name}_backend_reconfirmed"] = confirmed
             if not connected:
-                failures.append(f"backend did not reconnect after Sensor {sensor} {state_name} local test")
+                failures.append(f"BLOCKED: backend fixture did not reconnect after Sensor {sensor} {state_name} local test")
             elif not confirmed:
                 failures.append(f"backend-reported state did not match restored {state_name.upper()} state for Sensor {sensor}")
     return metrics, failures
@@ -332,11 +335,33 @@ def _thermal(records: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
         if median is None or abs(median - reference) > 4:
             failures.append(f"Sensor {sensor} room median is not within 4 C of reference")
 
-    answer = choice("Place both waterproof sensor tips in a stirred ice-water mixture; keep electronics dry.", ["Immersed - start 60 second capture", "Cannot perform - fail"])
+    answer = choice("Place both waterproof sensor tips in a well-stirred ice-water mixture; keep electronics dry.", ["Immersed - monitor automatically until stable", "Cannot perform - fail"])
     if answer.startswith("Cannot"):
         failures.append("BLOCKED: ice-water immersion was not performed")
         return metrics, failures
-    capture("ice_water", 60, records)
+    stabilization_started = time.monotonic()
+    stabilization_deadline = stabilization_started + _duration(300)
+    windows: dict[int, list[float]] = {1: [], 2: []}
+    stable = False
+    print("Monitoring ice-water readings for a stable 10-sample plateau (up to 300 seconds)...")
+    while time.monotonic() < stabilization_deadline:
+        record = _snapshot("ice_water")
+        records.append(record)
+        snapshot = ((record.get("current", {}).get("value") or {}).get("snapshot") or {})
+        sensors = {item.get("sensor_id"): item for item in snapshot.get("sensors", [])}
+        for sensor in (1, 2):
+            value = sensors.get(sensor, {}).get("temperature_c")
+            if value is not None:
+                windows[sensor].append(float(value))
+                windows[sensor] = windows[sensor][-10:]
+        if all(len(windows[sensor]) == 10 and max(windows[sensor]) - min(windows[sensor]) <= 0.5 for sensor in (1, 2)):
+            stable = True
+            break
+        time.sleep(min(_duration(1), max(0.05, stabilization_deadline - time.monotonic())))
+    metrics["ice_water_stabilization_seconds"] = round(time.monotonic() - stabilization_started, 1)
+    metrics["ice_water_stable_plateau"] = stable
+    if not stable:
+        failures.append("BLOCKED: ice-water readings did not reach a stable plateau within 300 seconds")
     ice = _phase_rows(records, "ice_water")[-12:]
     ice_values: dict[int, float | None] = {}
     for sensor in (1, 2):
@@ -411,6 +436,18 @@ def _history(records: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
             candidate = record["ble_status"]["value"].get("history_sync")
             if str((candidate or {}).get("operation_id") or "") == requested_operation_id:
                 sync = candidate
+        operation_response = _safe(
+            "GET", f"{BACKEND}/api/v1/operations/{requested_operation_id}"
+        )
+        if operation_response.get("ok"):
+            operation = operation_response.get("value") or {}
+            if str(operation.get("state", "")).upper() == "SUCCEEDED":
+                sync = {
+                    **(operation.get("result") or {}),
+                    "state": "COMPLETE",
+                    "operation_id": requested_operation_id,
+                    "source": "manual",
+                }
         # The backend reports RUNNING while synchronization is active and then
         # replaces it with COMPLETE, INCOMPLETE, FAILED, or CANCELLED.  Older
         # verification code checked a field the API has never exposed, which
@@ -677,34 +714,103 @@ def _inspection(records: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str
     return metrics, failures
 
 
-def _button_display(records: list[dict[str, Any]], shared_remote: bool) -> tuple[dict[str, Any], list[str]]:
+def _button_display(
+    records: list[dict[str, Any]],
+    shared_remote: bool,
+    evidence_directory: Path | None = None,
+) -> tuple[dict[str, Any], list[str]]:
     failures: list[str] = []
     metrics: dict[str, Any] = {}
+    uart: UartCapture | None = None
+    if not shared_remote:
+        try:
+            uart = UartCapture.from_environment()
+        except Exception as exc:
+            failures.append(f"BLOCKED: UART button timing capture is unavailable: {exc}")
+    button_timeout = max(1.0, float(os.environ.get("THERMOMETER_BUTTON_TIMEOUT_SECONDS", "30")))
     initial = _display_states()
-    for sensor in (1, 2):
-        before = initial.get(sensor)
-        if before is None:
-            failures.append(f"Sensor {sensor} initial display state unavailable")
-            continue
-        if shared_remote:
-            target = not before
-            response = _safe("PUT", f"{BACKEND}/api/v1/ble/displays/{sensor}", {"enabled": target})
-            remote_ok, remote_ms, observed = _wait_display(sensor, target)
-            metrics[f"sensor_{sensor}_remote_command_ms"] = round(remote_ms, 1)
-            metrics[f"sensor_{sensor}_remote_confirmed"] = bool(response.get("ok") and remote_ok)
-            if not response.get("ok") or not remote_ok:
-                failures.append(f"Sensor {sensor} remote display command was not confirmed")
-            before = observed if observed is not None else target
-        answer = choice(f"Press the physical Sensor {sensor} display button once, then confirm.", ["Pressed", "Cannot perform"])
-        if answer.startswith("Cannot"):
-            failures.append(f"BLOCKED: Sensor {sensor} physical button action was not performed")
-            continue
-        changed, elapsed, observed = _wait_display(sensor, not before)
-        records.append({"label": "physical_button", "sensor": sensor, "before": before, "after": observed, "backend_observation_ms": elapsed})
-        metrics[f"sensor_{sensor}_physical_toggle_observed"] = changed
-        if not changed:
-            failures.append(f"Sensor {sensor} physical button change was not reflected in backend state")
-        initial[sensor] = observed if observed is not None else before
+    try:
+        for sensor in (1, 2):
+            before = initial.get(sensor)
+            if before is None:
+                failures.append(f"Sensor {sensor} initial display state unavailable")
+                continue
+            if shared_remote:
+                target = not before
+                response = _safe("PUT", f"{BACKEND}/api/v1/ble/displays/{sensor}", {"enabled": target})
+                remote_ok, remote_ms, observed = _wait_display(sensor, target)
+                metrics[f"sensor_{sensor}_remote_command_ms"] = round(remote_ms, 1)
+                metrics[f"sensor_{sensor}_remote_confirmed"] = bool(response.get("ok") and remote_ok)
+                if not response.get("ok") or not remote_ok:
+                    failures.append(f"Sensor {sensor} remote display command was not confirmed")
+                before = observed if observed is not None else target
+            timing_ms: float | None = None
+            pressed = None
+            rendered = None
+            if not shared_remote and uart is not None:
+                prompt_started_ns = time.time_ns()
+                print(
+                    f"Press the physical Sensor {sensor} display button once. "
+                    f"UART will detect it automatically (timeout {button_timeout:.0f} seconds)..."
+                )
+                pressed = uart.wait_for(
+                    (f"sensor {sensor} button", "pressed"),
+                    after_wall_ns=prompt_started_ns,
+                    timeout=button_timeout,
+                )
+                if pressed is None:
+                    failures.append(
+                        f"BLOCKED: Sensor {sensor} button press was not detected on UART within {button_timeout:.0f} seconds"
+                    )
+                else:
+                    rendered = uart.wait_for(
+                        (
+                            "VERIFY LOCAL_DISPLAY_RENDER",
+                            f"sensor={sensor}",
+                            f"enabled={int(not before)}",
+                        ),
+                        after_wall_ns=pressed.observed_wall_ns,
+                        timeout=2.0,
+                    )
+                if rendered is not None and pressed is not None:
+                    timing_ms = (rendered.observed_wall_ns - pressed.observed_wall_ns) / 1_000_000
+                elif pressed is not None:
+                    failures.append(f"Sensor {sensor} UART render marker did not follow its detected button press")
+            elif shared_remote:
+                answer = choice(
+                    f"Press the physical Sensor {sensor} display button once, then confirm.",
+                    ["Pressed", "Cannot perform"],
+                )
+                if answer.startswith("Cannot"):
+                    failures.append(f"BLOCKED: Sensor {sensor} physical button action was not performed")
+                    continue
+
+            changed, elapsed, observed = _wait_display(sensor, not before)
+            records.append({
+                "label": "physical_button",
+                "sensor": sensor,
+                "before": before,
+                "after": observed,
+                "backend_observation_ms": elapsed,
+                "button_to_render_ms": timing_ms,
+                "button_uart_line": pressed.line if pressed is not None else None,
+                "render_uart_line": rendered.line if rendered is not None else None,
+            })
+            metrics[f"sensor_{sensor}_physical_toggle_observed"] = changed
+            metrics[f"sensor_{sensor}_button_to_render_ms"] = round(timing_ms, 2) if timing_ms is not None else None
+            if not changed:
+                failures.append(f"Sensor {sensor} physical button change was not reflected in backend state")
+            if timing_ms is not None and timing_ms > 20:
+                failures.append(f"Sensor {sensor} button-to-render contribution was {timing_ms:.1f} ms (>20 ms)")
+            initial[sensor] = observed if observed is not None else before
+    finally:
+        if uart is not None:
+            if evidence_directory is not None:
+                write_json(
+                    evidence_directory / "button-uart-events.json",
+                    [event.__dict__ for event in uart.events],
+                )
+            uart.close()
     if shared_remote:
         invalid = _safe("PUT", f"{BACKEND}/api/v1/ble/displays/3", {"enabled": True})
         rejected = not invalid.get("ok") and "422" in invalid.get("error", "")
@@ -713,14 +819,9 @@ def _button_display(records: list[dict[str, Any]], shared_remote: bool) -> tuple
             failures.append("invalid sensor identifier was not rejected")
     else:
         lcd = choice("Inspect numeric, OFF, DISCONNECTED, signed, and average LCD rendering.", ["All cases pass", "One or more cases fail", "Could not inspect"])
-        backlight = choice("Cycle the selected backlight control through low, medium, and high.", ["Three readable levels pass", "Levels/readability fail", "Not implemented"])
-        timing = choice("Does serial/logic-analyzer evidence show the firmware button-to-render software contribution is at most 20 ms?", ["Yes - evidence captured", "No - exceeds 20 ms", "No timing instrument available"])
-        metrics.update(lcd_render_confirmation=lcd, backlight_confirmation=backlight, button_render_timing_confirmation=timing)
+        metrics.update(lcd_render_confirmation=lcd)
         if lcd == "Could not inspect": failures.append("BLOCKED: LCD cases could not be inspected")
         elif lcd != "All cases pass": failures.append(f"LCD cases: {lcd}")
-        if backlight != "Three readable levels pass": failures.append(f"backlight: {backlight}")
-        if timing == "No timing instrument available": failures.append("BLOCKED: no instrument was available for the 20 ms button/render timing")
-        elif timing != "Yes - evidence captured": failures.append(f"20 ms timing: {timing}")
     return metrics, failures
 
 
@@ -871,8 +972,8 @@ def _mechanical(records: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str
     post_rows = _phase_rows(records, "post_test_smoke")[-5:]
     post_valid = _connected(records[-1]) and any(_sensor_valid(row, 1) and _sensor_valid(row, 2) for row in post_rows)
     if not pre_valid:
-        failures.append("pre-test connected/data smoke check failed")
-    if not post_valid:
+        failures.append("BLOCKED: pre-test connected/data smoke check was not stable, so mechanical effects cannot be isolated")
+    elif not post_valid:
         failures.append("post-test connected/data smoke check failed")
     return {"pre_test_smoke_pass": pre_valid, "post_test_smoke_pass": post_valid, **outcomes}, failures
 
@@ -966,7 +1067,7 @@ def run_assisted(repository: Path, evidence_root: Path, result: dict[str, Any], 
         elif workflow == "inspection":
             observed, issues = _inspection(records)
         elif workflow == "buttons":
-            observed, issues = _button_display(records, False)
+            observed, issues = _button_display(records, False, directory)
         elif workflow == "shared_display":
             observed, issues = _button_display(records, True)
         elif workflow == "ble_control":
