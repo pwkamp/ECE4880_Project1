@@ -1,33 +1,52 @@
 # Networked Thermometer
 
-ESP32 firmware, Python BLE connector, MySQL schema, and the computer console.
+A dual-sensor networked thermometer for ECE:4880. An ESP32 third box reads two
+DS18B20 probes and drives a physical 16x2 LCD and buttons; a Python service on
+the PC connects to it over authenticated BLE, polls it once a second, and
+writes readings to MySQL; a web console reads those readings back out of
+MySQL, shows live readouts and a 300-second scrolling chart, lets you toggle
+each sensor's display remotely, and emails an alert over Gmail SMTP when a
+reading crosses a configured threshold.
 
-Requirements-driven qualification is documented in [verification/README.md](verification/README.md). Run all unattended software checks with `python verification/runner.py run software`; HIL and full profiles keep operator-dependent evidence separate.
+Requirements-driven qualification is documented in
+[verification/README.md](verification/README.md). Run all unattended software
+checks with `python verification/runner.py run software`; HIL and full
+profiles keep operator-dependent evidence separate.
 
-## Computer console
+## Architecture
 
-The web app lives in [`frontend/`](frontend/). The **computer** component of
-the ECE:4880 dual-sensor networked thermometer system.
+Four pieces, in the order data flows:
 
-> BLE is optional. Set `VITE_DATA_SOURCE=ble` to use the Python connector
-> (see [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql)).
+1. **Firmware** ([`firmware/`](firmware/)) - ESP-IDF C on the ESP32. Reads
+   both DS18B20 probes over 1-Wire once a second, drives the HD44780 LCD and
+   the two physical display buttons, and serves an authenticated
+   request/response BLE GATT protocol (no notifications). See
+   [firmware/README.md](firmware/README.md).
+2. **BLE connector service** ([`backend/`](backend/)) - a Python/FastAPI
+   process on the PC (`127.0.0.1:8000`). Owns the BLE link, polls
+   `GET_CURRENT` once a second, authenticates every request over an
+   HMAC-SHA256 challenge/nonce scheme, and writes each sample to MySQL through
+   a database-adapter seam. Also the target of the web console's remote
+   display-toggle command - that path is a direct authenticated REST call
+   from the webapp backend to this service, not a database-backed queue. See
+   [backend/README.md](backend/README.md).
+3. **MySQL** ([`backend/database/`](backend/database/)) - one `thermometer`
+   database. `temperature_samples` holds one row per 1 Hz poll (no `device_id`
+   column; this is a single-device system by design). `alert_recipients` /
+   `alert_rules` / `alert_rule_recipients` / `alert_settings` hold the
+   email-alert configuration the web console reads and writes. See
+   [backend/database/README.md](backend/database/README.md).
+4. **Web console** ([`frontend/`](frontend/)) - a Vite/React app plus a small
+   Node/Express service (`127.0.0.1:8787`). The browser never talks to BLE or
+   MySQL directly: it polls the Python service and the Node service over
+   HTTP, once a second, for readouts/chart data and connection status, and
+   POSTs threshold-crossing events to the Node service, which emails the
+   configured recipients over Gmail SMTP. See
+   [frontend/README.md](frontend/README.md).
 
----
-
-## Screenshots
-
-![Computer console with both sensor readouts and the 300-second chart recorder](docs/screenshots/console.png)
-
-*Main console: large real-time readouts for both sensors, the fixed-scale
-chart recorder (the hatched band is a simulated data outage), sensor display
-toggles, and the threshold-alert configuration.*
-
-<!-- Add more screenshots here as you capture them, e.g.:
-![Off-scale spike](docs/screenshots/offscale.png)
-![Simulated alert](docs/screenshots/alert.png)
--->
-
----
+Full wiring details (ports, env vars, data path) are in
+[Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql)
+below.
 
 ## Running it
 
@@ -40,8 +59,15 @@ cd frontend
 npm run dev
 ```
 
+This starts the web console against its built-in mock data source - no
+firmware, BLE adapter, or MySQL required. For the full BLE + MySQL + email
+path, see [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql)
+and [Running with email alerts](#running-with-email-alerts) below.
+
 `scripts/setup.sh` is not Docker: the ESP32 talks over the **host** Bluetooth
-adapter (WinRT / BlueZ), which containers do not own cleanly.
+adapter (WinRT / BlueZ), which containers do not own cleanly. A
+Docker Compose path also exists for the full integrated stack - see
+`backend/run.ps1` / `backend/run.sh` and `frontend/run.ps1` / `frontend/run.sh`.
 
 If you already have dependencies:
 
@@ -64,7 +90,24 @@ save; `Ctrl+C` stops it.
 | `cd frontend && npm run lint` | oxlint |
 
 No cloud services are required to run the console. Live email alerts need a
-Gmail App Password in `frontend/server/.env` (`EMAIL_MODE=live`).
+Gmail App Password in `frontend/server/.env` (`EMAIL_MODE=live`) - see
+[Running with email alerts](#running-with-email-alerts).
+
+## Screenshots
+
+[SCREENSHOT-1: replace with new webapp screenshot]
+*Live dashboard view - both sensor readouts and the 300-second chart recorder.*
+
+[SCREENSHOT-2: replace with new webapp screenshot]
+*Alert configuration panel - threshold, recipient, and message setup.*
+
+## AI tool disclosure
+
+Claude and Claude Code were used throughout this project's development,
+most heavily for test automation and for an early AI-generated requirements
+pass. That early requirements pass was reviewed by the team and partially
+rejected, not accepted as-is; all AI-assisted code and documentation changes
+were reviewed by a team member before merging.
 
 The web console lives in [`frontend/`](frontend/). `cd frontend && npm run dev` is how you run it. BLE and MySQL
 are optional extra processes you start **in addition** to that, not instead of
@@ -231,7 +274,7 @@ That adapter implements `ThermometerDatabaseAdapter` in
 `backend/pc_client/mysql_adapter.py`. If the factory is unset, Python uses
 `NoOpDatabaseAdapter` and stores nothing; `GET /healthz` then shows
 `"persistence_configured": false` and the console displays no temperature
-samples. Schema details (including `users` / alert tables and
+samples. Schema details (including the alert tables and
 `failure_reason`) are in `backend/database/README.md`.
 
 Confirm the reader without the UI:
@@ -649,8 +692,11 @@ Interface methods:
    not treated as returning to the safe band.
 4. **Thresholds are stored in Celsius** and converted for display; editing in
    °F round-trips through Celsius (minor display rounding).
-5. **Alert destination** is a free-text field with no validation; nothing is
-   sent in this MVP.
+5. **Alert destination** is validated as an email address (`frontend/src/components/AlertSettings.tsx`)
+   and persisted server-side through `/api/alert-config`
+   (`frontend/server/alertConfig.ts`, backed by the `alert_recipients` /
+   `alert_rules` / `alert_settings` tables); email is actually sent in
+   `EMAIL_MODE=live` (see [Running with email alerts](#running-with-email-alerts)).
 6. **Tooling:** added `vitest` + `jsdom` as dev dependencies for the test suite
    (the original brief suggested a plain React app).
 

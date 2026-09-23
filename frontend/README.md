@@ -18,6 +18,7 @@ Open <http://localhost:5173>.
 | --- | --- |
 | `npm run dev` | Vite UI on `:5173` plus the Node alert/sample service on `:8787` |
 | `npm test` | Unit tests |
+| `npm run test:e2e` | Playwright end-to-end tests (see `frontend/e2e/`) |
 | `npm run build` | Type-check + production build into `dist/` |
 | `npm run lint` | oxlint |
 
@@ -68,6 +69,13 @@ For non-container development, `VITE_BLE_API_BASE`, `BACKEND_PROXY_TARGET`,
 `FRONTEND_SERVER_PROXY_TARGET`, and `FRONTEND_HOST` may override the browser
 BLE endpoint and Vite targets/bind. An empty `VITE_BLE_API_BASE` preserves the
 relative Linux proxy path.
+
+Threshold-alert recipients and thresholds are persisted server-side (MySQL,
+via `/api/alert-config`), not just in the browser. Alerts are sent over Gmail
+SMTP only. To send live email instead of the console/test sender, run
+`.\frontend\configure-smtp.ps1` to write `EMAIL_MODE=live` and Gmail App
+Password credentials into `backend/.env`, then restart `frontend/run.ps1` so
+Docker recreates the frontend service with the new mode.
 
 ## BLE
 
