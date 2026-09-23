@@ -14,7 +14,7 @@ it('rejects an unknown EMAIL_MODE', () => {
 });
 
 it('throws when live mode is missing SMTP vars', () => {
-  expect(() => loadConfig({ SMS_MODE: 'live' } as NodeJS.ProcessEnv)).toThrow(/SMTP_USER/);
+  expect(() => loadConfig({ EMAIL_MODE: 'live' } as NodeJS.ProcessEnv)).toThrow(/SMTP_USER/);
 });
 
 it('accepts a complete live Gmail config', () => {

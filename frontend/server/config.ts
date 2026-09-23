@@ -21,8 +21,7 @@ export interface Config {
 const MODES: readonly EmailMode[] = ['console', 'test', 'live'];
 
 export function loadConfig(env: NodeJS.ProcessEnv): Config {
-  // SMS_MODE is a legacy alias from before the Twilio SMS -> Gmail SMTP pivot.
-  const rawMode = env.EMAIL_MODE ?? env.SMS_MODE ?? 'console';
+  const rawMode = env.EMAIL_MODE ?? 'console';
   if (!MODES.includes(rawMode as EmailMode)) {
     throw new Error(`EMAIL_MODE must be one of ${MODES.join(', ')} (got "${rawMode}")`);
   }
