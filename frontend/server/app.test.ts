@@ -2,8 +2,8 @@ import request from 'supertest';
 import { expect, it } from 'vitest';
 import { createApp } from './app.ts';
 import type { Config } from './config.ts';
-import type { SmsSender } from './sms/types.ts';
 import type { AlertConfigStore, PersistedAlertConfig } from './alertConfig.ts';
+import type { EmailSender } from './email/types.ts';
 
 const consoleConfig: Config = {
   mode: 'console',
@@ -12,7 +12,7 @@ const consoleConfig: Config = {
   smtp: null,
   mysqlUrl: null,
 };
-const okSender: SmsSender = { async send() { return { status: 'logged' }; } };
+const okSender: EmailSender = { async send() { return { status: 'logged' }; } };
 
 const validEvent = {
   id: 'e1',

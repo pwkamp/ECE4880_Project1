@@ -2,5 +2,5 @@
 
 #include "esp_err.h"
 
-/* Hardware-independent entry point for the future local buttons/backlight input. */
+/* Starts the active-low Sensor 1/2 buttons on GPIO34/GPIO35. */
 esp_err_t local_controls_start(void);

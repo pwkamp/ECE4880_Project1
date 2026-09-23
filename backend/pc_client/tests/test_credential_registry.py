@@ -54,6 +54,8 @@ class CredentialRegistryTests(unittest.TestCase):
             self.assertEqual(tuple(rows[0]), CSV_FIELDS)
             self.assertEqual(rows[0]["pairing_passkey"], "012345")
 
+            self.assertEqual(registry.list_all(), (stored,))
+
             self.assertTrue(registry.delete("aabbccddeeff"))
             self.assertIsNone(registry.lookup("AA:BB:CC:DD:EE:FF"))
 

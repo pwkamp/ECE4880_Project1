@@ -183,7 +183,9 @@ static void report_sensor_result(size_t sensor_index, esp_err_t error)
     const bool was_connected = health->connected;
     health->connected = false;
     health->last_error = error;
-    ++health->consecutive_failures;
+    if (health->consecutive_failures < UINT32_MAX) {
+        ++health->consecutive_failures;
+    }
 
     if (!was_connected && !error_changed &&
         health->consecutive_failures != 1U &&
@@ -231,8 +233,7 @@ temperature_sensor_reading_t temperature_sensor_read(size_t sensor_index,
     const gpio_num_t gpio = SENSOR_GPIOS[sensor_index];
     esp_err_t result = start_conversion(gpio);
     if (result == ESP_OK) {
-        /* Conversion happens in the sensor while the rest of the application,
-         * including the button task and BLE stack, continues to run. */
+        /* Conversion happens in the probe while BLE and controls keep running. */
         vTaskDelay(pdMS_TO_TICKS(750));
 
         int16_t raw_temperature = 0;
@@ -245,8 +246,7 @@ temperature_sensor_reading_t temperature_sensor_read(size_t sensor_index,
     }
     report_sensor_result(sensor_index, result);
 
-    /* Keep missing and healthy probes on the same one-second cadence, and
-     * prevent an unplugged wire from causing a busy retry loop. */
+    /* Missing and healthy probes both retain the one-second sample cadence. */
     TickType_t next_cycle = cycle_started;
     vTaskDelayUntil(&next_cycle, pdMS_TO_TICKS(THERMOMETER_SAMPLE_PERIOD_MS));
     return reading;

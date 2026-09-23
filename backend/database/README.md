@@ -96,8 +96,10 @@ connector actively populates it.
 - **Thresholds are `DECIMAL(5,2)` Celsius**, matching `temperature_samples`. Both
   `min_threshold` and `max_threshold` are required (every rule is a bounded band
   with a message for each side).
-- **`monitored_series` is `ENUM('SENSOR1','SENSOR2','AVERAGE')`**, mapping to the
-  three series in `temperature_samples`.
+- **`monitored_series` is `ENUM('SENSOR1','SENSOR2')`.** The UI applies its
+  shared threshold configuration to both physical sensors, so persistence
+  writes one rule row for each source. Average-based alerts were removed from
+  the application model during the Lab 1 cleanup.
 
 ## Timestamp handling
 
@@ -151,6 +153,12 @@ a MySQL server against this schema:
   a requirements-doc task, not a schema change.
 
 ## Superseded baseline
+
+- **Application user accounts remain removed.** The trusted-local deployment
+  has no `users` table, passwords, session cookie, login, or USER/ADMIN roles.
+  The later qualification work added a real `/api/alert-config` consumer for
+  the email-only recipient and rule tables, so those tables are no longer
+  dead schema. SMS and average-source alert configuration remain removed.
 
 - **Remote-control command queue is superseded by stakeholder decision.** The original design routed display-control
   commands through a MySQL `control_commands` queue that the BLE service would

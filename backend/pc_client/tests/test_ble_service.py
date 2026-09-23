@@ -1011,6 +1011,8 @@ class BleServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(status.desired_connected)
         self.assertFalse(status.connected)
         self.assertFalse(status.ready)
+        self.assertEqual(status.retry_count, 0)
+        self.assertIsNone(status.last_error)
         self.assertEqual(
             service.get_operation(operation.operation_id).state,
             OperationState.CANCELLED,

@@ -36,7 +36,7 @@ CREATE TABLE alert_rules( -- SWE-DB-LLR-556
     max_threshold DECIMAL(5,2) NOT NULL,
     high_temp_message VARCHAR(255) NOT NULL,
     low_temp_message VARCHAR(255) NOT NULL,
-    monitored_series ENUM('SENSOR1','SENSOR2','AVERAGE') NOT NULL,
+    monitored_series ENUM('SENSOR1','SENSOR2') NOT NULL,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at_utc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

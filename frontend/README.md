@@ -71,6 +71,7 @@ relative Linux proxy path.
 
 ## BLE
 
-Create `frontend/.env` from `.env.example` and set `VITE_DATA_SOURCE=ble`.
+BLE/MySQL is the default source. Set `VITE_DATA_SOURCE=mock` only for an
+intentional UI simulation.
 Restart `npm run dev`. Start `backend/main.py` separately. Full Scan → PIN →
 Connect steps are in the repository root [README](../README.md#connecting-the-console-to-ble-and-mysql).

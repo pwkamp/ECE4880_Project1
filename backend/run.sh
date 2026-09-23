@@ -6,12 +6,17 @@ COMPOSE_FILE="$BACKEND_DIR/compose.yaml"
 ENV_FILE="$BACKEND_DIR/.env"
 ENV_EXAMPLE="$BACKEND_DIR/.env.example"
 KEEP_DATABASE=false
-if [[ "${1:-}" == "--keep-db" && "$#" -eq 1 ]]; then
-  KEEP_DATABASE=true
-elif [[ "$#" -ne 0 ]]; then
-  echo "Usage: backend/run.sh [--keep-db]" >&2
-  exit 2
-fi
+RESET_PAIRINGS=false
+for argument in "$@"; do
+  case "$argument" in
+    --keep-db) KEEP_DATABASE=true ;;
+    --reset-pairings) RESET_PAIRINGS=true ;;
+    *)
+      echo "Usage: backend/run.sh [--keep-db] [--reset-pairings]" >&2
+      exit 2
+      ;;
+  esac
+done
 
 fail() {
   echo "backend/run.sh: $*" >&2
@@ -81,6 +86,12 @@ if [[ "$KEEP_DATABASE" == false ]]; then
   "${compose[@]}" down --volumes --remove-orphans
 else
   echo "Keeping the existing MySQL volume and its temperature history."
+fi
+
+if [[ "$RESET_PAIRINGS" == true ]]; then
+  echo "Removing all thermometer bonds enrolled by this project..."
+  "${compose[@]}" run --rm --no-deps --build backend \
+    python -m pc_client.pairing_reset --all
 fi
 check_port_available "$backend_port"
 if [[ "$KEEP_DATABASE" == false ]]; then

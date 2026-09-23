@@ -73,12 +73,6 @@ test('SCRUM-633: source enum resolves each monitored signal', () => {
   const f = mkFrame(20, 30);
   expect(sourceCelsius(f, AlertSource.SENSOR_1)).toBe(20);
   expect(sourceCelsius(f, AlertSource.SENSOR_2)).toBe(30);
-  expect(sourceCelsius(f, AlertSource.AVERAGE)).toBe(25);
-});
-
-test('SCRUM-633: AVERAGE needs both sensors, else it reads as no data', () => {
-  expect(sourceCelsius(mkFrame(20, null), AlertSource.AVERAGE)).toBeNull();
-  expect(sourceCelsius(mkFrame(null, 20), AlertSource.AVERAGE)).toBeNull();
 });
 
 // --- SCRUM-622: High Edge Trigger --------------------------------------
@@ -161,7 +155,7 @@ test('SCRUM-621: two recipients on the same rule each get their own alert', () =
 });
 
 test('SCRUM-621: state key is (recipientId, ruleId, source)', () => {
-  expect(ruleStateKey('alice', 'r1', AlertSource.AVERAGE)).toBe('alice::r1::AVERAGE');
+  expect(ruleStateKey('alice', 'r1', AlertSource.SENSOR_1)).toBe('alice::r1::SENSOR_1');
 });
 
 // --- enable/disable gates --------------------------------------------

@@ -27,8 +27,6 @@ import type { SensorId, ThermometerFrame } from '../datasource/types';
 export const AlertSource = {
   SENSOR_1: 'SENSOR_1',
   SENSOR_2: 'SENSOR_2',
-  /** Mean of both sensors. Treated as "no reading" unless BOTH sensors report. */
-  AVERAGE: 'AVERAGE',
 } as const;
 
 export type AlertSource = (typeof AlertSource)[keyof typeof AlertSource];
@@ -117,11 +115,6 @@ export function sourceCelsius(
   frame: ThermometerFrame,
   source: AlertSource,
 ): number | null {
-  if (source === AlertSource.AVERAGE) {
-    const a = frame.readings[1].celsius;
-    const b = frame.readings[2].celsius;
-    return a == null || b == null ? null : (a + b) / 2;
-  }
   const sensorId = SOURCE_SENSOR[source];
   return sensorId == null ? null : frame.readings[sensorId].celsius;
 }

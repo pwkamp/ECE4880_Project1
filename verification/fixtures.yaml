@@ -25,7 +25,7 @@
   "esp_idf": {"type": "software", "description": "ESP-IDF command environment (PATH, IDF_PATH, or VS Code extension installation)", "automated": true, "preflight": {"type": "esp_idf"}},
   "fake_ble_device": {"type": "simulator", "description": "Deterministic fake BLE transport", "automated": true, "preflight": {"type": "path", "path": "backend/pc_client/tests/test_ble_service.py"}},
   "fake_ble_device_with_300_samples": {"type": "simulator", "description": "Fake BLE history source with 300 records", "automated": true, "preflight": {"type": "path", "path": "backend/pc_client/tests/test_history_sync.py"}},
-  "fake_notification_provider": {"type": "simulator", "description": "Captured email provider", "automated": true, "preflight": {"type": "path", "path": "frontend/server/sms/consoleSender.ts"}},
+  "fake_notification_provider": {"type": "simulator", "description": "Captured email provider", "automated": true, "preflight": {"type": "path", "path": "frontend/server/email/consoleSender.ts"}},
   "firmware_logic_harness": {"type": "software", "description": "Host/static firmware qualification harness", "automated": true, "preflight": {"type": "path", "path": "verification/checks/qualification_checks.py"}},
   "frontend_test_suite": {"type": "software", "description": "Vitest/Supertest suite", "automated": true, "preflight": {"type": "path", "path": "frontend/package.json"}},
   "full_computer_stack": {"type": "system", "description": "Backend, database and frontend running", "automated": false, "preflight": {"type": "manual", "prompt": "Confirm backend, MySQL, frontend and browser are healthy"}},

@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { handleNotify } from './notify.ts';
-import type { SmsMessage, SmsSender } from './sms/types.ts';
+import type { EmailMessage, EmailSender } from './email/types.ts';
 
 const base = {
   id: 'e1',
@@ -15,8 +15,8 @@ const base = {
 };
 
 function spySender(opts: { throws?: boolean } = {}) {
-  const calls: SmsMessage[] = [];
-  const sender: SmsSender = {
+  const calls: EmailMessage[] = [];
+  const sender: EmailSender = {
     async send(msg) {
       calls.push(msg);
       if (opts.throws) throw new Error('provider down');

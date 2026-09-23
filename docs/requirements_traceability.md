@@ -11,31 +11,34 @@ Status meanings:
   and its acceptance timing are not implemented.
 - **Acceptance pending**: code supports the requirement, but the end-to-end
   hardware/database/web timing test remains outstanding.
+- **Descoped**: was implemented and verified, then deliberately removed
+  because the feature it supported was never consumed end-to-end; the row
+  records why.
 
 ## System behavior enabled by this repository
 
 | Requirement | Jira | Status | Repository contribution |
 |---|---|---|---|
 | SYS-HLR-500 | SCRUM-414 | Acceptance pending | Current sensor/status data is exposed to the database adapter and diagnostic REST API. |
-| SYS-HLR-510 | SCRUM-415 | Simulated | Per-sensor remote display control uses prioritized REST-to-BLE requests and ESP32-confirmed state; the LED simulates the LCD. |
+| SYS-HLR-510 | SCRUM-415 | Acceptance pending | Per-sensor remote display control uses prioritized REST-to-BLE requests, ESP32-confirmed state, and the physical HD44780 LCD. |
 | SYS-HLR-520 | SCRUM-416 | Acceptance pending | Autonomous discovery, power-cycle reconnect, first-current publication, and a ten-second recovery deadline are implemented. |
 
-The internet-facing web UI, concrete MySQL implementation, alerts, and final
-hardware are separate workstreams, so this repository alone cannot close the
-system-level requirements.
+The web UI and concrete MySQL integration are implemented in this repository.
+Final physical wiring, timing, and full-system acceptance still require the
+assembled hardware.
 
 ## ESP32 firmware
 
 | Requirement(s) | Jira issue(s) | Status | Implementation / verification |
 |---|---|---|---|
 | SWE-EMB-MLR-300..304 | SCRUM-456..460 | Implemented | ESP-IDF C application, continuous two-sensor state, independent history, and disconnect/recovery model; firmware builds. |
-| SWE-EMB-MLR-305 | SCRUM-461 | Simulated | Independent logical display flags rendered through the LED simulator. |
-| SWE-EMB-MLR-310..313 | SCRUM-466..469 | Implemented / interface only | Celsius state, atomic snapshot, recovery, and remote display state are implemented; physical LCD presentation is an interface stub. |
-| SWE-EMB-LLR-300..311 | SCRUM-470..481 | Implemented / simulated | Ordered startup, per-sensor runtime records, independent fake acquisition, 1 Hz snapshots, fixed 300-record rings, state mapping, faults, and recovery. Real sensor drivers remain pending. |
-| SWE-EMB-LLR-312..313 | SCRUM-482..483 | Interface only | Local button API and shared toggle path exist; GPIO/debounce hardware is not selected. |
+| SWE-EMB-MLR-305 | SCRUM-461 | Acceptance pending | Independent logical display flags are rendered on the physical two-row HD44780 LCD. |
+| SWE-EMB-MLR-310..313 | SCRUM-466..469 | Implemented / acceptance pending | Celsius state, atomic snapshot, recovery, remote display state, and physical LCD presentation are implemented. |
+| SWE-EMB-LLR-300..311 | SCRUM-470..481 | Implemented / acceptance pending | Ordered startup, independent DS18B20 acquisition on GPIO14/GPIO27, presence/CRC validation, 1 Hz snapshots, fixed 300-record rings, state mapping, faults, and recovery. |
+| SWE-EMB-LLR-312..313 | SCRUM-482..483 | Implemented / acceptance pending | Active-low GPIO34/GPIO35 buttons use 40 ms debounce and the shared toggle path. |
 | SWE-EMB-LLR-314..316 | SCRUM-484..486 | Implemented | Overflow-safe average calculation/validity and cached snapshot rendering. |
-| SWE-EMB-LLR-317 | SCRUM-487 | Interface only | Immediate render scheduling contract exists; physical input timing is not yet verified. |
-| SWE-EMB-LLR-318..322 | SCRUM-488..492 | Interface only | Real LCD/backlight integration contract compiles; no display bus, geometry, or input hardware is selected. |
+| SWE-EMB-LLR-317 | SCRUM-487 | Implemented / acceptance pending | Button and BLE state changes schedule immediate serialized LCD rendering; physical timing remains to be measured. |
+| SWE-EMB-LLR-318..322 | SCRUM-488..492 | Implemented / acceptance pending | The 16x2 HD44780 parallel interface uses GPIO16/17/18/19/21/23; its directly powered backlight is not software-controllable. |
 | SWE-EMB-LLR-323..326 | SCRUM-493..496 | Implemented | Canonical Celsius values, mutex-protected snapshots, boot identity, and recovery without restart. |
 | SWE-EMB-LLR-327..328 | SCRUM-497..498 | Implemented | Local/remote commands share state mutation/rendering, and invalid commands do not change state. |
 
@@ -81,13 +84,13 @@ this repository.
 | Requirement(s) | Jira issue(s) | Status | Implementation / verification |
 |---|---|---|---|
 | SWE-DB-MLR-551 | SCRUM-531 | Implemented | temperature_samples persists both probe series, computed average, and per-series status with sample identity (boot_id, sample_seq). Status vocabulary follows the implementation (VALID/DISCONNECTED/NOT_RETRIEVED/MISSING); requirement text update is a docs task. |
-| SWE-DB-MLR-552 | SCRUM-532 | Implemented | users, alert_recipients, alert_rules, and alert_rule_recipients junction persist user roles, alert recipients, and alert rules for the web application. |
+| SWE-DB-MLR-552 | SCRUM-532 | Descoped (Lab 1 cleanup, 2026-09-22) | The users/alert_recipients/alert_rules/alert_rule_recipients schema this requirement traced to was built but never consumed - no adapter, route, or test in the repo ever read or wrote it - and was removed. The alert system that actually shipped stores thresholds and recipients client-side (frontend/src/components/AlertSettings.tsx, frontend/src/lib/alertEngine.ts) with no server-side persistence layer. See "Descoped: user/alert tables" in backend/database/README.md. |
 | SWE-DB-LLR-550 | SCRUM-550 | Implemented | temperature_samples created with all specified fields except device_id, intentionally omitted: single-device system by design, adapter keys on BLE address/name, so the column would hold no distinguishing value. Closed deviation. Also carries a nullable failure_reason (SCRUM-341), populated for PROVISIONAL rows explaining a missed poll; not yet its own requirement. |
 | SWE-DB-LLR-551 | SCRUM-551 | Implemented (see note) | UNIQUE KEY (boot_id, sample_seq) enforces real-sample uniqueness (natural key demoted from PK so NULL-keyed PROVISIONAL rows insert under a surrogate id). Duplicate rejection covered by an automated test and a live manual test against a real server (backend/pc_client/tests/test_mysql_adapter.py, SCRUM-341): error 1062 is caught and reported, not raised or silently ignored. Note: the key is not device-scoped, i.e. not UNIQUE(device_id, boot_id, sample_seq) as SCRUM-341's own write-contract draft assumed - device_id was deliberately descoped from the schema (see SWE-DB-LLR-550's closed deviation: single-device system, no multi-device basis in spec). Uniqueness here is therefore global rather than per-device; equivalent for one device, and would need revisiting if the system ever supported more than one. |
 | SWE-DB-LLR-552 | SCRUM-552 | Implemented | Index entry_index (observed_at_utc) verified live with EXPLAIN against a real server for both required query forms: latest-sample (`ORDER BY observed_at_utc DESC LIMIT 1`) uses an index scan (reverse) at any table size; time-window range (`WHERE observed_at_utc BETWEEN ...`) requires a realistic row count to confirm - MySQL's optimizer correctly prefers a table scan over the index on a near-empty table, which is expected behavior, not a defect. Verified against 20k synthetic rows with a narrow (60s) window: index range scan on entry_index, as intended. Synthetic rows removed after verification. |
-| SWE-DB-LLR-554 | SCRUM-554 | Implemented | users table: unique username, password_hash (no plaintext), role ENUM(USER,ADMIN), enabled (default TRUE), created/updated UTC audit timestamps. Verified: role storage, enabled default, updated_at auto-refresh on edit, username uniqueness rejection (error 1062). |
-| SWE-DB-LLR-555 | SCRUM-555 | Implemented | alert_recipients table: type ENUM(EMAIL,SMS), address, no per-type uniqueness. Verified: multiple EMAIL and SMS recipients persist and are retrievable. |
-| SWE-DB-LLR-556 | SCRUM-556 | Implemented | alert_rules (min/max thresholds DECIMAL(5,2) Celsius, high/low messages, monitored_series) plus alert_rule_recipients many-to-many junction. Verified: all five rule fields persist; rule links to multiple recipients; ON DELETE CASCADE removes links but not recipients. |
+| SWE-DB-LLR-554 | SCRUM-554 | Descoped (Lab 1 cleanup, 2026-09-22) | Password-based USER/ADMIN account design (unique username, hashed password, role, enabled flag) was implemented and verified against a real server, but the web app that would consume it was never built - the alert config UI that shipped (AlertSettings.tsx) has no login layer. The users table and the frontend/src/lib/sessionCookie.ts module written ahead of that login layer were both removed together. See backend/database/README.md. |
+| SWE-DB-LLR-555 | SCRUM-555 | Descoped (Lab 1 cleanup, 2026-09-22) | alert_recipients table (type ENUM(EMAIL,SMS), address) was implemented and verified, but recipients are stored client-side in the alerting flow that shipped, not in this table. Removed with the rest of the users/alert schema. |
+| SWE-DB-LLR-556 | SCRUM-556 | Descoped (Lab 1 cleanup, 2026-09-22) | alert_rules/alert_rule_recipients (thresholds, messages, monitored_series, many-to-many junction) were implemented and verified, but threshold rules are evaluated client-side (frontend/src/lib/alertEngine.ts) in the alerting flow that shipped, not read from this schema. Removed with the rest of the users/alert schema. |
 | SWE-DB-LLR-559 | SCRUM-559 | Implemented | Temperature and threshold fields typed DECIMAL(5,2), stored in Celsius. |
 | SWE-DB-LLR-560 | SCRUM-560 | Implemented | Timestamps stored UTC. Server timezone set to UTC (default-time-zone='+00:00'); verified @@global.time_zone = +00:00 and a DB-stamped row returns UTC. |
 

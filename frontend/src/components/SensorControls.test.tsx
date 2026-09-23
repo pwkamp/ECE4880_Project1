@@ -18,6 +18,17 @@ function frame(enabled: boolean): ThermometerFrame {
   };
 }
 
+function disconnectedFrame(): ThermometerFrame {
+  const value = frame(false);
+  value.readings[1] = {
+    sensorId: 1,
+    celsius: null,
+    connected: false,
+    enabled: false,
+  };
+  return value;
+}
+
 beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
@@ -62,4 +73,20 @@ test('reports a failed display command and unlocks the toggle', async () => {
   expect(container.textContent).toContain('ESP32 did not confirm');
   expect(checkbox.disabled).toBe(false);
   expect(checkbox.checked).toBe(true);
+});
+
+test('does not allow a disconnected physical sensor to be enabled', async () => {
+  const setSensorEnabled = vi.fn();
+  const source = { setSensorEnabled } as unknown as ThermometerSource;
+  await act(async () =>
+    root.render(<SensorControls frame={disconnectedFrame()} source={source} />),
+  );
+
+  const checkbox = container.querySelectorAll('input')[0] as HTMLInputElement;
+  expect(checkbox.disabled).toBe(true);
+  expect(checkbox.checked).toBe(false);
+  expect(container.textContent).toContain('unavailable');
+
+  checkbox.click();
+  expect(setSensorEnabled).not.toHaveBeenCalled();
 });

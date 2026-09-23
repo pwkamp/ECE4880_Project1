@@ -2,15 +2,15 @@ import express from 'express';
 import type { Config } from './config.ts';
 import { handleNotify } from './notify.ts';
 import type { SampleStore } from './samples.ts';
-import type { SmsSender } from './sms/types.ts';
 import { PersistedAlertConfigSchema, type AlertConfigStore } from './alertConfig.ts';
+import type { EmailSender } from './email/types.ts';
 
 /** Cap on remembered event ids (oldest evicted first). */
 const SEEN_LIMIT = 5000;
 
 export function createApp(deps: {
   config: Config;
-  sender: SmsSender;
+  sender: EmailSender;
   samples?: SampleStore | null;
   alertConfig?: AlertConfigStore | null;
 }) {

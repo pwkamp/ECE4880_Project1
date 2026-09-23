@@ -639,6 +639,8 @@ class ThermometerBleService:
             ConnectionPhase.DISCONNECTED,
             connected=False,
             ready=False,
+            retry_count=0,
+            last_error=None,
             reason="explicitly disconnected",
         )
         if self._pending_connect_operation_id:

@@ -72,9 +72,9 @@ it.
 
 ## Connecting the console to BLE and MySQL
 
-This is the full wiring guide. The React app on `:5173` stays; you add the
-Python BLE connector on `:8000` and (optionally) MySQL so live temperatures
-come from the third box.
+This is the full wiring guide. The React app on `:5173` uses the Python BLE
+connector on `:8000` and MySQL as the authoritative read path for temperatures
+from the third box.
 
 ### What talks to what
 
@@ -84,8 +84,8 @@ directly.
 
 ```
   ESP32 thermometer  --BLE-->  Python FastAPI  --writes-->  MySQL
-  (firmware, fake or           backend/main.py              thermometer.
-   real sensors)               127.0.0.1:8000               temperature_samples
+  (two DS18B20 probes)          backend/main.py              thermometer.
+                                127.0.0.1:8000               temperature_samples
                                       ^
                                       | HTTP /api/v1/ble/*
                                       |
@@ -104,7 +104,7 @@ directly.
 | Alert + sample reader | started with `npm run dev` in `frontend/` | `127.0.0.1:8787` | Email delivery; **reads** `temperature_samples` when `MYSQL_URL` is set |
 | BLE connector | `backend/.venv/bin/python main.py` | `127.0.0.1:8000` | Scan, pair, connect, poll the box at 1 Hz, **write** samples through a DB adapter |
 | MySQL | `mysqld` / local MySQL | `127.0.0.1:3306` | Stores 1 Hz rows the console charts from |
-| ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of temperatures (fake-sensor firmware is fine for demo) |
+| ESP32 | flashed firmware | BLE advertisement `Thermometer-XXXXXX` | Source of physical DS18B20 temperatures and connection status |
 
 FastAPI has **no CORS**. That is why the browser must go through Vite’s proxy
 and not `fetch('http://127.0.0.1:8000/...')`. OpenAPI is still at
@@ -129,11 +129,12 @@ Interactive schemas (the ones the teammate meant):
 
 The console’s **Device connection** panel drives scan / connect / disconnect /
 reconnect. Sensor display checkboxes call `PUT /displays/{id}`. Chart and
-readouts prefer MySQL; they use `/current` only when the Node reader is off.
+readouts use MySQL exclusively; only the backend issues BLE current/history
+transactions and keeps the database synchronized.
 
 ### End-to-end data path (this is the important part)
 
-1. Firmware samples both probes once per second (fake waveforms or real ADCs).
+1. Firmware samples both DS18B20 probes once per second and rejects missing or CRC-invalid readings.
 2. Python, once `ready=true`, polls `GET`-equivalent GATT current and asks the
    **database adapter** to persist a row (`publish_current_sample`).
 3. A real adapter (owned by the DB teammate, **not in this repo**) `INSERT`s
@@ -143,16 +144,16 @@ readouts prefer MySQL; they use `/current` only when the Node reader is off.
 5. `PythonBleSource` in the React app turns each row into a `ThermometerFrame`
    (celsius, connected, display-enabled) for the chart and big numbers.
 
-If step 3 is still the built-in **no-op adapter**, MySQL stays empty. The
-console then falls back to step 2’s live snapshot (`/api/v1/ble/current`) so
-you can still demo with only Python + an ESP32.
+If step 3 uses the built-in **no-op adapter**, MySQL stays empty and the console
+has no temperature rows to display. The platform launchers select the concrete
+MySQL adapter for the complete integration run.
 
 ### Prerequisites
 
 - **Node.js 20+** and npm - web console.
 - **Python 3.10+** - BLE connector. 3.12/3.14 are fine.
-- **An ESP32** flashed with this repo’s `firmware/` (fake sensors are the
-  default and are enough). The box must be powered and advertising.
+- **An ESP32** flashed with this repo's production `firmware/`, with DS18B20
+  data on GPIO14/GPIO27. The box must be powered and advertising.
 - **Bluetooth adapter** on the PC. The Python connector **detects the OS at
   startup** (`pc_client/platform_runtime.py` via `sys.platform`) and picks the
   pairing stack - you do not choose Windows vs Linux in config.
@@ -163,8 +164,8 @@ you can still demo with only Python + an ESP32.
     Use the console **Scan** then **Connect**, and type the six-digit firmware
     PIN. Your user should be in the `bluetooth` group.
   - **macOS:** still pair in OS Settings, then Connect (no native PIN helper).
-- **MySQL 8** if you want the chart seeded from the database (optional for a
-  first BLE bring-up).
+- **MySQL 8.4**, provisioned by the Docker Compose launchers for the complete
+  data path.
 - **One Python connector at a time.** It owns the BLE adapter. A second copy
   can lock up Bluetooth. On Linux, leave auto-scan off unless you set
   `THERMOMETER_LINUX_AUTO_SCAN=1` (not recommended).
@@ -175,7 +176,7 @@ Firmware passkey: copy
 name is `Thermometer-` plus the MAC suffix. That same PIN is what you type in
 the console’s **Pairing passkey** field (or Windows’ pairing dialog).
 
-### 1. Start MySQL and create the schema (optional, but this is the “temps from DB” path)
+### 1. Start MySQL and create the schema
 
 Install MySQL locally. Then from the repo:
 
@@ -229,8 +230,8 @@ THERMOMETER_DB_NAME=thermometer
 That adapter implements `ThermometerDatabaseAdapter` in
 `backend/pc_client/mysql_adapter.py`. If the factory is unset, Python uses
 `NoOpDatabaseAdapter` and stores nothing; `GET /healthz` then shows
-`"persistence_configured": false` and the console falls back to
-`/api/v1/ble/current`. Schema details (including `users` / alert tables and
+`"persistence_configured": false` and the console displays no temperature
+samples. Schema details (including `users` / alert tables and
 `failure_reason`) are in `backend/database/README.md`.
 
 Confirm the reader without the UI:
@@ -327,7 +328,7 @@ the **same machine** that will run Python.
 
 #### Firmware (the ESP32)
 
-1. Flash this repo’s `firmware/` (fake sensors are enough).
+1. Wire both DS18B20 probes and flash this repo's production `firmware/`.
 2. Copy `firmware/device_config.cmake.example` → gitignored
    `firmware/device_config.cmake` and set a **unique six-digit PIN** (ASCII
    digits only, e.g. `482913`).
@@ -386,9 +387,10 @@ in `bluetooth`, or another process owns `hci0`.
 3. Auto-discover stays **on**. With one known device it will try to
    pair/connect by itself. With zero devices, `phase` stays `DISCOVERING`
    until the box advertises. You can still click **Scan** and **Connect**.
-4. If Windows already bonded the box with the wrong PIN, forget it in
-   Settings → Bluetooth (or `DELETE /api/v1/ble/pairing/{address}`) and
-   Connect again from the console.
+4. If Windows has a stale/wrong bond and GATT discovery cannot connect, stop
+   the backend and run `.\backend\run.ps1 -KeepDatabase -ResetPairings`.
+   This removes only thermometers enrolled by this project. Then start the
+   backend, Scan, Connect, and enter the firmware PIN again.
 
 #### macOS
 
@@ -432,7 +434,9 @@ After a successful first enroll, `backend/paired_devices.csv` remembers the
 PIN. Later power-cycles on **Windows** can reconnect without typing it again.
 On **Linux**, click **Scan** then **Connect** if it does not resume (auto-scan
 is off). **Disconnect** drops GATT but keeps the last target; forget the OS
-bond with `DELETE /api/v1/ble/pairing/{address}` if you need a clean pair.
+bond with `DELETE /api/v1/ble/pairing/{address}` while connected. For a broken
+connection that cannot authorize that endpoint, use the explicit launcher
+reset described above.
 
 Connect from curl if you are debugging the API without the UI:
 
@@ -572,12 +576,13 @@ business logic depend only on that interface - never on the mock.
                      ┌───────────────┴────────────────┐
                      ▼                                ▼
         MockThermometerSource            PythonBleSource
-        (default simulator)              (VITE_DATA_SOURCE=ble)
+        (VITE_DATA_SOURCE=mock)           (production default)
                                          FastAPI :8000 + MySQL reader
 ```
 
-The active source is chosen in [`src/datasource/index.ts`](src/datasource/index.ts)
-(`VITE_DATA_SOURCE=ble` vs the built-in local stream). See
+The active source is chosen in [`src/datasource/index.ts`](src/datasource/index.ts).
+BLE/MySQL is the default; `VITE_DATA_SOURCE=mock` explicitly selects the local
+test stream. See
 [Connecting the console to BLE and MySQL](#connecting-the-console-to-ble-and-mysql).
 
 ```
@@ -632,153 +637,6 @@ Interface methods:
 
 ---
 
-## Connecting to the real hardware
-
-This is the plan for wiring the console to the actual third box, the sensor
-probes, and the phone. **None of it changes the UI** - it is all one new file
-plus firmware work.
-
-### 1. Physical piece → what it maps to
-
-| Real thing | Interface element | What has to be built |
-| --- | --- | --- |
-| Third-box microcontroller | the transport (below) | firmware that emits a JSON frame ~1 Hz |
-| Power switch | `frame.switchState` | firmware reports `'off'`, **or** the console infers "off" from loss of signal (see step 4) |
-| Sensor probe 1 / 2 | `readings[n].celsius` | ADC / 1-Wire read, converted to °C, sent raw |
-| Probe unplugged | `readings[n].connected = false`, `celsius = null` | firmware detects an open circuit / out-of-range read on that channel |
-| Physical display button | `readings[n].enabled` | firmware toggles a per-sensor flag and reports it |
-| Console's on/off toggle | `setSensorEnabled(id, bool)` | firmware accepts a command message and applies it to the same flag |
-| Email inbox | the alert log → real email | the Node backend plus configured SMTP credentials (see below) |
-
-### 2. Choose a transport (box ↔ computer)
-
-Pick based on what the box's microcontroller can do:
-
-| Transport | Good when | `RealThermometerSource` uses |
-| --- | --- | --- |
-| **WebSocket** (box runs a WS server, e.g. on an ESP32) | box has Wi-Fi; want true 1 Hz push and a return channel for the virtual button | `new WebSocket('ws://<box-ip>:81')` |
-| **HTTP polling** | simplest firmware; box exposes `GET /reading` and `POST /command` | `fetch` on a 1 s interval |
-| **MQTT over WebSocket** | box is battery-powered / behind NAT; a broker sits in between | an MQTT-WS client, subscribe to `box/frame`, publish to `box/command` |
-| **USB serial** (box plugged into the computer) | no networking on the box | the Web Serial API (`navigator.serial`, Chrome only), or a tiny local bridge that re-exposes serial as a WebSocket |
-
-WebSocket is the recommended target: it matches the 1 Hz streaming model and
-gives a built-in path for `setSensorEnabled` commands.
-
-### 3. Define the on-the-wire JSON
-
-Have the firmware emit exactly the `ThermometerFrame` shape so the adapter is
-nearly a pass-through:
-
-```json
-{
-  "timestamp": 1717000000000,
-  "switchState": "on",
-  "readings": {
-    "1": { "sensorId": 1, "celsius": 22.4, "connected": true,  "enabled": true },
-    "2": { "sensorId": 2, "celsius": null, "connected": false, "enabled": true }
-  }
-}
-```
-
-If the box's native format differs, the translation lives in one place - the
-adapter's message handler - and nothing else needs to know.
-
-### 4. Implement `RealThermometerSource`
-
-One new file, `src/datasource/realThermometerSource.ts`, implementing
-`ThermometerSource`. Skeleton:
-
-```ts
-import type { ThermometerFrame, ThermometerSource, SensorId } from './types';
-
-export class RealThermometerSource implements ThermometerSource {
-  private ws: WebSocket | null = null;
-  private last: ThermometerFrame = OFFLINE_FRAME;          // switchState: 'off'
-  private history: ThermometerFrame[] = [];
-  private listeners = new Set<(f: ThermometerFrame) => void>();
-  private staleTimer: ReturnType<typeof setTimeout> | null = null;
-
-  constructor(private url: string) {}
-
-  start() {
-    this.ws = new WebSocket(this.url);
-    this.ws.onmessage = (e) => {
-      const frame = JSON.parse(e.data) as ThermometerFrame; // validate here
-      this.ingest(frame);
-    };
-    this.ws.onclose = () => {
-      this.scheduleReconnect();       // exponential backoff
-      this.markOffline();             // synthesize switchState:'off' frames
-    };
-  }
-
-  stop() { this.ws?.close(); this.ws = null; }
-
-  private ingest(frame: ThermometerFrame) {
-    this.last = frame;
-    this.history.push(frame);
-    this.trimHistory(frame.timestamp);           // keep ~360 s
-    this.resetStaleWatchdog();                    // 3 s → markOffline()
-    for (const l of this.listeners) l(frame);
-  }
-
-  getFrame() { return this.last; }
-  getSwitchState() { return this.last.switchState; }
-  getHistory(seconds: number) {
-    const cutoff = Date.now() - seconds * 1000;
-    return this.history.filter((f) => f.timestamp >= cutoff);
-  }
-  subscribe(fn: (f: ThermometerFrame) => void) {
-    this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
-  }
-  setSensorEnabled(sensorId: SensorId, enabled: boolean) {
-    this.ws?.send(JSON.stringify({ type: 'setEnabled', sensorId, enabled }));
-    // Optionally update this.last optimistically so the UI reacts < 1 s.
-  }
-}
-```
-
-Then change the one line in `src/datasource/index.ts`:
-
-```ts
-export const thermometerSource: ThermometerSource =
-  new RealThermometerSource('ws://third-box.local:81');
-```
-
-Nothing in `src/components`, `src/hooks`, or `src/lib` changes. The demo-control
-panel hides itself because `RealThermometerSource` does not implement the
-optional `ThermometerSimControls`.
-
-### 5. Two things the adapter must handle that the mock fakes for free
-
-- **"Switch off" as a disconnect.** A truly powered-off box sends nothing, so
-  the adapter needs a **staleness watchdog**: if no frame arrives for ~3 s,
-  synthesize frames with `switchState: 'off'` so the console shows
-  "no data available" and the chart gaps. When frames resume, real data flows
-  again - this is what satisfies the spec's "recover within 10 s" requirement.
-  (If the box has a *soft* switch that keeps the radio alive, it can just report
-  `switchState: 'off'` directly and the watchdog is a backup.)
-- **Clock skew.** The chart's X-axis uses frame timestamps. If the box clock is
-  unreliable, have the adapter stamp `timestamp = Date.now()` on arrival
-  instead of trusting the box.
-
-### 6. Where the app and the box run
-
-The console is a static site. On demo day, from `frontend/` run `npm run dev` (or serve
-`npm run build` output) on the lab computer, with the box on the **same LAN**.
-Note: a browser page served over **https** cannot open an insecure `ws://` - so
-either serve the console over plain `http` on the LAN, or terminate `wss://`
-with a certificate on the box/broker.
-
-### Phone / email alert delivery
-
-Email delivery is implemented: see [Running with email alerts](#running-with-email-alerts).
-Default `console` mode needs no credentials. Real send is `EMAIL_MODE=live`
-with a Gmail App Password.
-
----
-
 ## Assumptions / judgement calls (worth confirming with the instructor)
 
 1. **"Display off" (virtual button off)** is shown as its own readout message
@@ -813,7 +671,7 @@ missing-vs-off-scale rendering behave exactly as the spec requires.
 This repository contains a request/response BLE thermometer implementation:
 
 - ESP-IDF firmware for two independent temperature sensors
-- deterministic fake sensor data and disconnect/recovery simulation
+- physical DS18B20 acquisition, with a deterministic fake backend for explicit tests
 - two independent 300-record circular history buffers
 - authenticated BLE pairing, bonding, encrypted GATT access, and protocol-level challenge-response
 - a reusable async Python client library
@@ -890,9 +748,13 @@ Each sensor has independent runtime state:
 
 Each sensor has an independent acquisition task whose backend call waits for the next conversion. Results are sent to one state-owner task. A one-second state deadline snapshots the latest values into the two fixed 300-entry circular buffers and updates the display. Once full, the oldest record is overwritten. History is addressed by sequence number so a ring update cannot silently shift a client's requested position.
 
-Periodic independent disconnects are enabled by default. A disconnect invalidates that sensor without disturbing the other sensor. On recovery, the sensor becomes valid again and its display is reset to disabled.
+Each physical probe is validated independently using its 1-Wire presence pulse
+and scratchpad CRC. A missing or invalid probe is marked disconnected without
+disturbing the other sensor. On recovery, it becomes valid again with its
+display disabled.
 
-The two logical display states are independent. The current single GPIO LED is a physical stand-in: it is on when either valid sensor's display is enabled, and off when neither is visible. Both local controls and BLE commands use the same state-changing functions and render path.
+The two display states are independent. The HD44780 LCD, physical buttons, and
+BLE commands all use the same state-changing functions and render path.
 
 The average is valid only while both sensors are connected and both displays are enabled.
 
@@ -905,18 +767,21 @@ Firmware modules:
 - [ble_server.c](firmware/main/src/ble_server.c): secure GATT service, pairing, advertising
 - [temperature_sensors.h](firmware/main/include/temperature_sensors.h): sensor-backend interface
 - [local_display.h](firmware/main/include/local_display.h): display-backend interface
-- [local_controls.c](firmware/main/src/local_controls.c): local button/backlight integration stub
+- [local_controls.c](firmware/main/src/local_controls.c): debounced GPIO34/GPIO35 buttons
 
 ## Hardware backends
 
-Sensor and display backends are selected independently under `Thermometer Configuration` in `idf.py menuconfig`. This allows any of these combinations:
+Production firmware uses two independently wired DS18B20 probes and the 16x2
+HD44780 LCD. Sensor 1 data is GPIO14 and sensor 2 data is GPIO27; each 1-Wire
+bus needs its own approximately 4.7 kOhm pull-up to 3.3 V and three-wire probe
+power. The LCD uses RS/E on GPIO16/GPIO17 and D4-D7 on
+GPIO18/GPIO19/GPIO21/GPIO23. Physical display buttons use GPIO34/GPIO35 with
+external pull-ups. LEDs are not used.
 
-- fake sensors + LED display simulator (default)
-- real sensors + LED display simulator
-- fake sensors + real LCD
-- real sensors + real LCD
-
-[fake_temperature_sensors.c](firmware/main/src/fake_temperature_sensors.c) and [led_display.c](firmware/main/src/led_display.c) are working implementations. [real_temperature_sensors.c](firmware/main/src/real_temperature_sensors.c) and [real_display.c](firmware/main/src/real_display.c) are compiling integration stubs with the required behavior documented at their handoff points. The Jira requirements do not select a sensor model, LCD bus, pinout, or display geometry, so those hardware choices are deliberately not invented here. Target defaults select a likely LED GPIO; confirm it for the actual board.
+The deterministic sensor backend remains selectable in `idf.py menuconfig`
+for explicit simulation tests, but the checked-in and active defaults select
+the physical DS18B20 backend. The web application likewise defaults to its
+BLE/MySQL source; its browser-only mock requires `VITE_DATA_SOURCE=mock`.
 
 ## Power behavior
 
@@ -934,33 +799,23 @@ On the original ESP32, the default Bluetooth low-power clock is the main crystal
 
 Comments next to implementations cite relevant Jira requirement and SCRUM issue
 IDs. [The traceability matrix](docs/requirements_traceability.md) distinguishes
-implemented behavior, simulation support, integration stubs, and pending
-hardware acceptance. Jira was used read-only; no issue fields or statuses are
+implemented behavior, simulation support, and pending hardware acceptance.
+Jira was used read-only; no issue fields or statuses are
 changed by this project.
 
 ## Build and flash
 
-Use an ESP-IDF 6.x terminal. On the first build, create the local device
-configuration from its committed example:
+See [firmware/README.md](firmware/README.md) for the full build/flash
+walkthrough (ESP-IDF 6.x, `device_config.cmake` setup, and known build-cache
+gotchas). The original ESP32 is the only active firmware target; defaults for
+other chips are not part of the active project. The app binary is named
+`thermometer_gatt_server.bin`.
 
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Edit device_config.cmake with this ESP32's unique six-digit passkey.
-idf.py set-target esp32
-idf.py build
-idf.py -p COM5 flash monitor
-```
-
-Replace `COM5` as needed. The original ESP32 is the only active firmware
-target; defaults for other chips are not part of the active project. The app
-binary is named `thermometer_gatt_server.bin`.
 Changing a provisioned passkey does not authorize replacement of the existing
 ESP32 bond. Use the authenticated reset API before changing it. If the owner
-credential is lost, erase NVS or reflash/erase the device and remove its Windows
-Bluetooth entry as a physical recovery procedure.
+credential is lost, use the explicit backend launcher reset with the current
+firmware (`-ResetPairings` on Windows or `--reset-pairings` on Linux), then
+enter the firmware PIN again. Erasing NVS remains the physical last resort.
 
 ## Production Python connector service
 
@@ -1226,24 +1081,21 @@ per-device six-digit passkey is supplied during enrollment and the refreshed bon
 must report `EncryptionAndAuthentication`. GATT traffic then uses an unmodified
 `BleakClient` with pairing disabled.
 
-GATT service discovery is uncached during development. Windows bonds are kept
-until the authenticated owner selects **Reset Pairing**, so normal application
-restarts and automatic reconnects do not repeat the security ceremony. NimBLE
-bond persistence remains enabled. Repeat pairing is rejected instead of
-silently replacing an ESP32-side owner record.
+GATT services are refreshed from the ESP32 on each Windows connection. This is
+intentional: firmware updates can leave WinRT's cached characteristic handles
+pointing at an unreachable attribute even when Windows still reports a valid
+bond. Windows bonds are kept until the authenticated owner selects **Reset
+Pairing** or explicitly starts the backend with `-ResetPairings`. NimBLE bond
+persistence remains enabled. If the host bond was explicitly removed or
+corrupted, repeat pairing replaces the stale ESP32 bond only after the peer
+supplies the configured six-digit PIN.
 
 ## Tests
 
 ### Python unit tests
 
-From a fresh checkout, create the backend environment and install the
-development dependency set from the repository root:
-
-```powershell
-python -m venv backend\.venv
-backend\.venv\Scripts\python.exe -m pip install -r backend\pc_client\requirements-dev.txt
-backend\.venv\Scripts\python.exe master_test.py
-```
+See [backend/README.md](backend/README.md#tests) for the environment setup
+and run command (`master_test.py` from the repository root).
 
 The tests cover byte layout, request IDs, response validation, current/history
 decoding, incomplete-record rejection, requester-only ordering, display control,
@@ -1259,29 +1111,17 @@ when the entire discovered suite passes.
 
 The firmware validation presently consists of protocol-generation checks, a
 clean ESP-IDF build, and hardware acceptance; there is no separate on-target
-Unity test application yet. In an initialized ESP-IDF 6.x terminal:
+Unity test application yet. See [firmware/README.md](firmware/README.md#firmware-tests)
+for the build/size commands.
 
-```powershell
-Set-Location firmware
-if (-not (Test-Path device_config.cmake)) {
-    Copy-Item device_config.cmake.example device_config.cmake
-}
-# Set a unique six-digit passkey if this is a new local configuration.
-idf.py set-target esp32
-idf.py fullclean
-idf.py build
-idf.py size
-```
-
-The clean build validates the shared JSON, creates
+The build validates the shared JSON, creates
 `firmware/build/generated/thermometer_config.h`, compiles the selected
 sensor/display implementations, links the application, and checks its partition
-size. Use `idf.py menuconfig` to compile-check all four independent fake/real
-sensor and display combinations documented in
-[the firmware README](firmware/README.md#firmware-tests).
+size. The normal build uses physical DS18B20 sensors and the HD44780 display;
+the fake sensor backend is an explicit menuconfig test option.
 
-For the hardware smoke test, flash and monitor the default fake-sensor/LED
-build, then use the service or GUI to verify secure connection, one-second
-current readings, history synchronization, both display controls, and automatic
-reconnection after an ESP32 power cycle. Firmware build and hardware failures
-are intentionally not hidden inside the Python unit-test runner.
+For the hardware smoke test, flash and monitor the production build. With no
+probes attached, both sensors must stay disconnected and cannot be enabled.
+Then attach each probe and use the service or GUI to verify real one-second
+readings, MySQL persistence and history, both display controls, and automatic
+reconnection after an ESP32 power cycle.

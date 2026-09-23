@@ -84,6 +84,12 @@ class CredentialRegistry:
         with self._lock:
             return self._records.get(normalized)
 
+    def list_all(self) -> tuple[DeviceCredential, ...]:
+        """Return a stable snapshot of every thermometer enrolled on this PC."""
+
+        with self._lock:
+            return tuple(self._records[address] for address in sorted(self._records))
+
     def save_verified(
         self,
         address: str,

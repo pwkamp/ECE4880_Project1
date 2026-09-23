@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "driver/gpio.h"
 #include "esp_log.h"
 #include "hd44780.h"
 
@@ -55,7 +54,7 @@ static void format_sensor_line(char *line, size_t line_size,
     const int32_t temperature = sensor->temperature_centi_c;
     const uint32_t magnitude =
         (uint32_t)(temperature < 0 ? -temperature : temperature);
-    (void)snprintf(line, line_size, "S%u:%s%" PRIu32 ".%02" PRIu32 "C ON",
+    (void)snprintf(line, line_size, "S%u:%s%" PRIu32 ".%02" PRIu32 "C  ON",
                    sensor_number, temperature < 0 ? "-" : "",
                    magnitude / 100U, magnitude % 100U);
 }
@@ -122,7 +121,6 @@ esp_err_t local_display_set_backlight(uint8_t brightness_percent)
         return ESP_ERR_INVALID_ARG;
     }
 
-    /* The current board powers the LCD backlight directly and has no
-     * controllable backlight GPIO. Keep the shared command contract valid. */
+    /* This board powers the LCD backlight directly; there is no control pin. */
     return ESP_OK;
 }

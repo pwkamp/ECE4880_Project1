@@ -1,4 +1,4 @@
-export type SmsMode = 'console' | 'test' | 'live';
+export type EmailMode = 'console' | 'test' | 'live';
 
 export interface SmtpConfig {
   host: string;
@@ -10,7 +10,7 @@ export interface SmtpConfig {
 }
 
 export interface Config {
-  mode: SmsMode;
+  mode: EmailMode;
   port: number;
   apiToken: string | null;
   smtp: SmtpConfig | null;
@@ -18,14 +18,14 @@ export interface Config {
   mysqlUrl: string | null;
 }
 
-const MODES: readonly SmsMode[] = ['console', 'test', 'live'];
+const MODES: readonly EmailMode[] = ['console', 'test', 'live'];
 
 export function loadConfig(env: NodeJS.ProcessEnv): Config {
-  const rawMode = env.EMAIL_MODE ?? env.SMS_MODE ?? 'console';
-  if (!MODES.includes(rawMode as SmsMode)) {
+  const rawMode = env.EMAIL_MODE ?? 'console';
+  if (!MODES.includes(rawMode as EmailMode)) {
     throw new Error(`EMAIL_MODE must be one of ${MODES.join(', ')} (got "${rawMode}")`);
   }
-  const mode = rawMode as SmsMode;
+  const mode = rawMode as EmailMode;
 
   const port = env.PORT ? Number(env.PORT) : 8787;
   if (!Number.isInteger(port) || port <= 0) {

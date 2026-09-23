@@ -95,7 +95,14 @@ def firmware_build() -> int:
                 return cleaned
         defaults = f"sdkconfig.defaults;{fixture.as_posix()}"
         built = run(
-            [*idf.command, "-B", str(build_dir), "-D", f"SDKCONFIG={sdkconfig.as_posix()}", "-D", f"SDKCONFIG_DEFAULTS={defaults}", "build"],
+            [
+                *idf.command,
+                "--no-ccache",
+                "-B", str(build_dir),
+                "-D", f"SDKCONFIG={sdkconfig.as_posix()}",
+                "-D", f"SDKCONFIG_DEFAULTS={defaults}",
+                "build",
+            ],
             FIRMWARE,
             timeout=1200,
             extra_env=idf_env,
@@ -104,9 +111,9 @@ def firmware_build() -> int:
             return built
         generated = (build_dir / "config" / "sdkconfig.h").read_text(encoding="utf-8")
         expected = (
-            ["CONFIG_THERMOMETER_SENSOR_BACKEND_REAL 1", "CONFIG_THERMOMETER_DISPLAY_BACKEND_REAL 1"]
+            ["CONFIG_THERMOMETER_SENSOR_BACKEND_REAL 1"]
             if name == "real"
-            else ["CONFIG_THERMOMETER_SENSOR_BACKEND_FAKE 1", "CONFIG_THERMOMETER_DISPLAY_BACKEND_LED 1"]
+            else ["CONFIG_THERMOMETER_SENSOR_BACKEND_FAKE 1"]
         )
         missing = [value for value in expected if value not in generated]
         if missing:
@@ -117,8 +124,9 @@ def firmware_build() -> int:
     if "CONFIG_THERMOMETER_SENSOR_BACKEND_REAL=y" not in production:
         print("FAIL production sdkconfig does not select real sensors")
         return 1
-    if "CONFIG_THERMOMETER_DISPLAY_BACKEND_REAL=y" not in production:
-        print("FAIL production sdkconfig still selects the LED/stub display instead of the required LCD")
+    cmake = (FIRMWARE / "main" / "CMakeLists.txt").read_text(encoding="utf-8")
+    if '"src/real_display.c"' not in cmake or "hd44780" not in cmake:
+        print("FAIL production firmware does not compile the required HD44780 LCD backend")
         return 1
     return 0
 
@@ -256,7 +264,7 @@ def main() -> int:
             "frontend/src/components/AlertSettings.tsx": ["Alert emails", "valid email"],
             "frontend/server/alertConfig.ts": ["PersistedAlertConfigSchema", "createMysqlAlertConfigStore", "DELETE FROM alert_rules"],
             "frontend/src/lib/alertConfigClient.ts": ["/api/alert-config", "saveAlertConfig"],
-            "frontend/server/sms/smtpSender.ts": ["sendMail"],
+            "frontend/server/email/smtpSender.ts": ["sendMail"],
             "frontend/server/config.ts": ["smtp.gmail.com", "EMAIL_MODE"],
             "frontend/server/notify.ts": ["normalizeDestination", "composeAlertEmail"],
         })
@@ -281,7 +289,7 @@ def main() -> int:
         result = frontend_tests("src/lib/alertEngine.test.ts")
         return 2 if result == 0 else result
     if test_id == "ALR-03":
-        return frontend_tests("server/sms/index.test.ts", "server/sms/consoleSender.test.ts", "server/sms/smtpSender.test.ts", "src/hooks/useAlertNotifier.test.tsx")
+        return frontend_tests("server/email/index.test.ts", "server/email/consoleSender.test.ts", "server/email/smtpSender.test.ts", "src/hooks/useAlertNotifier.test.tsx")
     if test_id == "DOC-01":
         return doc_integrity()
     print(f"BLOCKED: no automated implementation for {test_id}", file=sys.stderr)

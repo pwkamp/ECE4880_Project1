@@ -103,6 +103,10 @@ class PlatformRuntimeTests(unittest.TestCase):
             options["settings"].auto_discovery_interval_seconds,
             CONFIG.service.auto_discovery_interval_seconds,
         )
+        self.assertGreaterEqual(
+            options["settings"].recovery_deadline_seconds,
+            CONFIG.client.connect_timeout_seconds + 5.0,
+        )
 
 
 if __name__ == "__main__":

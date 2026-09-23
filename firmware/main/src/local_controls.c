@@ -1,8 +1,5 @@
 #include "local_controls.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -80,8 +77,7 @@ static void button_task(void *unused)
              ++index) {
             if (poll_button(&buttons[index], now) &&
                 !thermometer_toggle_display(buttons[index].sensor_id)) {
-                ESP_LOGW(TAG,
-                         "sensor %u is disconnected; saved display state unchanged",
+                ESP_LOGW(TAG, "sensor %u is disconnected; display unchanged",
                          (unsigned int)buttons[index].sensor_id);
             }
         }
@@ -98,7 +94,7 @@ esp_err_t local_controls_start(void)
     const gpio_config_t gpio = {
         .pin_bit_mask = (1ULL << GPIO_NUM_34) | (1ULL << GPIO_NUM_35),
         .mode = GPIO_MODE_INPUT,
-        /* GPIO34 and GPIO35 require the board's external pull-ups. */
+        /* Input-only GPIO34/35 do not have internal pull resistors. */
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,

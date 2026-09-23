@@ -67,23 +67,28 @@ export async function createMysqlAlertConfigStore(url: string): Promise<AlertCon
         await connection.query('DELETE FROM alert_rule_recipients');
         await connection.query('DELETE FROM alert_rules');
         await connection.query('DELETE FROM alert_recipients');
-        const [ruleResult] = await connection.execute(
-          `INSERT INTO alert_rules
-             (min_threshold,max_threshold,high_temp_message,low_temp_message,monitored_series,enabled)
-           VALUES (?,?,?,?, 'AVERAGE', ?)`,
-          [valid.minC, valid.maxC, valid.maxMessage, valid.minMessage, valid.enabled],
-        );
-        const ruleId = (ruleResult as { insertId: number }).insertId;
+        const ruleIds: number[] = [];
+        for (const source of ['SENSOR1', 'SENSOR2'] as const) {
+          const [ruleResult] = await connection.execute(
+            `INSERT INTO alert_rules
+               (min_threshold,max_threshold,high_temp_message,low_temp_message,monitored_series,enabled)
+             VALUES (?,?,?,?,?,?)`,
+            [valid.minC, valid.maxC, valid.maxMessage, valid.minMessage, source, valid.enabled],
+          );
+          ruleIds.push((ruleResult as { insertId: number }).insertId);
+        }
         for (const destination of [...new Set(valid.destinations)]) {
           const [recipientResult] = await connection.execute(
             `INSERT INTO alert_recipients (type,address,enabled) VALUES ('EMAIL',?,TRUE)`,
             [destination],
           );
           const recipientId = (recipientResult as { insertId: number }).insertId;
-          await connection.execute(
-            'INSERT INTO alert_rule_recipients (alert_rule_id,alert_recipient_id) VALUES (?,?)',
-            [ruleId, recipientId],
-          );
+          for (const ruleId of ruleIds) {
+            await connection.execute(
+              'INSERT INTO alert_rule_recipients (alert_rule_id,alert_recipient_id) VALUES (?,?)',
+              [ruleId, recipientId],
+            );
+          }
         }
         await connection.commit();
       } catch (error) {
