@@ -5,8 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from verification.core.evidence import safe_output_path
+
 
 def write(run: dict[str, Any], results: list[dict[str, Any]], coverage: dict[str, Any], path: Path) -> None:
+    path = safe_output_path(path)
     outcome_counts = {state: sum(item["outcome"] == state for item in results) for state in ("PASS", "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE")}
     lines = [
         "# ECE4880 Verification Summary",

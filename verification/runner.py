@@ -26,6 +26,7 @@ from verification.core.environment import collect
 from verification.core.evidence import write_json
 from verification.core.execution import blocked_result, run_automated, run_manual
 from verification.core.preflight import CONFIRMED, blockers, confirmations_pending, run_preflight
+from verification.core.paths import existing_run, safe_test_id, within
 from verification.core.services import ServiceManager
 from verification.reporters import coverage as coverage_reporter
 from verification.reporters import dashboard_data, junit, markdown
@@ -275,11 +276,7 @@ def run(profile: str, non_interactive: bool, defer_photos: bool = False, start_s
 
 
 def _latest_run() -> Path | None:
-    marker = ARTIFACTS / "latest"
-    if not marker.exists():
-        return None
-    path = ARTIFACTS / marker.read_text(encoding="utf-8").strip()
-    return path if path.is_dir() else None
+    return existing_run(ARTIFACTS, "latest")
 
 
 def status() -> int:
@@ -292,7 +289,7 @@ def status() -> int:
 
 
 def report(run_id: str) -> int:
-    run_dir = _latest_run() if run_id == "latest" else ARTIFACTS / run_id
+    run_dir = existing_run(ARTIFACTS, run_id)
     if run_dir is None or not run_dir.is_dir():
         print(f"verification run not found: {run_id}", file=sys.stderr)
         return 1
@@ -303,6 +300,7 @@ def report(run_id: str) -> int:
 def _rebuild_run_outputs(run_dir: Path, results: list[dict[str, Any]]) -> None:
     """Recalculate every derived artifact after an evidence/adjudication edit."""
 
+    run_dir = within(run_dir, ARTIFACTS)
     results_path = run_dir / "results.jsonl"
     results_path.write_text("".join(json.dumps(item, sort_keys=True) + "\n" for item in results), encoding="utf-8")
     frozen = run_dir / "catalogs"
@@ -324,7 +322,7 @@ def _rebuild_run_outputs(run_dir: Path, results: list[dict[str, Any]]) -> None:
 def adjudicate(run_id: str, test_id: str, outcome: str, reason: str, operator: str) -> tuple[bool, str]:
     """Record a traceable operator decision for a non-automated test result."""
 
-    run_dir = _latest_run() if run_id == "latest" else ARTIFACTS / run_id
+    run_dir = existing_run(ARTIFACTS, run_id)
     if run_dir is None or not run_dir.is_dir():
         return False, f"verification run not found: {run_id}"
     outcome = outcome.upper()
@@ -364,7 +362,7 @@ def adjudicate(run_id: str, test_id: str, outcome: str, reason: str, operator: s
 
 
 def add_evidence(run_id: str, test_id: str, photos: list[str], complete: bool) -> int:
-    run_dir = _latest_run() if run_id == "latest" else ARTIFACTS / run_id
+    run_dir = existing_run(ARTIFACTS, run_id)
     if run_dir is None or not run_dir.is_dir():
         print(f"verification run not found: {run_id}", file=sys.stderr)
         return 1
@@ -374,7 +372,11 @@ def add_evidence(run_id: str, test_id: str, photos: list[str], complete: bool) -
     if not matches:
         print(f"test result not found: {test_id}", file=sys.stderr)
         return 1
-    target_dir = run_dir / "evidence" / test_id / "photos"
+    canonical_test_id = safe_test_id(str(matches[0]["test_id"]))
+    if canonical_test_id is None:
+        print("stored test identifier is invalid", file=sys.stderr)
+        return 1
+    target_dir = run_dir / "evidence" / canonical_test_id / "photos"
     target_dir.mkdir(parents=True, exist_ok=True)
     copied: list[str] = []
     for raw in photos:

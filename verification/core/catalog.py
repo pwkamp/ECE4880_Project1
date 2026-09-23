@@ -16,6 +16,8 @@ from typing import Any
 ALLOWED_OUTCOMES = {"PASS", "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE"}
 ALLOWED_METHODS = {"automated", "semi-automated", "manual"}
 PROFILES = ("software", "integration", "hil", "full")
+CATALOG_ROOT = Path(__file__).resolve().parents[1]
+HASHED_CATALOGS = {"requirements.yaml", "tests.yaml", "setup_groups.yaml"}
 
 
 class CatalogError(ValueError):
@@ -30,7 +32,10 @@ def load_catalog(path: Path) -> Any:
 
 
 def catalog_hash(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    resolved = path.resolve()
+    if resolved.parent != CATALOG_ROOT or resolved.name not in HASHED_CATALOGS:
+        raise CatalogError(f"refusing to hash a path outside the verification catalog: {path}")
+    return hashlib.sha256(resolved.read_bytes()).hexdigest()
 
 
 def validate_catalogs(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:

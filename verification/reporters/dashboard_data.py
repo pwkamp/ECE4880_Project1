@@ -6,8 +6,18 @@ import json
 import shutil
 from pathlib import Path
 
+from verification.core.evidence import safe_output_path
+from verification.core.paths import within
+
+
+REPOSITORY = Path(__file__).resolve().parents[2]
+ARTIFACTS = REPOSITORY / "artifacts" / "verification"
+DASHBOARD = REPOSITORY / "verification" / "dashboard"
+
 
 def publish(run_dir: Path, dashboard_dir: Path) -> None:
+    run_dir = within(run_dir, ARTIFACTS)
+    dashboard_dir = within(dashboard_dir, DASHBOARD)
     history: dict[str, list[dict[str, object]]] = {}
     for candidate in sorted(run_dir.parent.iterdir(), reverse=True):
         results_path = candidate / "results.jsonl"
@@ -47,6 +57,6 @@ def publish(run_dir: Path, dashboard_dir: Path) -> None:
         "history": history,
     }
     dashboard_dir.mkdir(parents=True, exist_ok=True)
-    (dashboard_dir / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    latest = run_dir.parent / "latest"
+    safe_output_path(dashboard_dir / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    latest = safe_output_path(run_dir.parent / "latest")
     latest.write_text(run_dir.name + "\n", encoding="utf-8")

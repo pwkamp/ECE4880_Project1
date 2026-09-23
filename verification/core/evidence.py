@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
+
+from .paths import within
 
 
 _REDACTIONS = (
@@ -16,6 +19,22 @@ _REDACTIONS = (
     (re.compile(r"(?i)(\s-p)([^\s]+)"), r"\1[REDACTED]"),
 )
 
+_REPOSITORY = Path(__file__).resolve().parents[2]
+_OUTPUT_ROOTS = (
+    _REPOSITORY / "artifacts" / "verification",
+    _REPOSITORY / "verification" / "dashboard",
+    Path(tempfile.gettempdir()),
+)
+
+
+def safe_output_path(path: Path) -> Path:
+    for root in _OUTPUT_ROOTS:
+        try:
+            return within(path, root)
+        except ValueError:
+            continue
+    raise ValueError(f"verification output path is outside approved roots: {path}")
+
 
 def redact(value: str) -> str:
     for pattern, replacement in _REDACTIONS:
@@ -24,9 +43,10 @@ def redact(value: str) -> str:
 
 
 def write_text(path: Path, value: str) -> str:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(redact(value), encoding="utf-8")
-    return path.as_posix()
+    destination = safe_output_path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(redact(value), encoding="utf-8")
+    return destination.as_posix()
 
 
 def write_json(path: Path, value: Any) -> str:

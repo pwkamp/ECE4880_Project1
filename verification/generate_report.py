@@ -14,6 +14,11 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from verification.core.paths import existing_run, within
+
 ROOT = Path(__file__).resolve().parent
 REPOSITORY = ROOT.parent
 ARTIFACTS = REPOSITORY / "artifacts" / "verification"
@@ -25,13 +30,8 @@ def load_json(path: Path) -> Any:
 
 
 def resolve_run(value: str) -> Path:
-    if value == "latest":
-        marker = ARTIFACTS / "latest"
-        if not marker.is_file():
-            raise FileNotFoundError("no latest verification run exists")
-        value = marker.read_text(encoding="utf-8").strip()
-    run = ARTIFACTS / value
-    if not run.is_dir():
+    run = existing_run(ARTIFACTS, value)
+    if run is None:
         raise FileNotFoundError(f"verification run not found: {value}")
     return run
 
@@ -111,6 +111,7 @@ def plot_timeline(csv_path: Path, destination: Path) -> Path | None:
 
 
 def gather(run: Path) -> dict[str, Any]:
+    run = within(run, ARTIFACTS)
     requirements_path = run / "catalogs" / "requirements.yaml"
     tests_path = run / "catalogs" / "tests.yaml"
     setup_groups_path = run / "catalogs" / "setup_groups.yaml"
@@ -124,6 +125,16 @@ def gather(run: Path) -> dict[str, Any]:
     tests = load_json(tests_path)
     setup_groups = load_json(setup_groups_path)
     results = [json.loads(line) for line in (run / "results.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    for result in results:
+        retained: list[str] = []
+        for raw in result.get("evidence", []):
+            try:
+                source = within(run / str(raw), run)
+            except ValueError:
+                continue
+            if source.is_file():
+                retained.append(source.relative_to(run).as_posix())
+        result["evidence"] = retained
     coverage = load_json(run / "requirements-coverage.json")
     run_metadata = load_json(run / "run.json")
     current_requirement_hash = hashlib.sha256((ROOT / "requirements.yaml").read_bytes()).hexdigest()
@@ -151,7 +162,7 @@ def gather(run: Path) -> dict[str, Any]:
     generated = run / "document" / "generated"
     for result in results:
         for evidence in result.get("evidence", []):
-            source = run / evidence
+            source = within(run / evidence, run)
             if source.name == "sample-timeline.csv" and source.is_file():
                 graph = plot_timeline(source, generated / f"{result['test_id']}-temperature.png")
                 if graph:
@@ -163,9 +174,12 @@ def procedure_text(test: dict[str, Any]) -> list[str]:
     lines = []
     procedure = test.get("entrypoint", {}).get("procedure")
     if procedure:
-        path = REPOSITORY / procedure
-        if path.is_file():
-            lines.append(f"Detailed controlled procedure: `{procedure}`.")
+        try:
+            path = within(REPOSITORY / procedure, ROOT / "manual")
+        except ValueError:
+            path = None
+        if path is not None and path.is_file():
+            lines.append(f"Detailed controlled procedure: `{path.relative_to(REPOSITORY).as_posix()}`.")
     for step in test.get("manual_steps", []):
         lines.append(f"{step.get('instruction', '')} Expected evidence: {step.get('expected', '')}.")
     if not lines:
@@ -175,6 +189,7 @@ def procedure_text(test: dict[str, Any]) -> list[str]:
 
 
 def markdown_report(run_dir: Path, data: dict[str, Any], include_requirements: bool) -> Path:
+    run_dir = within(run_dir, ARTIFACTS)
     destination = run_dir / "document" / "qualification-report.md"
     destination.parent.mkdir(parents=True, exist_ok=True)
     run = data["run"]
@@ -242,6 +257,7 @@ def markdown_report(run_dir: Path, data: dict[str, Any], include_requirements: b
 
 
 def latex_report(run_dir: Path, data: dict[str, Any], include_requirements: bool) -> Path:
+    run_dir = within(run_dir, ARTIFACTS)
     destination = run_dir / "document" / "qualification-report.tex"
     destination.parent.mkdir(parents=True, exist_ok=True)
     run = data["run"]

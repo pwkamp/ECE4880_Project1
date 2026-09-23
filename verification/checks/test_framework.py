@@ -7,7 +7,8 @@ from unittest.mock import patch
 from pathlib import Path
 
 from verification.core.catalog import validate_catalogs
-from verification.core.evidence import redact
+from verification.core.evidence import redact, safe_output_path
+from verification.core.paths import existing_run
 from verification.core.instrumentation import TimestampedLog, measure, write_database_capture
 from verification.core.execution import _manual_measurements
 from verification.core.services import ServiceManager
@@ -137,10 +138,28 @@ class EvidenceTests(unittest.TestCase):
             (run / "fixture-status.json").write_text("{}", encoding="utf-8")
             (run / "instrumentation-status.json").write_text("{}", encoding="utf-8")
 
-            publish(run, dashboard)
+            with patch("verification.reporters.dashboard_data.ARTIFACTS", repository / "artifacts" / "verification"), patch(
+                "verification.reporters.dashboard_data.DASHBOARD", dashboard
+            ):
+                publish(run, dashboard)
 
             payload = json.loads((dashboard / "latest.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["test_catalog"][0]["id"], "FROZEN")
+
+    def test_run_lookup_rejects_traversal_and_escaped_latest_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = Path(directory) / "artifacts"
+            run = artifacts / "2026-09-23T035434Z_f096661"
+            run.mkdir(parents=True)
+            self.assertEqual(existing_run(artifacts, run.name), run.resolve())
+            self.assertIsNone(existing_run(artifacts, "../../outside"))
+            (artifacts / "latest").write_text("../../outside\n", encoding="utf-8")
+            self.assertIsNone(existing_run(artifacts, "latest"))
+
+    def test_verification_writer_rejects_paths_outside_approved_roots(self) -> None:
+        outside = Path.home() / "verification-path-escape.txt"
+        with self.assertRaises(ValueError):
+            safe_output_path(outside)
 
     def test_common_secrets_are_redacted(self) -> None:
         value = redact("Authorization: Bearer abc\npassword=hunter2 mysql://u:p@mysql/db passkey=123456 MYSQL_ROOT_PASSWORD=rootpw mysql -pclipw")

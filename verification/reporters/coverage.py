@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from verification.core.evidence import safe_output_path
+
 
 def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], results: list[dict[str, Any]]) -> dict[str, Any]:
     tests_by_requirement: dict[str, list[dict[str, Any]]] = {item["uid"]: [] for item in requirements}
@@ -50,6 +52,8 @@ def calculate(requirements: list[dict[str, Any]], tests: list[dict[str, Any]], r
 
 
 def write(report: dict[str, Any], json_path: Path, csv_path: Path) -> None:
+    json_path = safe_output_path(json_path)
+    csv_path = safe_output_path(csv_path)
     json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     with csv_path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=["uid", "jira", "level", "component", "requirement_status", "tests", "automated_tests", "human_tests", "result", "reason"])
