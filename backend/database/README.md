@@ -23,6 +23,7 @@ a per-machine server setting, not part of this file.
 |---|---|---|
 | `temperature_samples` | One row per 1 Hz poll: both probes, computed average, per-sensor status | SWE-DB-LLR-550 |
 | `alert_recipients` | Enabled email destinations | SWE-DB-LLR-555 |
+| `alert_settings` | Single-row (`id=1`) master enable/disable toggle for all alerting | (none) |
 | `alert_rules` | Threshold rules with messages and monitored series | SWE-DB-LLR-556 |
 | `alert_rule_recipients` | Junction linking rules to recipients (many-to-many) | SWE-DB-LLR-556 |
 
@@ -88,6 +89,11 @@ connector actively populates it.
 - **Email only.** `alert_recipients.type` accepts only `EMAIL`; SMS/phone
   delivery and validation are out of scope. Multiple email rows are supported.
 - **`enabled` defaults TRUE.** New email recipients and rules are active.
+- **`alert_settings` is a single-row master toggle.** `id` is constrained to `1`
+  (`CHECK (id = 1)`); its `enabled` column gates alerting globally, independent
+  of the per-recipient and per-rule `enabled` flags. `frontend/server/alertConfig.ts`
+  creates this table if missing, seeds row `id=1`, and reads/writes it alongside
+  the recipient and rule tables through the same `/api/alert-config` endpoint.
 - **Rule/recipient link is many-to-many.** A rule can notify several recipients
   and a recipient can serve several rules, so the link is a junction table
   (`alert_rule_recipients`) rather than a column. Both foreign keys are

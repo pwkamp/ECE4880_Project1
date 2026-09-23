@@ -126,6 +126,7 @@ backend\.venv\Scripts\python.exe master_test.py
 ```
 
 `master_test.py` discovers every `test_*.py` below `backend/pc_client/tests`
-and exits nonzero for import, setup, or test failures. No ESP32 or Bluetooth
-adapter is required for these unit tests. See the repository README for the
-API, enrollment, database-adapter, and firmware-test details.
+(plus `verification/checks`) and exits nonzero for import, setup, or test
+failures. No ESP32 or Bluetooth adapter is required for these unit tests. See
+the repository README for the API, enrollment, database-adapter, and
+firmware-test details.
