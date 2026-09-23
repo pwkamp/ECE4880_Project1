@@ -844,10 +844,10 @@ The architecture is event driven except for the required one-second sample:
 On the original ESP32, the default Bluetooth low-power clock is the main crystal. ESP-IDF supports modem sleep and frequency scaling with that clock, but holds a lock that prevents automatic light sleep while Bluetooth is active. If the board actually has a 32.768 kHz crystal, selecting it as the Bluetooth/RTC low-power clock allows deeper BLE-preserving light sleep. Newer targets may support light sleep with their main crystal. This is a board clock decision, not something the application should guess.
 
 Comments next to implementations cite relevant Jira requirement and SCRUM issue
-IDs. [The traceability matrix](docs/requirements_traceability.md) distinguishes
-implemented behavior, simulation support, and pending hardware acceptance.
-Jira was used read-only; no issue fields or statuses are
-changed by this project.
+IDs. Jira was used read-only; no issue fields or statuses are changed by this
+project. Requirement-level acceptance is tracked by the qualification
+framework in [`verification/`](verification/README.md), which produces
+[`docs/qualification-report.pdf`](docs/qualification-report.pdf).
 
 ## Build and flash
 

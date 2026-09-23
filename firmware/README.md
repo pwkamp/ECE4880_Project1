@@ -135,7 +135,7 @@ idf.py build
 idf.py -p /dev/ttyUSB0 flash monitor
 ```
 
-After the board advertises as `Thermometer-XXXXXX`, follow
-[`docs/integration-test.md`](../docs/integration-test.md) to start the three
-components and verify the complete BLE-to-graph path using the PC's built-in
-Bluetooth adapter.
+After the board advertises as `Thermometer-XXXXXX`, follow the root
+[`README.md`](../README.md#connecting-the-console-to-ble-and-mysql) to start
+the three components and verify the complete BLE-to-graph path using the PC's
+built-in Bluetooth adapter.

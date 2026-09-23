@@ -55,9 +55,9 @@ host HCI device directly. On Windows, `run.ps1` prepares `backend/.venv` and
 runs `main.py` natively. Enrollment data on both systems is stored under the
 gitignored `backend/.runtime/`, separately from the reset database.
 
-Start the matching frontend launcher from a second terminal. The complete
-setup and acceptance checklist is in
-[`docs/integration-test.md`](../docs/integration-test.md).
+Start the matching frontend launcher from a second terminal. The full wiring
+guide and connection checklist are in the root
+[`README.md`](../README.md#connecting-the-console-to-ble-and-mysql).
 
 ## Install and run
 
